@@ -1,0 +1,102 @@
+export type WidthUnit = "in" | "m";
+
+export type CostAdder = {
+  id: string;
+  label: string;
+  // stored as dollars per linear meter
+  dollarsPerMeter: number;
+  enabled: boolean;
+};
+
+export type CalcInputs = {
+  gsm: number;              // g/m^2
+  width: number;            // inches or meters
+  widthUnit: WidthUnit;
+  doseMgPerKg: number;      // mg/kg fabric
+
+  stockMgPerL: number;      // fixed 30 mg/L (30 ppm)
+  pricePerLiter: number;    // default 36 $/L
+  discountPercent: number;  // 0-100
+
+  lengthMeters?: number;    // optional: totals
+  adders: CostAdder[];
+};
+
+export type CalcOutputs = {
+  widthMeters: number;
+
+  kgPerLinearMeter: number;
+  mgPerLinearMeter: number;
+  litersStockPerLinearMeter: number;
+
+  effectivePricePerLiter: number;
+  fuzeCostPerLinearMeter: number;
+
+  addersPerLinearMeter: number;
+  totalCostPerLinearMeter: number;
+
+  totalLitersStock?: number;
+  bottles19L?: number;
+};
+
+function clamp(n: number, min: number, max: number) {
+  if (!Number.isFinite(n)) return min;
+  return Math.max(min, Math.min(max, n));
+}
+
+export function widthToMeters(width: number, unit: WidthUnit) {
+  const w = Number(width) || 0;
+  return unit === "in" ? w * 0.0254 : w;
+}
+
+export function calcQuote(inputs: CalcInputs): CalcOutputs {
+  const gsm = Math.max(0, Number(inputs.gsm) || 0);
+  const widthMeters = Math.max(0, widthToMeters(inputs.width, inputs.widthUnit));
+  const doseMgPerKg = Math.max(0, Number(inputs.doseMgPerKg) || 0);
+
+  const stockMgPerL = Math.max(0.000001, Number(inputs.stockMgPerL) || 30);
+  const pricePerLiter = Math.max(0, Number(inputs.pricePerLiter) || 0);
+  const discountPercent = clamp(Number(inputs.discountPercent) || 0, 0, 100);
+
+  const effectivePricePerLiter = pricePerLiter * (1 - discountPercent / 100);
+
+  // kg per linear meter = GSM * width(m) / 1000
+  const kgPerLinearMeter = (gsm * widthMeters) / 1000;
+
+  // mg per linear meter = dose(mg/kg) * kg/m
+  const mgPerLinearMeter = doseMgPerKg * kgPerLinearMeter;
+
+  // liters stock per linear meter = mg/m / (mg/L)
+  const litersStockPerLinearMeter = mgPerLinearMeter / stockMgPerL;
+
+  // FUZE cost per meter
+  const fuzeCostPerLinearMeter = litersStockPerLinearMeter * effectivePricePerLiter;
+
+  const addersPerLinearMeter = (inputs.adders || [])
+    .filter(a => a.enabled)
+    .reduce((sum, a) => sum + (Number(a.dollarsPerMeter) || 0), 0);
+
+  const totalCostPerLinearMeter = fuzeCostPerLinearMeter + addersPerLinearMeter;
+
+  const lengthMeters = inputs.lengthMeters;
+  let totalLitersStock: number | undefined;
+  let bottles19L: number | undefined;
+
+  if (typeof lengthMeters === "number" && lengthMeters > 0) {
+    totalLitersStock = litersStockPerLinearMeter * lengthMeters;
+    bottles19L = Math.ceil(totalLitersStock / 19);
+  }
+
+  return {
+    widthMeters,
+    kgPerLinearMeter,
+    mgPerLinearMeter,
+    litersStockPerLinearMeter,
+    effectivePricePerLiter,
+    fuzeCostPerLinearMeter,
+    addersPerLinearMeter,
+    totalCostPerLinearMeter,
+    totalLitersStock,
+    bottles19L,
+  };
+}
