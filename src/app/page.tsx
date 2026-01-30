@@ -167,7 +167,7 @@ export default function Page() {
       <header className="border-b bg-white/80 backdrop-blur">
         <div className="mx-auto max-w-6xl px-6 py-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Image src="/fuze-logo.svg" alt="FUZE" width={140} height={40} priority />
+            <div className="rounded-xl bg-neutral-900 px-3 py-2 inline-flex shadow-sm"><Image src="/fuze-logo.jpg" alt="FUZE" width={140} height={40} priority /></div>
             <div className="text-sm text-neutral-500">
               FUZE Metamaterial tools • F1 quoting & process reference
             </div>
