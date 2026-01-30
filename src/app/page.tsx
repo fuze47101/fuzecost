@@ -3,7 +3,12 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { calcQuote, type CostAdder, type WidthUnit } from "@/lib/calc";
-import { calcBathDilution, calcDoseToStock } from "@/lib/dilution";
+import {
+  calcBathDilution,
+  calcDoseToStock,
+  calcTargetBathFromPickup,
+  type PickupMode,
+} from "@/lib/dilution";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -34,7 +39,7 @@ type DocItem = {
 };
 
 export default function Page() {
-  // ===== Quote (existing) =====
+  // ===== Quote =====
   const [gsm, setGsm] = useState(150);
   const [widthUnit, setWidthUnit] = useState<WidthUnit>("in");
   const [width, setWidth] = useState(60);
@@ -76,14 +81,17 @@ export default function Page() {
     setAdders(prev => prev.map(a => (a.id === id ? { ...a, ...patch } : a)));
   };
 
-  // ===== Dilution tab =====
+  // ===== Dilution =====
   const [bathVolume, setBathVolume] = useState(200);
-  const [targetBathPpm, setTargetBathPpm] = useState(3); // mg/L ~ ppm
+
+  // Square 1: explicit bath concentration
+  const [targetBathPpm, setTargetBathPpm] = useState(3); // ppm ≈ mg/L
   const bath = useMemo(
     () => calcBathDilution({ bathVolumeLiters: bathVolume, targetMgPerL: targetBathPpm, stockMgPerL: 30 }),
     [bathVolume, targetBathPpm]
   );
 
+  // Square 2: dose → stock liters (material required)
   const [fabricKg, setFabricKg] = useState(100);
   const [doseMgPerKg, setDoseMgPerKg] = useState(1.0);
   const doseToStock = useMemo(
@@ -91,7 +99,28 @@ export default function Page() {
     [fabricKg, doseMgPerKg]
   );
 
-  // ===== Docs tab (access code + presigned links) =====
+  // Square 3: pickup → required bath concentration, plus recipe at current bath volume
+  const [pickupMode, setPickupMode] = useState<PickupMode>("dry-to-wet");
+  const [pickupPercent, setPickupPercent] = useState(80); // dry-to-wet
+  const [incrementalPickupPercent, setIncrementalPickupPercent] = useState(15); // wet-on-wet
+  const pickupCalc = useMemo(() => {
+    return calcTargetBathFromPickup({
+      doseMgPerKg,
+      mode: pickupMode,
+      pickupPercent,
+      incrementalPickupPercent,
+    });
+  }, [doseMgPerKg, pickupMode, pickupPercent, incrementalPickupPercent]);
+
+  const pickupRecipe = useMemo(() => {
+    return calcBathDilution({
+      bathVolumeLiters: bathVolume,
+      targetMgPerL: pickupCalc.requiredMgPerL,
+      stockMgPerL: 30,
+    });
+  }, [bathVolume, pickupCalc.requiredMgPerL]);
+
+  // ===== Docs (access code + presigned links) =====
   const [docsCode, setDocsCode] = useState("");
   const [docsLoading, setDocsLoading] = useState(false);
   const [docsError, setDocsError] = useState("");
@@ -119,17 +148,16 @@ export default function Page() {
       setDocs(json.items || []);
       setDocsLoading(false);
       sessionStorage.setItem("docsCode", code);
-    } catch (e: any) {
+    } catch {
       setDocsError("Network error loading documents.");
       setDocsLoading(false);
     }
   }
 
-  // attempt auto-load if they already entered a code this session
+  // auto-load if code saved this browser session
   if (typeof window !== "undefined") {
     const saved = sessionStorage.getItem("docsCode");
     if (saved && docs.length === 0 && !docsLoading && !docsError) {
-      // fire and forget (no infinite loop since docsLoading flips immediately)
       fetchDocs(saved);
     }
   }
@@ -140,10 +168,12 @@ export default function Page() {
         <div className="mx-auto max-w-6xl px-6 py-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Image src="/fuze-logo.svg" alt="FUZE" width={140} height={40} priority />
-            <div className="text-sm text-neutral-500">Cost, dilution & document reference</div>
+            <div className="text-sm text-neutral-500">
+              FUZE Metamaterial tools • F1 quoting & process reference
+            </div>
           </div>
           <div className="text-sm text-neutral-500">
-            Stock: <span className="font-medium text-neutral-800">30 mg/L</span> • Bottle:{" "}
+            F1 stock: <span className="font-medium text-neutral-800">30 ppm</span> • Bottle:{" "}
             <span className="font-medium text-neutral-800">19 L</span>
           </div>
         </div>
@@ -185,7 +215,7 @@ export default function Page() {
 
                   <div>
                     <div className="flex items-center justify-between">
-                      <Label>Target FUZE add-on (mg/kg)</Label>
+                      <Label>Target F1 add-on (mg/kg)</Label>
                       <div className="text-sm text-neutral-600 font-medium">{dose.toFixed(2)}</div>
                     </div>
                     <Slider value={[dose]} min={0.25} max={2.0} step={0.05} onValueChange={(v) => setDose(v[0] ?? 1.0)} className="mt-2" />
@@ -199,7 +229,7 @@ export default function Page() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label>FUZE price ($/L)</Label>
+                      <Label>F1 price ($/L)</Label>
                       <Input type="number" value={pricePerLiter} min={0} step="0.01" onChange={(e) => setPricePerLiter(Number(e.target.value))} />
                     </div>
                     <div>
@@ -266,31 +296,10 @@ export default function Page() {
                       <span className="text-base font-medium text-neutral-500">/ m</span>
                     </div>
                     <div className="mt-3 text-sm text-neutral-600">
-                      FUZE: <span className="font-medium">{money(outputs.fuzeCostPerLinearMeter)}/m</span> • Adders:{" "}
+                      F1: <span className="font-medium">{money(outputs.fuzeCostPerLinearMeter)}/m</span> • Adders:{" "}
                       <span className="font-medium">{money(outputs.addersPerLinearMeter)}/m</span>
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="rounded-2xl border bg-white p-4">
-                      <div className="text-sm text-neutral-500">Fabric mass</div>
-                      <div className="text-xl font-semibold">{num(outputs.kgPerLinearMeter, 8)} kg / m</div>
-                      <div className="text-xs text-neutral-500 mt-1">Width = {num(outputs.widthMeters, 4)} m</div>
-                    </div>
-                    <div className="rounded-2xl border bg-white p-4">
-                      <div className="text-sm text-neutral-500">FUZE required</div>
-                      <div className="text-xl font-semibold">{num(outputs.mgPerLinearMeter, 8)} mg / m</div>
-                      <div className="text-xs text-neutral-500 mt-1">{num(outputs.litersStockPerLinearMeter, 10)} L stock / m</div>
-                    </div>
-                  </div>
-
-                  {typeof outputs.totalLitersStock === "number" && typeof outputs.bottles19L === "number" && (
-                    <div className="rounded-2xl border bg-white p-4">
-                      <div className="text-sm text-neutral-500">Job totals</div>
-                      <div className="text-sm mt-1">Total stock: <span className="font-medium">{num(outputs.totalLitersStock, 3)} L</span></div>
-                      <div className="text-sm">Bottles (19 L): <span className="font-medium">{outputs.bottles19L}</span></div>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             </div>
@@ -314,9 +323,9 @@ export default function Page() {
                   <Separator />
 
                   <div className="rounded-2xl border bg-white p-4">
-                    <div className="text-sm text-neutral-500">Recipe result</div>
+                    <div className="text-sm text-neutral-500">Recipe result (F1 stock at 30 ppm)</div>
                     <div className="text-sm mt-2">
-                      FUZE stock (30 mg/L): <span className="font-medium">{num(bath.stockLiters, 4)} L</span>
+                      F1 stock: <span className="font-medium">{num(bath.stockLiters, 4)} L</span>
                     </div>
                     <div className="text-sm">
                       Water: <span className="font-medium">{num(bath.waterLiters, 4)} L</span>
@@ -327,13 +336,13 @@ export default function Page() {
                   </div>
 
                   <div className="text-xs text-neutral-500">
-                    Uses C1V1=C2V2. This is for setting bath concentration; add-on dosing depends on pickup/process.
+                    Uses C1V1=C2V2. This sets bath concentration; add-on depends on pickup and process.
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="rounded-2xl shadow-sm">
-                <CardHeader><CardTitle>From dose (mg/kg) → stock liters needed</CardTitle></CardHeader>
+                <CardHeader><CardTitle>From dose (mg/kg) → F1 stock needed</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
                   <div>
                     <Label>Fabric weight processed (kg)</Label>
@@ -349,10 +358,10 @@ export default function Page() {
                   <div className="rounded-2xl border bg-white p-4">
                     <div className="text-sm text-neutral-500">Result</div>
                     <div className="text-sm mt-2">
-                      Total silver required: <span className="font-medium">{num(doseToStock.totalMgNeeded, 3)} mg</span>
+                      Total F1 required: <span className="font-medium">{num(doseToStock.totalF1MgNeeded, 3)} mg</span>
                     </div>
                     <div className="text-sm">
-                      FUZE stock (30 mg/L): <span className="font-medium">{num(doseToStock.stockLitersNeeded, 4)} L</span>
+                      F1 stock (30 ppm): <span className="font-medium">{num(doseToStock.stockLitersNeeded, 4)} L</span>
                     </div>
                     <div className="text-sm">
                       Bottles (19 L): <span className="font-medium">{doseToStock.bottles19L}</span>
@@ -360,7 +369,89 @@ export default function Page() {
                   </div>
 
                   <div className="text-xs text-neutral-500">
-                    This is a “material required” calculator. Converting to bath ppm needs pickup / liquor ratio (we can add next).
+                    This is material required. Use pickup to convert dose → bath ppm.
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-2xl shadow-sm lg:col-span-2">
+                <CardHeader><CardTitle>Pickup → required bath concentration</CardTitle></CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <Label>Target add-on (mg/kg)</Label>
+                      <Input type="number" value={doseMgPerKg} min={0} step="0.01" onChange={(e) => setDoseMgPerKg(Number(e.target.value))} />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <Label>Process mode</Label>
+                      <div className="flex gap-2">
+                        <Button type="button" className="w-full" variant={pickupMode === "dry-to-wet" ? "default" : "outline"} onClick={() => setPickupMode("dry-to-wet")}>
+                          Dry-to-wet
+                        </Button>
+                        <Button type="button" className="w-full" variant={pickupMode === "wet-on-wet" ? "default" : "outline"} onClick={() => setPickupMode("wet-on-wet")}>
+                          Wet-on-wet
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {pickupMode === "dry-to-wet" ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <Label>Pickup (%)</Label>
+                        <Input type="number" value={pickupPercent} min={0} step="1" onChange={(e) => setPickupPercent(Number(e.target.value))} />
+                      </div>
+                      <div className="text-xs text-neutral-500 flex items-end">
+                        Pickup on dry fabric basis (example: 80%).
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <Label>Incremental pickup (%)</Label>
+                        <Input type="number" value={incrementalPickupPercent} min={0} step="1" onChange={(e) => setIncrementalPickupPercent(Number(e.target.value))} />
+                      </div>
+                      <div className="text-xs text-neutral-500 flex items-end">
+                        Wet-on-wet incremental pickup on dry basis (example: +15%).
+                      </div>
+                    </div>
+                  )}
+
+                  <Separator />
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="rounded-2xl border bg-white p-4">
+                      <div className="text-sm text-neutral-500">Pickup (L/kg)</div>
+                      <div className="text-xl font-semibold">{num(pickupCalc.pickupFractionLperKg, 4)}</div>
+                      <div className="text-xs text-neutral-500 mt-1">{pickupCalc.note}</div>
+                    </div>
+
+                    <div className="rounded-2xl border bg-white p-4">
+                      <div className="text-sm text-neutral-500">Required bath ppm</div>
+                      <div className="text-xl font-semibold">{num(pickupCalc.requiredMgPerL, 4)}</div>
+                      <div className="text-xs text-neutral-500 mt-1">ppm ≈ mg/L</div>
+                    </div>
+
+                    <div className="rounded-2xl border bg-white p-4">
+                      <div className="text-sm text-neutral-500">Also shown as g/L</div>
+                      <div className="text-xl font-semibold">{num(pickupCalc.requiredGPerL, 6)}</div>
+                      <div className="text-xs text-neutral-500 mt-1">g/L = (mg/L) ÷ 1000</div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border bg-white p-4">
+                    <div className="text-sm text-neutral-500">Recipe for current bath volume ({bathVolume} L)</div>
+                    <div className="text-sm mt-2">
+                      Target ppm: <span className="font-medium">{num(pickupCalc.requiredMgPerL, 4)}</span> • F1 stock:{" "}
+                      <span className="font-medium">{num(pickupRecipe.stockLiters, 4)} L</span> • Water:{" "}
+                      <span className="font-medium">{num(pickupRecipe.waterLiters, 4)} L</span> • Bottles (19 L):{" "}
+                      <span className="font-medium">{pickupRecipe.bottles19L}</span>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-neutral-500">
+                    Assumes 1 kg of bath liquor ≈ 1 liter for quick estimating.
                   </div>
                 </CardContent>
               </Card>
@@ -377,22 +468,13 @@ export default function Page() {
                 </div>
 
                 <div className="flex gap-2 max-w-lg">
-                  <Input
-                    placeholder="Access code"
-                    value={docsCode}
-                    onChange={(e) => setDocsCode(e.target.value)}
-                  />
-                  <Button
-                    onClick={() => fetchDocs(docsCode)}
-                    disabled={docsLoading || !docsCode}
-                  >
+                  <Input placeholder="Access code" value={docsCode} onChange={(e) => setDocsCode(e.target.value)} />
+                  <Button onClick={() => fetchDocs(docsCode)} disabled={docsLoading || !docsCode}>
                     {docsLoading ? "Loading…" : "Unlock"}
                   </Button>
                 </div>
 
-                {docsError && (
-                  <div className="text-sm text-red-600">{docsError}</div>
-                )}
+                {docsError && <div className="text-sm text-red-600">{docsError}</div>}
 
                 {docs.length > 0 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -402,10 +484,7 @@ export default function Page() {
                         <div className="font-semibold">{d.title}</div>
                         {d.note && <div className="text-sm text-neutral-600 mt-1">{d.note}</div>}
                         <div className="mt-3">
-                          <a
-                            href={d.url}
-                            className="inline-flex items-center rounded-xl border px-3 py-2 text-sm font-medium hover:bg-neutral-50"
-                          >
+                          <a href={d.url} className="inline-flex items-center rounded-xl border px-3 py-2 text-sm font-medium hover:bg-neutral-50">
                             Download
                           </a>
                         </div>
@@ -415,7 +494,7 @@ export default function Page() {
                 )}
 
                 <div className="text-xs text-neutral-500 pt-2">
-                  Downloads are time-limited signed links. If a link expires, just unlock again.
+                  Downloads are time-limited signed links. If a link expires, unlock again.
                 </div>
               </CardContent>
             </Card>
