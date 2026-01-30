@@ -386,10 +386,10 @@ export default function Page() {
                     <div className="md:col-span-2">
                       <Label>Process mode</Label>
                       <div className="flex gap-2">
-                        <Button type="button" className="w-full" variant={pickupMode === "dry-to-wet" ? "default" : "outline"} onClick={() => setPickupMode("dry-to-wet")}>
+                        <Button type="button" className="flex-1" variant={pickupMode === "dry-to-wet" ? "default" : "outline"} onClick={() => setPickupMode("dry-to-wet")}>
                           Dry-to-wet
                         </Button>
-                        <Button type="button" className="w-full" variant={pickupMode === "wet-on-wet" ? "default" : "outline"} onClick={() => setPickupMode("wet-on-wet")}>
+                        <Button type="button" className="flex-1" variant={pickupMode === "wet-on-wet" ? "default" : "outline"} onClick={() => setPickupMode("wet-on-wet")}>
                           Wet-on-wet
                         </Button>
                       </div>
