@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { calcQuote, type CostAdder, type WidthUnit } from "@/lib/calc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,25 +24,20 @@ function uid() {
 }
 
 export default function Page() {
-  // Core inputs
   const [gsm, setGsm] = useState(150);
   const [widthUnit, setWidthUnit] = useState<WidthUnit>("in");
   const [width, setWidth] = useState(60);
-  const [dose, setDose] = useState(1.0); // mg/kg
+  const [dose, setDose] = useState(1.0);
 
-  // Pricing
   const [pricePerLiter, setPricePerLiter] = useState(36);
   const [discountPercent, setDiscountPercent] = useState(0);
-
-  // Optional totals
   const [lengthMeters, setLengthMeters] = useState<number | "">("");
 
-  // Factory adders ($/m)
   const [adders, setAdders] = useState<CostAdder[]>([
-    { id: "moq", label: "Below MOQ", dollarsPerMeter: 0, enabled: true },
-    { id: "waste", label: "Waste in application bath", dollarsPerMeter: 0, enabled: true },
-    { id: "process", label: "Additional processing", dollarsPerMeter: 0, enabled: true },
-    { id: "other", label: "Other", dollarsPerMeter: 0, enabled: true },
+    { id: "moq", label: "Below MOQ", centsPerMeter: 0, enabled: true },
+    { id: "waste", label: "Waste in application bath", centsPerMeter: 0, enabled: true },
+    { id: "process", label: "Additional processing", centsPerMeter: 0, enabled: true },
+    { id: "other", label: "Other", centsPerMeter: 0, enabled: true },
   ]);
 
   const outputs = useMemo(() => {
@@ -61,7 +57,7 @@ export default function Page() {
   const addRow = () => {
     setAdders(prev => [
       ...prev,
-      { id: uid(), label: "Custom adder", dollarsPerMeter: 0, enabled: true },
+      { id: uid(), label: "Custom adder", centsPerMeter: 0, enabled: true },
     ]);
   };
   const removeRow = (id: string) => setAdders(prev => prev.filter(a => a.id !== id));
@@ -73,10 +69,11 @@ export default function Page() {
     <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50">
       <header className="border-b bg-white/80 backdrop-blur">
         <div className="mx-auto max-w-6xl px-6 py-6 flex items-center justify-between">
-          <div>
-            <div className="text-sm tracking-wide text-neutral-500">FUZE</div>
-            <div className="text-xl font-semibold">fuzecost</div>
-            <div className="text-sm text-neutral-500">Cost & quote estimator (pad & bath)</div>
+          <div className="flex items-center gap-4">
+            <Image src="/fuze-logo.svg" alt="FUZE" width={140} height={40} priority />
+            <div className="text-sm text-neutral-500">
+              Cost & quote estimator (pad & bath)
+            </div>
           </div>
           <div className="text-sm text-neutral-500">
             Stock: <span className="font-medium text-neutral-800">30 mg/L</span> • Bottle:{" "}
@@ -96,7 +93,6 @@ export default function Page() {
 
           <TabsContent value="quote" className="mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Inputs */}
               <Card className="rounded-2xl shadow-sm">
                 <CardHeader>
                   <CardTitle>Inputs</CardTitle>
@@ -105,31 +101,15 @@ export default function Page() {
                   <div className="grid grid-cols-3 gap-3">
                     <div className="col-span-2">
                       <Label>Fabric weight (GSM)</Label>
-                      <Input
-                        type="number"
-                        value={gsm}
-                        min={0}
-                        step="1"
-                        onChange={(e) => setGsm(Number(e.target.value))}
-                      />
+                      <Input type="number" value={gsm} min={0} step="1" onChange={(e) => setGsm(Number(e.target.value))} />
                     </div>
                     <div>
                       <Label>Width unit</Label>
                       <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          variant={widthUnit === "in" ? "default" : "outline"}
-                          onClick={() => setWidthUnit("in")}
-                          className="w-full"
-                        >
+                        <Button type="button" variant={widthUnit === "in" ? "default" : "outline"} onClick={() => setWidthUnit("in")} className="w-full">
                           Inches
                         </Button>
-                        <Button
-                          type="button"
-                          variant={widthUnit === "m" ? "default" : "outline"}
-                          onClick={() => setWidthUnit("m")}
-                          className="w-full"
-                        >
+                        <Button type="button" variant={widthUnit === "m" ? "default" : "outline"} onClick={() => setWidthUnit("m")} className="w-full">
                           Meters
                         </Button>
                       </div>
@@ -138,13 +118,7 @@ export default function Page() {
 
                   <div>
                     <Label>Fabric width ({widthUnit === "in" ? "in" : "m"})</Label>
-                    <Input
-                      type="number"
-                      value={width}
-                      min={0}
-                      step="0.01"
-                      onChange={(e) => setWidth(Number(e.target.value))}
-                    />
+                    <Input type="number" value={width} min={0} step="0.01" onChange={(e) => setWidth(Number(e.target.value))} />
                   </div>
 
                   <div>
@@ -152,23 +126,10 @@ export default function Page() {
                       <Label>Target FUZE add-on (mg/kg)</Label>
                       <div className="text-sm text-neutral-600 font-medium">{dose.toFixed(2)}</div>
                     </div>
-                    <Slider
-                      value={[dose]}
-                      min={0.25}
-                      max={2.0}
-                      step={0.05}
-                      onValueChange={(v) => setDose(v[0] ?? 1.0)}
-                      className="mt-2"
-                    />
+                    <Slider value={[dose]} min={0.25} max={2.0} step={0.05} onValueChange={(v) => setDose(v[0] ?? 1.0)} className="mt-2" />
                     <div className="mt-2">
                       <Label className="text-xs text-neutral-500">Or enter exact</Label>
-                      <Input
-                        type="number"
-                        value={dose}
-                        min={0}
-                        step="0.01"
-                        onChange={(e) => setDose(Number(e.target.value))}
-                      />
+                      <Input type="number" value={dose} min={0} step="0.01" onChange={(e) => setDose(Number(e.target.value))} />
                     </div>
                   </div>
 
@@ -177,24 +138,11 @@ export default function Page() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <Label>FUZE price ($/L)</Label>
-                      <Input
-                        type="number"
-                        value={pricePerLiter}
-                        min={0}
-                        step="0.01"
-                        onChange={(e) => setPricePerLiter(Number(e.target.value))}
-                      />
+                      <Input type="number" value={pricePerLiter} min={0} step="0.01" onChange={(e) => setPricePerLiter(Number(e.target.value))} />
                     </div>
                     <div>
                       <Label>Customer discount (%)</Label>
-                      <Input
-                        type="number"
-                        value={discountPercent}
-                        min={0}
-                        max={100}
-                        step="0.5"
-                        onChange={(e) => setDiscountPercent(Number(e.target.value))}
-                      />
+                      <Input type="number" value={discountPercent} min={0} max={100} step="0.5" onChange={(e) => setDiscountPercent(Number(e.target.value))} />
                     </div>
                   </div>
 
@@ -218,7 +166,7 @@ export default function Page() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="font-semibold">Factory adders ($/linear meter)</div>
+                        <div className="font-semibold">Factory adders (¢ / linear meter)</div>
                         <div className="text-sm text-neutral-500">
                           Added costs reported by the factory (MOQ, waste, processing, etc.).
                         </div>
@@ -240,28 +188,18 @@ export default function Page() {
                             />
                           </div>
                           <div className="col-span-6">
-                            <Input
-                              value={a.label}
-                              onChange={(e) => updateAdder(a.id, { label: e.target.value })}
-                            />
+                            <Input value={a.label} onChange={(e) => updateAdder(a.id, { label: e.target.value })} />
                           </div>
                           <div className="col-span-4">
                             <Input
                               type="number"
-                              value={a.dollarsPerMeter}
-                              step="0.01"
-                              onChange={(e) =>
-                                updateAdder(a.id, { dollarsPerMeter: Number(e.target.value) })
-                              }
+                              value={a.centsPerMeter}
+                              step="1"
+                              onChange={(e) => updateAdder(a.id, { centsPerMeter: Number(e.target.value) })}
                             />
                           </div>
                           <div className="col-span-1">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              onClick={() => removeRow(a.id)}
-                              title="Remove row"
-                            >
+                            <Button type="button" variant="ghost" onClick={() => removeRow(a.id)} title="Remove row">
                               ✕
                             </Button>
                           </div>
@@ -272,7 +210,6 @@ export default function Page() {
                 </CardContent>
               </Card>
 
-              {/* Outputs */}
               <Card className="rounded-2xl shadow-sm">
                 <CardHeader>
                   <CardTitle>Quote</CardTitle>

@@ -3,28 +3,27 @@ export type WidthUnit = "in" | "m";
 export type CostAdder = {
   id: string;
   label: string;
-  // stored as dollars per linear meter
-  dollarsPerMeter: number;
+  // cents per linear meter
+  centsPerMeter: number;
   enabled: boolean;
 };
 
 export type CalcInputs = {
-  gsm: number;              // g/m^2
-  width: number;            // inches or meters
+  gsm: number;
+  width: number;
   widthUnit: WidthUnit;
-  doseMgPerKg: number;      // mg/kg fabric
+  doseMgPerKg: number;
 
-  stockMgPerL: number;      // fixed 30 mg/L (30 ppm)
-  pricePerLiter: number;    // default 36 $/L
-  discountPercent: number;  // 0-100
+  stockMgPerL: number;   // 30 mg/L
+  pricePerLiter: number; // default 36
+  discountPercent: number;
 
-  lengthMeters?: number;    // optional: totals
+  lengthMeters?: number;
   adders: CostAdder[];
 };
 
 export type CalcOutputs = {
   widthMeters: number;
-
   kgPerLinearMeter: number;
   mgPerLinearMeter: number;
   litersStockPerLinearMeter: number;
@@ -72,9 +71,10 @@ export function calcQuote(inputs: CalcInputs): CalcOutputs {
   // FUZE cost per meter
   const fuzeCostPerLinearMeter = litersStockPerLinearMeter * effectivePricePerLiter;
 
+  // Adders are entered as cents/m → convert to dollars/m here
   const addersPerLinearMeter = (inputs.adders || [])
     .filter(a => a.enabled)
-    .reduce((sum, a) => sum + (Number(a.dollarsPerMeter) || 0), 0);
+    .reduce((sum, a) => sum + (Number(a.centsPerMeter) || 0) / 100, 0);
 
   const totalCostPerLinearMeter = fuzeCostPerLinearMeter + addersPerLinearMeter;
 
