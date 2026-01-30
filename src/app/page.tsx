@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { perfCharts, clampDoseToSupported } from "@/lib/performance";
 
 function money(n: number) {
   if (!Number.isFinite(n)) return "$0.00";
@@ -183,6 +184,7 @@ export default function Page() {
         <Tabs defaultValue="quote">
           <TabsList>
             <TabsTrigger value="quote">Quote</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="dilution">Dilution</TabsTrigger>
             <TabsTrigger value="docs">Documents</TabsTrigger>
             <TabsTrigger value="faq" disabled>FAQ (next)</TabsTrigger>
@@ -499,6 +501,108 @@ export default function Page() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="performance" className="mt-6">
+            <div className="grid grid-cols-1 gap-6">
+              <Card className="rounded-2xl shadow-sm">
+                <CardHeader>
+                  <CardTitle>Application level vs expected performance</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-sm text-neutral-600">
+                    This tab provides a practical reference for brands, factories, reps, and internal teams.
+                    Outcomes vary by fabric construction, finishing chemistry, process conditions, and quality control.
+                    Confirm results with appropriate lab validation and in-process QC.
+                  </div>
+
+                  <div className="rounded-2xl border bg-white p-4 text-sm text-neutral-700 space-y-2">
+                    <div className="font-semibold">Recommendation & caveats (FUZE F1 / FUZE Metamaterial)</div>
+                    <p>
+                      FUZE recommends <span className="font-medium">1.0 mg/kg</span> (weight of fabric) applications for premium performance and up to and over 100 wash durability
+                      targets when applied to specification. This level helps penetrate sacrificial finishing chemistries applied to the textile and helps achieve permanent bonding directly
+                      to the fiber. This level also helps overcome deficiencies in manufacturing equipment and factory precision.
+                    </p>
+                    <p>
+                      FUZE performance on cotton often outperforms synthetics at the same application levels due to natural fiber construction.
+                      Levels at and above 1.0 mg/kg are also recommended for enhanced ancillary features and benefits of a FUZE treatment, such as reduced drying time,
+                      better moisture transport, improved color fastness, and fiber protection — which typically improve at higher application levels.
+                    </p>
+                    <p>
+                      The 1.0 mg/kg application level receives FUZE certification, enhanced testing, and coordinated marketing.
+                      Validation is performed in approved labs using high definition ICP-MS instruments (see FAQ for additional detail on ICP validation and analysis).
+                    </p>
+                    <p className="text-xs text-neutral-500">
+                      Competitive note: FUZE Metamaterial is differentiated from legacy leaching metal-based antimicrobials by its permanent integration approach and validated performance profile.
+                    </p>
+                  </div>
+
+                  {(() => {
+                    const selectedDose = clampDoseToSupported(dose);
+                    const families = [
+                      { key: "synthetics", data: perfCharts.synthetics },
+                      { key: "cotton", data: perfCharts.cotton },
+                      { key: "blends", data: perfCharts.blends },
+                    ] as const;
+
+                    const pill = (text: string) => (
+                      <span className="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium text-neutral-700 bg-neutral-50">
+                        {text}
+                      </span>
+                    );
+
+                    return (
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        {families.map((f) => (
+                          <div key={f.key} className="rounded-2xl border bg-white p-4">
+                            <div className="font-semibold">{f.data.title}</div>
+                            <div className="text-xs text-neutral-500 mt-1">{f.data.subtitle}</div>
+
+                            <div className="mt-3 space-y-2">
+                              {f.data.points.map((pt) => {
+                                const active = pt.mgPerKg === selectedDose;
+                                return (
+                                  <div
+                                    key={pt.mgPerKg}
+                                    className={
+                                      "rounded-xl border px-3 py-2 space-y-2 " +
+                                      (active ? "border-neutral-900 bg-neutral-50" : "border-neutral-200")
+                                    }
+                                  >
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div className="text-sm font-medium">
+                                        {pt.mgPerKg.toFixed(2)} mg/kg
+                                      </div>
+                                      {active && (
+                                        <div className="text-xs font-semibold rounded-full bg-neutral-900 text-white px-2 py-1">
+                                          Selected
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-2">
+                                      {pill("Antimicrobial: " + pt.antimicrobial)}
+                                      {pill("Wash durability: " + pt.washDurability)}
+                                    </div>
+
+                                    <ul className="list-disc pl-5 text-xs text-neutral-600 space-y-1">
+                                      {pt.notes.map((n) => (
+                                        <li key={n}>{n}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
         </Tabs>
       </main>
 
