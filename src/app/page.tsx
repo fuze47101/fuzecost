@@ -202,8 +202,8 @@ export default function Page() {
                     <div>
                       <Label>Width unit</Label>
                       <div className="flex gap-2">
-                        <Button type="button" variant={widthUnit === "in" ? "default" : "outline"} onClick={() => setWidthUnit("in")} className="w-full">Inches</Button>
-                        <Button type="button" variant={widthUnit === "m" ? "default" : "outline"} onClick={() => setWidthUnit("m")} className="w-full">Meters</Button>
+                        <Button type="button" variant={widthUnit === "in" ? "default" : "outline"} onClick={() => setWidthUnit("in")} className="flex-1">Inches</Button>
+                        <Button type="button" variant={widthUnit === "m" ? "default" : "outline"} onClick={() => setWidthUnit("m")} className="flex-1">Meters</Button>
                       </div>
                     </div>
                   </div>
