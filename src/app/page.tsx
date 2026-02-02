@@ -264,7 +264,7 @@ export default function Page() {
                           <span className="text-xs text-neutral-500">1 USD =</span>
                           <input
                             type="text"
-                            type="text"
+                            
                             className="h-10 w-28 rounded-xl border bg-white px-3 text-sm"
                             inputMode="decimal"
                             defaultValue="1"
