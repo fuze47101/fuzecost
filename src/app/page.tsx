@@ -295,7 +295,7 @@ export default function Page() {
                   <div className="rounded-xl border bg-neutral-50 p-3 text-sm">
                     {(() => {
                       const perMeterUSD = outputs?.totalCostPerLinearMeter ?? NaN;
-                      const perYardUSD = outputs?.totalCostPerLinearYard ?? (isFinite(perMeterUSD) ? perMeterUSD * 0.9144 : NaN);
+                      const perYardUSD = (isFinite(perMeterUSD) ? perMeterUSD * 0.9144 : NaN);
 
                       const primaryUSD = priceUnit === "meter" ? perMeterUSD : perYardUSD;
                       const secondaryUSD = priceUnit === "meter" ? perYardUSD : perMeterUSD;

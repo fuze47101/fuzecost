@@ -105,9 +105,6 @@ export function calcQuote(inputs: CalcInputs): CalcOutputs {
     fuzeCostPerLinearMeter,
     addersPerLinearMeter,
     totalCostPerLinearMeter,
-    totalCostPerLinearYard,
-    fuzeCostPerLinearYard,
-    addersPerLinearYard,
     totalLitersStock,
     bottles19L,
   };
