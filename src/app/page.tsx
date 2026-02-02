@@ -855,6 +855,8 @@ export default function Page() {
 
       <footer className="px-6 py-10 text-center text-sm text-neutral-500">
         © {new Date().getFullYear()} FUZE • Tools are estimates; factory conditions may change results.
+      
+        <div className="mt-2 text-[11px] text-neutral-400">Build f675bab • 2026-02-02 14:58</div>
       </footer>
     </div>
   );
