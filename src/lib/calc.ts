@@ -43,10 +43,15 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
+
 export function widthToMeters(width: number, unit: WidthUnit) {
   const w = Number(width) || 0;
   return unit === "in" ? w * 0.0254 : w;
 }
+
+
+const YARDS_PER_METER = 1.0936132983377078;
+const METERS_PER_YARD = 0.9144;
 
 export function calcQuote(inputs: CalcInputs): CalcOutputs {
   const gsm = Math.max(0, Number(inputs.gsm) || 0);
@@ -87,6 +92,10 @@ export function calcQuote(inputs: CalcInputs): CalcOutputs {
     bottles19L = Math.ceil(totalLitersStock / 19);
   }
 
+  const totalCostPerLinearYard = totalCostPerLinearMeter * METERS_PER_YARD;
+  const fuzeCostPerLinearYard = fuzeCostPerLinearMeter * METERS_PER_YARD;
+  const addersPerLinearYard = addersPerLinearMeter * METERS_PER_YARD;
+
   return {
     widthMeters,
     kgPerLinearMeter,
@@ -96,6 +105,9 @@ export function calcQuote(inputs: CalcInputs): CalcOutputs {
     fuzeCostPerLinearMeter,
     addersPerLinearMeter,
     totalCostPerLinearMeter,
+    totalCostPerLinearYard,
+    fuzeCostPerLinearYard,
+    addersPerLinearYard,
     totalLitersStock,
     bottles19L,
   };

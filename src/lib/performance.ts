@@ -1,95 +1,94 @@
 export type FabricFamily = "synthetics" | "cotton" | "blends";
 
 export type PerfPoint = {
-  mgPerKg: number;              // application level
-  antimicrobial: string;        // displayed claim (per your instruction)
-  washDurability: string;       // displayed guidance
+  mgPerKg: number;
+  antimicrobial: string;
+  washDurability: string;
   notes: string[];
 };
 
-export const perfCharts: Record<
-  FabricFamily,
-  { title: string; subtitle: string; points: PerfPoint[] }
-> = {
-  synthetics: {
-    title: "Synthetics",
-    subtitle: "Polyester, nylon, elastane blends, technical performance constructions",
-    points: [
-      {
-        mgPerKg: 1.0,
-        antimicrobial: "99.99%",
-        washDurability: "Up to and over 100 washes (when applied to specification)",
-        notes: [
-          "Recommended for premium performance and maximum process tolerance.",
-          "Strong margin against finishing chemistry and equipment variability.",
-        ],
-      },
-      {
-        mgPerKg: 0.5,
-        antimicrobial: "99.99%",
-        washDurability: "Up to 50 washes (when applied to specification)",
-        notes: [
-          "Cost-optimized target level.",
-          "Recommend validation with ICP-MS and antimicrobial testing.",
-        ],
-      },
-    ],
-  },
+const points = [
+  1.0, 0.9, 0.8, 0.7,
+  0.6, 0.5,
+  0.4, 0.3, 0.2,
+];
 
-  cotton: {
-    title: "Cotton",
-    subtitle: "Cotton and cotton-rich constructions",
-    points: [
-      {
-        mgPerKg: 1.0,
-        antimicrobial: "99.99%",
-        washDurability: "Up to and over 100 washes (when applied to specification)",
-        notes: [
-          "Cotton often delivers strong outcomes at the same application levels due to fiber construction.",
-          "Recommended for premium performance and maximum consistency.",
-        ],
-      },
-      {
-        mgPerKg: 0.5,
-        antimicrobial: "99.99%",
-        washDurability: "Up to 50 washes (when applied to specification)",
-        notes: [
-          "Cost-optimized target level.",
-          "Recommend validation with ICP-MS and antimicrobial testing.",
-        ],
-      },
-    ],
-  },
+function durabilityFor(mg: number): string {
+  if (mg >= 1.0) return "Up to and over 100 washes (when applied to specification)";
+  if (mg >= 0.7) return "Approximately 75–100 washes (process dependent)";
+  if (mg >= 0.5) return "Up to 50 washes (when applied to specification)";
+  return "Reduced durability; validate for program requirements";
+}
 
-  blends: {
-    title: "Blends",
-    subtitle: "Cotton/synthetic blends and mixed-fiber systems",
-    points: [
-      {
-        mgPerKg: 1.0,
-        antimicrobial: "99.99%",
-        washDurability: "Up to and over 100 washes (when applied to specification)",
-        notes: [
-          "Best balance of robustness across mixed fiber behavior.",
-          "Recommended for premium performance and maximum consistency.",
-        ],
-      },
-      {
-        mgPerKg: 0.5,
-        antimicrobial: "99.99%",
-        washDurability: "Up to 50 washes (when applied to specification)",
-        notes: [
-          "Cost-optimized target level.",
-          "Recommend validation with ICP-MS and antimicrobial testing.",
-        ],
-      },
-    ],
-  },
+function antimicrobialFor(mg: number): string {
+  if (mg >= 0.5) return "99.99%";
+  return "Effective; validation recommended";
+}
+
+function notesFor(mg: number, family: FabricFamily): string[] {
+  const base = [
+    "Confirm application level with ICP-MS validation.",
+    "Performance depends on fabric construction, finishing chemistry, and process control.",
+  ];
+
+  if (mg >= 1.0) {
+    base.unshift(
+      "FUZE recommended level for premium performance and maximum durability.",
+      "Eligible for FUZE certification, enhanced testing, and coordinated marketing."
+    );
+  } else if (mg >= 0.5) {
+    base.unshift(
+      "Cost-optimized level with strong antimicrobial performance.",
+      "Recommend tighter process control and QC."
+    );
+  } else {
+    base.unshift(
+      "Below standard premium recommendation.",
+      "Use where pricing sensitivity is critical and validate outcomes carefully."
+    );
+  }
+
+  if (family === "cotton") {
+    base.push("Cotton often delivers strong outcomes at equivalent application levels.");
+  }
+
+  return base;
+}
+
+function buildFamily(family: FabricFamily, title: string, subtitle: string) {
+  return {
+    title,
+    subtitle,
+    points: points.map((mg) => ({
+      mgPerKg: mg,
+      antimicrobial: antimicrobialFor(mg),
+      washDurability: durabilityFor(mg),
+      notes: notesFor(mg, family),
+    })),
+  };
+}
+
+export const perfCharts = {
+  synthetics: buildFamily(
+    "synthetics",
+    "Synthetics",
+    "Polyester, nylon, elastane blends, technical constructions"
+  ),
+  cotton: buildFamily(
+    "cotton",
+    "Cotton",
+    "Cotton and cotton-rich constructions"
+  ),
+  blends: buildFamily(
+    "blends",
+    "Blends",
+    "Cotton/synthetic blends and mixed-fiber systems"
+  ),
 };
 
-export function clampDoseToSupported(dose: number) {
-  // We only display 0.5 and 1.0 points as requested.
-  // Clamp so the UI always highlights one of these.
+export function recommendedDose(dose: number) {
   if (!isFinite(dose)) return 1.0;
-  return dose >= 0.75 ? 1.0 : 0.5;
+  return points.reduce((prev, curr) =>
+    Math.abs(curr - dose) < Math.abs(prev - dose) ? curr : prev
+  );
 }

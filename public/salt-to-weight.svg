@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="b"/>
+      <feColorMatrix in="b" type="matrix"
+        values="1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 0.18 0" result="s"/>
+      <feMerge>
+        <feMergeNode in="s"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Card -->
+  <rect x="40" y="40" width="1120" height="440" rx="28" fill="url(#bg)" filter="url(#soft)"/>
+  <rect x="40" y="40" width="1120" height="440" rx="28" fill="none" stroke="#1f2937" stroke-width="2"/>
+
+  <!-- Title -->
+  <text x="80" y="110" fill="#e5e7eb"
+    font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
+    font-size="40" font-weight="800">
+    Application efficiency illustration
+  </text>
+  <text x="80" y="150" fill="#9ca3af"
+    font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
+    font-size="22" font-weight="500">
+    At 0.5 mg/kg, the applied amount is comparable to only a few grains of table salt distributed across 1 kg (2.2 lb) of fabric.
+  </text>
+
+  <!-- Left: Salt grains -->
+  <g transform="translate(110,220)">
+    <text x="0" y="-18" fill="#e5e7eb"
+      font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
+      font-size="22" font-weight="700">A few grains of salt</text>
+
+    <!-- grain 1 -->
+    <path d="M70 60c30-40 82-32 96 2 14 34-12 78-54 82C70 148 40 116 46 86c4-13 11-20 24-26z"
+      fill="#f3f4f6" opacity="0.95"/>
+    <!-- grain 2 -->
+    <path d="M200 98c28-36 76-30 90 1 14 31-11 72-50 76-39 4-66-25-60-52 4-11 10-18 20-25z"
+      fill="#f9fafb" opacity="0.95"/>
+
+    <!-- sparkle dots -->
+    <circle cx="120" cy="36" r="6" fill="#22c55e" opacity="0.9"/>
+    <circle cx="242" cy="70" r="5" fill="#22c55e" opacity="0.7"/>
+    <circle cx="160" cy="152" r="4" fill="#22c55e" opacity="0.65"/>
+
+    <text x="0" y="220" fill="#9ca3af"
+      font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
+      font-size="18" font-weight="500">
+      Visual analogy for scale (not a lab equivalency)
+    </text>
+  </g>
+
+  <!-- Center arrow -->
+  <g transform="translate(520,280)">
+    <line x1="0" y1="0" x2="120" y2="0" stroke="#6b7280" stroke-width="6" stroke-linecap="round"/>
+    <path d="M120 0l-24-18v36z" fill="#6b7280"/>
+    <text x="-8" y="48" fill="#9ca3af"
+      font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
+      font-size="18" font-weight="600">
+      distributed across
+    </text>
+  </g>
+
+  <!-- Right: 1 kg fabric block -->
+  <g transform="translate(710,210)">
+    <text x="0" y="-18" fill="#e5e7eb"
+      font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
+      font-size="22" font-weight="700">1 kg fabric (2.2 lb)</text>
+
+    <!-- Fabric tile -->
+    <rect x="0" y="10" width="360" height="220" rx="22" fill="#0f172a" stroke="#334155" stroke-width="2"/>
+
+    <!-- weave pattern -->
+    <g opacity="0.55">
+      <path d="M30 40h300" stroke="#1f2937" stroke-width="10" stroke-linecap="round"/>
+      <path d="M30 80h300" stroke="#1f2937" stroke-width="10" stroke-linecap="round"/>
+      <path d="M30 120h300" stroke="#1f2937" stroke-width="10" stroke-linecap="round"/>
+      <path d="M30 160h300" stroke="#1f2937" stroke-width="10" stroke-linecap="round"/>
+      <path d="M30 200h300" stroke="#1f2937" stroke-width="10" stroke-linecap="round"/>
+
+      <path d="M60 25v200" stroke="#111827" stroke-width="10" stroke-linecap="round"/>
+      <path d="M120 25v200" stroke="#111827" stroke-width="10" stroke-linecap="round"/>
+      <path d="M180 25v200" stroke="#111827" stroke-width="10" stroke-linecap="round"/>
+      <path d="M240 25v200" stroke="#111827" stroke-width="10" stroke-linecap="round"/>
+      <path d="M300 25v200" stroke="#111827" stroke-width="10" stroke-linecap="round"/>
+    </g>
+
+    <!-- label -->
+    <rect x="18" y="176" width="180" height="40" rx="18" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+    <text x="34" y="203" fill="#e5e7eb"
+      font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
+      font-size="18" font-weight="700">
+      0.5 mg / kg
+    </text>
+
+    <text x="0" y="280" fill="#9ca3af"
+      font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
+      font-size="18" font-weight="500">
+      Extremely low add-on, measurable via ICP-MS validation.
+    </text>
+  </g>
+</svg>

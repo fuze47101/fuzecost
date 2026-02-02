@@ -16,12 +16,26 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { perfCharts, clampDoseToSupported } from "@/lib/performance";
+import { perfCharts, recommendedDose } from "@/lib/performance";
 
-function money(n: number) {
-  if (!Number.isFinite(n)) return "$0.00";
-  return n.toLocaleString(undefined, { style: "currency", currency: "USD" });
+const displayFx = (currency: string, fx: number) => (currency === "USD" ? 1 : fx);
+
+function money(n: number, currency: string) {
+  if (!Number.isFinite(n)) {
+    return currency === "USD" ? "$0.00" : `${currency} 0.00`;
+  }
+
+  if (currency === "USD") {
+    return n.toLocaleString(undefined, {
+      style: "currency",
+      currency: "USD",
+    });
+  }
+
+  // For non-USD: show ISO code + numeric value (no $ symbol)
+  return `${currency} ${n.toFixed(2)}`;
 }
+
 function num(n: number, digits = 6) {
   if (!Number.isFinite(n)) return "0";
   return n.toLocaleString(undefined, { maximumFractionDigits: digits });
@@ -42,6 +56,10 @@ type DocItem = {
 export default function Page() {
   // ===== Quote =====
   const [gsm, setGsm] = useState(150);
+  const [priceUnit, setPriceUnit] = useState<"meter" | "yard">("meter");
+  const [currency, setCurrency] = useState<"USD"|"CNY"|"TWD"|"VND"|"PKR"|"INR"|"LKR"|"BDT">("USD");
+  const [fxToLocal, setFxToLocal] = useState<number>(1); // 1 USD = fxToLocal local currency units
+  const [fxText, setFxText] = useState<string>("1");
   const [widthUnit, setWidthUnit] = useState<WidthUnit>("in");
   const [width, setWidth] = useState(60);
   const [dose, setDose] = useState(1.0);
@@ -185,13 +203,127 @@ export default function Page() {
           <TabsList>
             <TabsTrigger value="quote">Quote</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
-            <TabsTrigger value="dilution">Dilution</TabsTrigger>
+<TabsTrigger value="dilution">Dilution</TabsTrigger>
             <TabsTrigger value="docs">Documents</TabsTrigger>
             <TabsTrigger value="faq" disabled>FAQ (next)</TabsTrigger>
-          </TabsList>
+                      <TabsTrigger value="faq">FAQ</TabsTrigger>
+</TabsList>
 
           {/* ===== Quote Tab ===== */}
           <TabsContent value="quote" className="mt-6">
+            {/* FX_AND_UNIT_BLOCK__FUZE */}
+            <div className="mt-6">
+              <Card className="rounded-2xl shadow-sm">
+                <CardHeader>
+                  <CardTitle>Quote display settings</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                    <div className="flex flex-wrap gap-4">
+                      <div className="space-y-1">
+                        <div className="text-xs font-medium text-neutral-600">Price unit</div>
+                        <div className="inline-flex rounded-xl border bg-white p-1">
+                          <button
+                            className={"px-3 py-1.5 text-sm rounded-lg " + (priceUnit === "meter" ? "bg-neutral-900 text-white" : "text-neutral-700")}
+                            onClick={() => setPriceUnit("meter")}
+                            type="button"
+                          >
+                            Meter
+                          </button>
+                          <button
+                            className={"px-3 py-1.5 text-sm rounded-lg " + (priceUnit === "yard" ? "bg-neutral-900 text-white" : "text-neutral-700")}
+                            onClick={() => setPriceUnit("yard")}
+                            type="button"
+                          >
+                            Yard
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="text-xs font-medium text-neutral-600">Currency</div>
+                        <select
+                          className="h-10 rounded-xl border bg-white px-3 text-sm"
+                          value={currency}
+                          onChange={(e) => setCurrency(e.target.value as any)}
+                        >
+                          <option value="USD">USD</option>
+                          <option value="CNY">RMB (CNY)</option>
+                          <option value="TWD">NTD (TWD)</option>
+                          <option value="VND">VND</option>
+                          <option value="PKR">PKR</option>
+                          <option value="INR">INR</option>
+                          <option value="LKR">LKR</option>
+                          <option value="BDT">BDT</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="text-xs font-medium text-neutral-600">FX rate</div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-xs text-neutral-500">1 USD =</span>
+                          <input
+                            type="text"
+                            type="text"
+                            className="h-10 w-28 rounded-xl border bg-white px-3 text-sm"
+                            inputMode="decimal"
+                            defaultValue="1"
+                            onChange={(e) => {
+                              const raw = e.target.value;
+                              const cleaned = raw.replace(/[^0-9.]/g, "");
+                              const parts = cleaned.split(".");
+                              const normalized = parts.length <= 2 ? cleaned : (parts[0] + "." + parts.slice(1).join("")); 
+                              const n = Number(normalized);
+                              setFxToLocal(Number.isFinite(n) ? n : 0);
+                            }}
+                          />
+                          <span className="text-xs text-neutral-500">{currency}</span>
+                          <a
+                            href="https://www.xe.com/currencyconverter/"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs text-neutral-600 underline underline-offset-2"
+                          >
+                            Check XE
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+
+                    </div>
+
+                  <div className="rounded-xl border bg-neutral-50 p-3 text-sm">
+                    {(() => {
+                      const perMeterUSD = outputs?.totalCostPerLinearMeter ?? NaN;
+                      const perYardUSD = outputs?.totalCostPerLinearYard ?? (isFinite(perMeterUSD) ? perMeterUSD * 0.9144 : NaN);
+
+                      const primaryUSD = priceUnit === "meter" ? perMeterUSD : perYardUSD;
+                      const secondaryUSD = priceUnit === "meter" ? perYardUSD : perMeterUSD;
+
+                      const fx = (isFinite(fxToLocal) && fxToLocal > 0) ? fxToLocal : 1;
+                      const primaryLocal = currency === "USD" ? primaryUSD : primaryUSD * fx;
+                      const secondaryLocal = currency === "USD" ? secondaryUSD : secondaryUSD * fx;
+
+                      const primaryLabel = priceUnit === "meter" ? "per linear meter" : "per yard";
+                      const secondaryLabel = priceUnit === "meter" ? "per yard" : "per linear meter";
+
+                      return (
+                        <div className="space-y-1">
+                          <div className="font-semibold text-neutral-900">
+                             {money(primaryLocal, currency)} <span className="text-neutral-600 font-normal">{primaryLabel}</span>
+                          </div>
+                          <div className="text-neutral-600">
+                             {money(secondaryLocal, currency)} <span className="text-neutral-500">{secondaryLabel}</span>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            {/* /FX_AND_UNIT_BLOCK__FUZE */}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="rounded-2xl shadow-sm">
                 <CardHeader><CardTitle>Inputs</CardTitle></CardHeader>
@@ -294,12 +426,47 @@ export default function Page() {
                   <div className="rounded-2xl border bg-white p-5">
                     <div className="text-sm text-neutral-500">Total quoted cost</div>
                     <div className="text-4xl font-semibold mt-1">
-                      {money(outputs.totalCostPerLinearMeter)}{" "}
+                      {money((outputs.totalCostPerLinearMeter * displayFx(currency, fxToLocal)), currency)}{" "}
                       <span className="text-base font-medium text-neutral-500">/ m</span>
                     </div>
+                    <div className="mt-3 space-y-2">
+                      <div className="text-4xl font-semibold tracking-tight">
+                        {money(
+                          (priceUnit === "meter"
+                            ? outputs.totalCostPerLinearMeter * 0.9144
+                            : outputs.totalCostPerLinearMeter) * displayFx(currency, fxToLocal),
+                          currency
+                        )}{" "}
+                        <span className="text-lg font-normal text-neutral-600">/ {priceUnit === "meter" ? "yd" : "m"}</span>
+                      </div>
+
+                      <div className="text-4xl font-semibold tracking-tight">
+                        {(() => {
+                          const unitCostPerM =
+                            outputs.totalCostPerLinearMeter * displayFx(currency, fxToLocal);
+                          const kgPerM = outputs.kgPerLinearMeter || 0;
+                          const perKg = kgPerM > 0 ? unitCostPerM / kgPerM : 0;
+                          return money(perKg, currency);
+                        })()}{" "}
+                        <span className="text-lg font-normal text-neutral-600">/ kg</span>
+                      </div>
+
+                      <div className="text-4xl font-semibold tracking-tight">
+                        {(() => {
+                          const unitCostPerM =
+                            outputs.totalCostPerLinearMeter * displayFx(currency, fxToLocal);
+                          const kgPerM = outputs.kgPerLinearMeter || 0;
+                          const lbPerM = kgPerM * 2.2046226218;
+                          const perLb = lbPerM > 0 ? unitCostPerM / lbPerM : 0;
+                          return money(perLb, currency);
+                        })()}{" "}
+                        <span className="text-lg font-normal text-neutral-600">/ lb</span>
+                      </div>
+                    </div>
+
                     <div className="mt-3 text-sm text-neutral-600">
-                      F1: <span className="font-medium">{money(outputs.fuzeCostPerLinearMeter)}/m</span> • Adders:{" "}
-                      <span className="font-medium">{money(outputs.addersPerLinearMeter)}/m</span>
+                      F1: <span className="font-medium">{money((outputs.fuzeCostPerLinearMeter * displayFx(currency, fxToLocal)), currency)}/m</span> • Adders:{" "}
+                      <span className="font-medium">{money((outputs.addersPerLinearMeter * displayFx(currency, fxToLocal)), currency)}/m</span>
                     </div>
                   </div>
                 </CardContent>
@@ -337,9 +504,7 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <div className="text-xs text-neutral-500">
-                    Uses C1V1=C2V2. This sets bath concentration; add-on depends on pickup and process.
-                  </div>
+                  
                 </CardContent>
               </Card>
 
@@ -370,9 +535,7 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <div className="text-xs text-neutral-500">
-                    This is material required. Use pickup to convert dose → bath ppm.
-                  </div>
+                  
                 </CardContent>
               </Card>
 
@@ -452,9 +615,7 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <div className="text-xs text-neutral-500">
-                    Assumes 1 kg of bath liquor ≈ 1 liter for quick estimating.
-                  </div>
+                  
                 </CardContent>
               </Card>
             </div>
@@ -482,7 +643,7 @@ export default function Page() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                     {docs.map((d) => (
                       <div key={d.id} className="rounded-2xl border bg-white p-4">
-                        <div className="text-xs text-neutral-500">{d.category}</div>
+                        
                         <div className="font-semibold">{d.title}</div>
                         {d.note && <div className="text-sm text-neutral-600 mt-1">{d.note}</div>}
                         <div className="mt-3">
@@ -509,12 +670,6 @@ export default function Page() {
                   <CardTitle>Application level vs expected performance</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="text-sm text-neutral-600">
-                    This tab provides a practical reference for brands, factories, reps, and internal teams.
-                    Outcomes vary by fabric construction, finishing chemistry, process conditions, and quality control.
-                    Confirm results with appropriate lab validation and in-process QC.
-                  </div>
-
                   <div className="rounded-2xl border bg-white p-4 text-sm text-neutral-700 space-y-2">
                     <div className="font-semibold">Recommendation & caveats (FUZE F1 / FUZE Metamaterial)</div>
                     <p>
@@ -534,10 +689,32 @@ export default function Page() {
                     <p className="text-xs text-neutral-500">
                       Competitive note: FUZE Metamaterial is differentiated from legacy leaching metal-based antimicrobials by its permanent integration approach and validated performance profile.
                     </p>
+                    <div className="mt-4 rounded-2xl border bg-white p-4">
+                      <div className="font-semibold text-sm text-neutral-800">Application efficiency (visual)</div>
+                      <div className="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-4 items-center">
+                        <div className="text-sm text-neutral-700 space-y-2">
+                          <p>
+                            At <span className="font-medium">0.5 mg/kg</span>, the applied amount is comparable to only a few grains of table salt distributed across
+                            <span className="font-medium"> 1 kg (2.2 lb)</span> of fabric — a practical illustration of the precision and efficiency of the FUZE Metamaterial.
+                          </p>
+                          <p className="text-xs text-neutral-500">
+                            Visual analogy for scale (not a lab equivalency). Confirm application with ICP-MS validation.
+                          </p>
+                        </div>
+                        <div className="rounded-2xl border bg-neutral-950 p-2">
+                          <img
+                            src="/salt-to-weight.svg"
+                            alt="Illustration: a few grains of salt compared to 1 kg fabric at 0.5 mg/kg add-on"
+                            className="w-full h-auto rounded-xl"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
 
                   {(() => {
-                    const selectedDose = clampDoseToSupported(dose);
+                    const selectedDose = recommendedDose(dose);
                     const families = [
                       { key: "synthetics", data: perfCharts.synthetics },
                       { key: "cotton", data: perfCharts.cotton },
@@ -574,7 +751,7 @@ export default function Page() {
                                       </div>
                                       {active && (
                                         <div className="text-xs font-semibold rounded-full bg-neutral-900 text-white px-2 py-1">
-                                          Selected
+                                          Recommended
                                         </div>
                                       )}
                                     </div>
@@ -602,6 +779,76 @@ export default function Page() {
               </Card>
             </div>
           </TabsContent>
+
+
+          
+<TabsContent value="faq" className="mt-6">
+  <Card className="rounded-2xl shadow-sm">
+    <CardHeader>
+      <CardTitle className="text-2xl font-semibold">FAQ</CardTitle>
+    </CardHeader>
+    <CardContent className="space-y-6 text-sm leading-relaxed">
+
+      <div>
+        <div className="font-medium">Is FUZE a permanent antimicrobial treatment?</div>
+        <div className="mt-1 pl-4 text-neutral-700">
+          Yes. FUZE is permanently integrated into the textile fiber and does not leach, wash out, or rely on ion release.
+          Performance remains for the life of the fabric.
+        </div>
+      </div>
+
+      <div>
+        <div className="font-medium">Why does FUZE perform differently than traditional silver technologies?</div>
+        <div className="mt-1 pl-4 text-neutral-700">
+          Conventional technologies rely on high concentrations of leaching metal ions to pass short-duration laboratory tests.
+          FUZE is non-ionic and non-leaching, designed for permanent effectiveness rather than depletion-based performance.
+        </div>
+      </div>
+
+      <div>
+        <div className="font-medium">Why does lower application still show effectiveness?</div>
+        <div className="mt-1 pl-4 text-neutral-700">
+          FUZE effectiveness is mathematically driven by time-to-contact (TTC). Lower application levels increase TTC,
+          but still fully inhibit bacterial growth, odor formation, and propagation over time.
+        </div>
+      </div>
+
+      <div>
+        <div className="font-medium">How should antimicrobial test results be interpreted?</div>
+        <div className="mt-1 pl-4 text-neutral-700">
+          Standard antimicrobial tests are timed. FUZE may show reduced instantaneous kill at lower doses,
+          while still completely preventing regrowth and odor formation over real-world use cycles.
+        </div>
+      </div>
+
+      <div>
+        <div className="font-medium">Why does FUZE often outperform synthetics on cotton?</div>
+        <div className="mt-1 pl-4 text-neutral-700">
+          Cotton’s natural fiber structure allows deeper integration and more uniform bonding of FUZE,
+          often producing superior durability compared to synthetic fibers at equivalent application levels.
+        </div>
+      </div>
+
+      <div>
+        <div className="font-medium">How small is a 0.5 mg/kg application?</div>
+        <div className="mt-1 pl-4 text-neutral-700">
+          A 0.5 mg/kg application is equivalent to approximately two grains of table salt distributed across
+          one kilogram (2.2 lb) of fabric — highlighting FUZE’s efficiency, safety, and precision.
+        </div>
+      </div>
+
+      <div>
+        <div className="font-medium">How is FUZE validated?</div>
+        <div className="mt-1 pl-4 text-neutral-700">
+          All FUZE validation is performed in approved laboratories using high-definition ICP-MS instrumentation
+          alongside antimicrobial and durability testing.
+        </div>
+      </div>
+
+    </CardContent>
+  </Card>
+</TabsContent>
+
 
         </Tabs>
       </main>
