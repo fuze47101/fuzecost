@@ -1,83 +1,129 @@
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { S3Client, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 
 const s3 = new S3Client({
   region: process.env.AWS_REGION || "us-east-2",
 });
 
-export async function POST(req: NextRequest) {
+const BUCKET = String(process.env.S3_BUCKET || "fuzedocs").trim();
+const KEY = "docs/_meta/categories.json";
+
+function norm(s: string) {
+  return String(s ?? "").trim();
+}
+
+async function streamToString(stream: any): Promise<string> {
+  // AWS SDK v3 returns a Readable stream in Node
+  return await new Promise((resolve, reject) => {
+    const chunks: any[] = [];
+    stream.on("data", (chunk: any) => chunks.push(chunk));
+    stream.on("error", reject);
+    stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
+  });
+}
+
+async function loadCategories(): Promise<string[]> {
   try {
-    const body = await req.json();
-    const rawCode = (body?.code ?? "") as string;
+    const out = await s3.send(new GetObjectCommand({ Bucket: BUCKET, Key: KEY }));
+    const text = await streamToString(out.Body);
+    const parsed = JSON.parse(text);
 
-    // Trim BOTH sides to eliminate invisible whitespace/newline issues
-    const provided = String(rawCode).trim();
-    const expected = String(process.env.UPLOAD_CODE ?? "").trim();
+    const arr = Array.isArray(parsed?.categories) ? parsed.categories : [];
+    const cleaned = arr
+      .map((x: any) => norm(x))
+      .filter(Boolean);
 
-    // Verify-only mode for "Enable Upload"
-    const verifyOnly = Boolean(body?.verifyOnly);
-
-    if (!expected) {
-      return NextResponse.json(
-        { message: "Server missing UPLOAD_CODE (runtime env not loaded)" },
-        { status: 500 }
-      );
+    // de-dupe case-insensitive, preserve first occurrence
+    const seen = new Set<string>();
+    const deduped: string[] = [];
+    for (const c of cleaned) {
+      const k = c.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      deduped.push(c);
     }
 
-    if (!provided) {
-      return NextResponse.json({ message: "Missing upload code" }, { status: 400 });
-    }
+    return deduped;
+  } catch (e: any) {
+    // If file doesn't exist yet, return defaults
+    return ["Regulatory", "Technical", "Marketing", "Training", "General"];
+  }
+}
 
-    if (provided !== expected) {
-      return NextResponse.json({ message: "Invalid upload code" }, { status: 401 });
-    }
+async function saveCategories(categories: string[]) {
+  const payload = JSON.stringify(
+    {
+      categories,
+      updatedAt: new Date().toISOString(),
+    },
+    null,
+    2
+  );
 
-    // If we're only verifying the code, stop here.
-    if (verifyOnly) {
-      return NextResponse.json({ ok: true });
-    }
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: BUCKET,
+      Key: KEY,
+      Body: payload,
+      ContentType: "application/json",
+    })
+  );
+}
 
-    const filename = String(body?.filename ?? "").trim();
-    const contentType = String(body?.contentType ?? "application/octet-stream").trim();
-    const category = String(body?.category ?? "general").trim() || "general";
-    const title = body?.title;
+export async function GET(req: NextRequest) {
+  // Read requires VIEW_CODE (or UPLOAD_CODE as fallback)
+  const viewExpected = norm(process.env.VIEW_CODE || "");
+  const uploadExpected = norm(process.env.UPLOAD_CODE || "");
 
-    if (!filename) {
-      return NextResponse.json({ message: "Missing filename" }, { status: 400 });
-    }
+  const provided = norm(req.headers.get("x-view-code") || req.nextUrl.searchParams.get("code") || "");
 
-    const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const safeCategory = category.replace(/[^a-zA-Z0-9._-]/g, "_");
+  // If neither code is configured, allow read (dev safety)
+  if (!viewExpected && !uploadExpected) {
+    const categories = await loadCategories();
+    return NextResponse.json({ categories });
+  }
 
-    const key = `docs/${safeCategory}/${crypto.randomBytes(8).toString("hex")}-${safeName}`;
+  // Accept view code, or upload code
+  const ok =
+    (viewExpected && provided === viewExpected) ||
+    (uploadExpected && provided === uploadExpected);
 
-    const bucket = String(process.env.S3_BUCKET || "fuzedocs").trim();
+  if (!ok) {
+    return NextResponse.json({ message: "Invalid view code" }, { status: 401 });
+  }
 
-    const command = new PutObjectCommand({
-      Bucket: bucket,
-      Key: key,
-      ContentType: contentType || "application/octet-stream",
-    });
+  const categories = await loadCategories();
+  return NextResponse.json({ categories });
+}
 
-    const uploadUrl = await getSignedUrl(s3, command, {
-      expiresIn: 60 * 10, // 10 minutes
-    });
-
-    return NextResponse.json({
-      uploadUrl,
-      key,
-      title,
-      category: safeCategory,
-      bucket,
-      region: String(process.env.AWS_REGION || "us-east-2").trim(),
-    });
-  } catch (err: any) {
-    console.error("sign-upload error:", err?.message || err);
+export async function POST(req: NextRequest) {
+  // Write requires UPLOAD_CODE
+  const expected = norm(process.env.UPLOAD_CODE || "");
+  if (!expected) {
     return NextResponse.json(
-      { message: `Failed to sign upload: ${err?.message || "unknown error"}` },
+      { message: "Server missing UPLOAD_CODE" },
       { status: 500 }
     );
   }
+
+  const body = await req.json().catch(() => ({} as any));
+  const provided = norm(body?.code || "");
+  if (provided !== expected) {
+    return NextResponse.json({ message: "Invalid upload code" }, { status: 401 });
+  }
+
+  const newCategory = norm(body?.category || "");
+  if (!newCategory) {
+    return NextResponse.json({ message: "Missing category" }, { status: 400 });
+  }
+
+  const categories = await loadCategories();
+
+  const exists = categories.some((c) => c.toLowerCase() === newCategory.toLowerCase());
+  if (!exists) {
+    categories.push(newCategory);
+    await saveCategories(categories);
+  }
+
+  return NextResponse.json({ categories });
 }

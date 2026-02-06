@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
-type Category = "Regulatory" | "Technical" | "Marketing" | "General";
+import { useEffect, useState } from "react";
 
 export default function DocumentsPanel() {
   const [viewCode, setViewCode] = useState("");
@@ -10,16 +8,57 @@ export default function DocumentsPanel() {
   const [viewUnlocked, setViewUnlocked] = useState(false);
   const [uploadUnlocked, setUploadUnlocked] = useState(false);
 
-  const [category, setCategory] = useState<Category>("Regulatory");
+  const [categories, setCategories] = useState<string[]>([
+    "Regulatory",
+    "Technical",
+    "Marketing",
+    "Training",
+    "General",
+  ]);
+  const [category, setCategory] = useState<string>("Regulatory");
+  const [newCategory, setNewCategory] = useState<string>("");
+
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
 
+  async function loadCategoriesFromServer(codeForRead: string) {
+    try {
+      const res = await fetch("/api/docs/categories", {
+        method: "GET",
+        headers: {
+          "x-view-code": codeForRead.trim(),
+        },
+      });
+
+      const json = await res.json().catch(() => ({} as any));
+      if (!res.ok) {
+        // Don’t block UI; just show why server didn’t return list
+        setStatus(`❌ ${json?.message || "Failed to load categories"} (HTTP ${res.status})`);
+        return;
+      }
+
+      const list = Array.isArray(json?.categories) ? json.categories : [];
+      if (list.length) {
+        setCategories(list);
+        if (!list.some((c: string) => c === category)) {
+          setCategory(list[0]);
+        }
+      }
+    } catch (e: any) {
+      setStatus(`❌ Failed to load categories: ${e?.message || "network error"}`);
+    }
+  }
+
   function unlockView() {
     if (!viewCode.trim()) return;
     setViewUnlocked(true);
+    setStatus("✅ View enabled");
+
+    // Load categories using view code
+    loadCategoriesFromServer(viewCode);
   }
 
   async function unlockUpload() {
@@ -51,9 +90,56 @@ export default function DocumentsPanel() {
 
       setUploadUnlocked(true);
       setStatus("✅ Upload enabled");
+
+      // Load categories using upload code (allowed by server)
+      loadCategoriesFromServer(uploadCode);
     } catch (e: any) {
       setUploadUnlocked(false);
       setStatus(`❌ Verification error: ${e?.message || "unknown"}`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function addCategory() {
+    const c = newCategory.trim();
+    if (!c) return;
+
+    if (!uploadUnlocked) {
+      setStatus("Enable Upload first (required to create categories).");
+      return;
+    }
+
+    try {
+      setBusy(true);
+      setStatus("Saving category…");
+
+      const res = await fetch("/api/docs/categories", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          code: uploadCode.trim(),
+          category: c,
+        }),
+      });
+
+      const json = await res.json().catch(() => ({} as any));
+      if (!res.ok) {
+        setStatus(`❌ ${json?.message || "Failed to save category"} (HTTP ${res.status})`);
+        return;
+      }
+
+      const list = Array.isArray(json?.categories) ? json.categories : [];
+      if (list.length) {
+        setCategories(list);
+        setCategory(c);
+        setNewCategory("");
+        setStatus(`✅ Category added: "${c}"`);
+      } else {
+        setStatus("✅ Category saved");
+      }
+    } catch (e: any) {
+      setStatus(`❌ Failed to save category: ${e?.message || "network error"}`);
     } finally {
       setBusy(false);
     }
@@ -122,6 +208,11 @@ export default function DocumentsPanel() {
     }
   }
 
+  // If user unlocks view after upload already unlocked or vice versa, optionally refresh categories
+  useEffect(() => {
+    // no-op; keeping hook for future expansions
+  }, [viewUnlocked, uploadUnlocked]);
+
   return (
     <div className="space-y-8">
       <div className="rounded-lg border p-6 space-y-4">
@@ -140,6 +231,7 @@ export default function DocumentsPanel() {
               <button
                 className="px-3 py-1 rounded bg-black text-white"
                 onClick={unlockView}
+                type="button"
               >
                 Unlock
               </button>
@@ -147,6 +239,9 @@ export default function DocumentsPanel() {
             <div className="text-xs text-neutral-500 mt-1">
               Unlocks the document list and downloads.
             </div>
+            {viewUnlocked && (
+              <div className="text-xs text-green-700 mt-1">View is enabled.</div>
+            )}
           </div>
 
           <div>
@@ -162,6 +257,7 @@ export default function DocumentsPanel() {
                 className="px-3 py-1 rounded bg-black text-white"
                 onClick={unlockUpload}
                 disabled={busy || !uploadCode.trim()}
+                type="button"
               >
                 Enable Upload
               </button>
@@ -183,13 +279,35 @@ export default function DocumentsPanel() {
               <select
                 className="border rounded px-2 py-1 w-full"
                 value={category}
-                onChange={(e) => setCategory(e.target.value as Category)}
+                onChange={(e) => setCategory(e.target.value)}
               >
-                <option>Regulatory</option>
-                <option>Technical</option>
-                <option>Marketing</option>
-                <option>General</option>
+                {categories.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
               </select>
+
+              <div className="mt-2 flex gap-2">
+                <input
+                  className="border rounded px-2 py-1 w-full"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  placeholder='Add new category (e.g., "Factory Training")'
+                />
+                <button
+                  className="px-3 py-1 rounded bg-black text-white"
+                  onClick={addCategory}
+                  type="button"
+                  disabled={busy || !newCategory.trim()}
+                >
+                  Add
+                </button>
+              </div>
+
+              <div className="text-xs text-neutral-500 mt-1">
+                Categories are saved on the server (S3) and persist for everyone.
+              </div>
             </div>
 
             <div>
@@ -226,6 +344,7 @@ export default function DocumentsPanel() {
             onClick={uploadAndPublish}
             disabled={busy}
             className="px-4 py-2 rounded bg-black text-white"
+            type="button"
           >
             Upload &amp; Publish
           </button>
