@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 
-type Category =
-  | "Regulatory"
-  | "Technical"
-  | "Marketing"
-  | "General";
+type Category = "Regulatory" | "Technical" | "Marketing" | "General";
 
 export default function DocumentsPanel() {
   const [viewCode, setViewCode] = useState("");
@@ -32,7 +28,10 @@ export default function DocumentsPanel() {
   }
 
   async function uploadAndPublish() {
-    if (!file || !uploadCode.trim()) return;
+    if (!file || !uploadCode.trim()) {
+      setStatus("Missing file or upload code");
+      return;
+    }
 
     try {
       setBusy(true);
@@ -44,35 +43,37 @@ export default function DocumentsPanel() {
         body: JSON.stringify({
           code: uploadCode.trim(),
           filename: file.name,
-          contentType: file.type,
+          contentType: file.type || "application/octet-stream",
           category,
           title,
         }),
       });
 
       if (!sign.ok) {
-        throw new Error("Invalid upload code");
+        setStatus("Invalid upload code");
+        return;
       }
 
       const { uploadUrl } = await sign.json();
 
-      setStatus("Uploading to secure storage…");
+      setStatus("Uploading…");
 
       const put = await fetch(uploadUrl, {
         method: "PUT",
-        headers: { "content-type": file.type },
+        headers: { "content-type": file.type || "application/octet-stream" },
         body: file,
       });
 
       if (!put.ok) {
-        throw new Error("Upload failed");
+        setStatus("Upload failed");
+        return;
       }
 
-      setStatus("✅ Uploaded and published");
+      setStatus("✅ Uploaded successfully");
       setFile(null);
       setTitle("");
-    } catch (err: any) {
-      setStatus(err.message || "Upload failed");
+    } catch (err) {
+      setStatus("Unexpected upload error");
     } finally {
       setBusy(false);
     }
@@ -88,7 +89,7 @@ export default function DocumentsPanel() {
             <label className="text-sm font-medium">View code</label>
             <div className="flex gap-2 mt-1">
               <input
-                className="border rounded px-2 py-1 w-full"
+                className="border rounded px-2 py-1 max-w-xs"
                 value={viewCode}
                 onChange={(e) => setViewCode(e.target.value)}
               />
@@ -108,7 +109,7 @@ export default function DocumentsPanel() {
             <label className="text-sm font-medium">Upload code</label>
             <div className="flex gap-2 mt-1">
               <input
-                className="border rounded px-2 py-1 w-full"
+                className="border rounded px-2 py-1 max-w-xs"
                 value={uploadCode}
                 onChange={(e) => setUploadCode(e.target.value)}
               />
@@ -153,23 +154,30 @@ export default function DocumentsPanel() {
                 className="border rounded px-2 py-1 w-full"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g., FUZE F1 SDS (PDF)"
+                placeholder="e.g., FUZE SDS PDF"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-sm">File</label>
-            <input
-              type="file"
-              className="block mt-1"
-              onChange={(e) =>
-                setFile(e.target.files?.[0] || null)
-              }
-            />
-            <div className="text-xs text-neutral-500 mt-1">
-              Allowed: PDF, JPG/PNG, MP4, PPT/PPTX
-            </div>
+            <label className="text-sm block mb-1">File</label>
+
+            <label className="inline-block px-4 py-2 bg-neutral-200 rounded cursor-pointer">
+              Choose File
+              <input
+                type="file"
+                className="hidden"
+                onChange={(e) =>
+                  setFile(e.target.files?.[0] || null)
+                }
+              />
+            </label>
+
+            {file && (
+              <div className="text-xs mt-2 text-neutral-600">
+                Selected: {file.name}
+              </div>
+            )}
           </div>
 
           <button
