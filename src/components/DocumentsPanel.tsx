@@ -28,8 +28,12 @@ export default function DocumentsPanel() {
   }
 
   async function uploadAndPublish() {
-    if (!file || !uploadCode.trim()) {
-      setStatus("Missing file or upload code");
+    if (!file) {
+      setStatus("Choose a file first.");
+      return;
+    }
+    if (!uploadCode.trim()) {
+      setStatus("Enter the upload code first.");
       return;
     }
 
@@ -49,12 +53,21 @@ export default function DocumentsPanel() {
         }),
       });
 
+      const signJson = await sign.json().catch(() => ({} as any));
+
       if (!sign.ok) {
-        setStatus("Invalid upload code");
+        // IMPORTANT: show real server message + status so we stop guessing
+        const msg = signJson?.message || "Upload authorization failed";
+        setStatus(`❌ ${msg} (HTTP ${sign.status})`);
         return;
       }
 
-      const { uploadUrl } = await sign.json();
+      const { uploadUrl, key } = signJson;
+
+      if (!uploadUrl) {
+        setStatus("❌ Server did not return an upload URL.");
+        return;
+      }
 
       setStatus("Uploading…");
 
@@ -65,15 +78,15 @@ export default function DocumentsPanel() {
       });
 
       if (!put.ok) {
-        setStatus("Upload failed");
+        setStatus(`❌ S3 upload failed (HTTP ${put.status})`);
         return;
       }
 
-      setStatus("✅ Uploaded successfully");
+      setStatus(`✅ Uploaded successfully: ${key || ""}`);
       setFile(null);
       setTitle("");
-    } catch (err) {
-      setStatus("Unexpected upload error");
+    } catch (err: any) {
+      setStatus(`❌ Unexpected error: ${err?.message || "unknown"}`);
     } finally {
       setBusy(false);
     }
@@ -87,11 +100,12 @@ export default function DocumentsPanel() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="text-sm font-medium">View code</label>
-            <div className="flex gap-2 mt-1">
+            <div className="flex gap-2 mt-1 items-center">
               <input
-                className="border rounded px-2 py-1 max-w-xs"
+                className="border rounded px-2 py-1 max-w-xs w-full"
                 value={viewCode}
                 onChange={(e) => setViewCode(e.target.value)}
+                placeholder="Enter view code"
               />
               <button
                 className="px-3 py-1 rounded bg-black text-white"
@@ -107,15 +121,17 @@ export default function DocumentsPanel() {
 
           <div>
             <label className="text-sm font-medium">Upload code</label>
-            <div className="flex gap-2 mt-1">
+            <div className="flex gap-2 mt-1 items-center">
               <input
-                className="border rounded px-2 py-1 max-w-xs"
+                className="border rounded px-2 py-1 max-w-xs w-full"
                 value={uploadCode}
                 onChange={(e) => setUploadCode(e.target.value)}
+                placeholder="Enter upload code"
               />
               <button
                 className="px-3 py-1 rounded bg-black text-white"
                 onClick={unlockUpload}
+                disabled={!uploadCode.trim()}
               >
                 Enable Upload
               </button>
@@ -137,9 +153,7 @@ export default function DocumentsPanel() {
               <select
                 className="border rounded px-2 py-1 w-full"
                 value={category}
-                onChange={(e) =>
-                  setCategory(e.target.value as Category)
-                }
+                onChange={(e) => setCategory(e.target.value as Category)}
               >
                 <option>Regulatory</option>
                 <option>Technical</option>
@@ -154,7 +168,7 @@ export default function DocumentsPanel() {
                 className="border rounded px-2 py-1 w-full"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g., FUZE SDS PDF"
+                placeholder="Optional title"
               />
             </div>
           </div>
@@ -167,9 +181,7 @@ export default function DocumentsPanel() {
               <input
                 type="file"
                 className="hidden"
-                onChange={(e) =>
-                  setFile(e.target.files?.[0] || null)
-                }
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
               />
             </label>
 
@@ -188,7 +200,7 @@ export default function DocumentsPanel() {
             Upload &amp; Publish
           </button>
 
-          {status && <div className="text-sm">{status}</div>}
+          {status && <div className="text-sm whitespace-pre-wrap">{status}</div>}
         </div>
       )}
     </div>
