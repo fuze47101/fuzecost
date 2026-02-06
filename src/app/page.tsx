@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import DocumentsPanel from "@/components/DocumentsPanel";
 import { useMemo, useState } from "react";
 import { calcQuote, type CostAdder, type WidthUnit } from "@/lib/calc";
 import {
@@ -623,45 +624,8 @@ export default function Page() {
 
           {/* ===== Docs Tab ===== */}
           <TabsContent value="docs" className="mt-6">
-            <Card className="rounded-2xl shadow-sm">
-              <CardHeader><CardTitle>Document repository</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-sm text-neutral-500">
-                  Enter the access code to view and download commonly requested documents (SDS, EPA, labels, SOPs).
-                </div>
-
-                <div className="flex gap-2 max-w-lg">
-                  <Input placeholder="Access code" value={docsCode} onChange={(e) => setDocsCode(e.target.value)} />
-                  <Button onClick={() => fetchDocs(docsCode)} disabled={docsLoading || !docsCode}>
-                    {docsLoading ? "Loading…" : "Unlock"}
-                  </Button>
-                </div>
-
-                {docsError && <div className="text-sm text-red-600">{docsError}</div>}
-
-                {docs.length > 0 && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                    {docs.map((d) => (
-                      <div key={d.id} className="rounded-2xl border bg-white p-4">
-                        
-                        <div className="font-semibold">{d.title}</div>
-                        {d.note && <div className="text-sm text-neutral-600 mt-1">{d.note}</div>}
-                        <div className="mt-3">
-                          <a href={d.url} className="inline-flex items-center rounded-xl border px-3 py-2 text-sm font-medium hover:bg-neutral-50">
-                            Download
-                          </a>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="text-xs text-neutral-500 pt-2">
-                  Downloads are time-limited signed links. If a link expires, unlock again.
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+  <DocumentsPanel />
+</TabsContent>
 
           <TabsContent value="performance" className="mt-6">
             <div className="grid grid-cols-1 gap-6">
