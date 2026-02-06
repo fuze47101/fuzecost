@@ -22,18 +22,50 @@ export default function DocumentsPanel() {
     setViewUnlocked(true);
   }
 
-  function unlockUpload() {
-    if (!uploadCode.trim()) return;
-    setUploadUnlocked(true);
+  async function unlockUpload() {
+    if (!uploadCode.trim()) {
+      setStatus("Enter the upload code first.");
+      return;
+    }
+
+    try {
+      setBusy(true);
+      setStatus("Verifying upload code…");
+
+      const res = await fetch("/api/docs/sign-upload", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          code: uploadCode.trim(),
+          verifyOnly: true,
+        }),
+      });
+
+      const json = await res.json().catch(() => ({} as any));
+
+      if (!res.ok) {
+        setUploadUnlocked(false);
+        setStatus(`❌ ${json?.message || "Upload code verification failed"} (HTTP ${res.status})`);
+        return;
+      }
+
+      setUploadUnlocked(true);
+      setStatus("✅ Upload enabled");
+    } catch (e: any) {
+      setUploadUnlocked(false);
+      setStatus(`❌ Verification error: ${e?.message || "unknown"}`);
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function uploadAndPublish() {
-    if (!file) {
-      setStatus("Choose a file first.");
+    if (!uploadUnlocked) {
+      setStatus("Enable Upload first.");
       return;
     }
-    if (!uploadCode.trim()) {
-      setStatus("Enter the upload code first.");
+    if (!file) {
+      setStatus("Choose a file first.");
       return;
     }
 
@@ -56,9 +88,7 @@ export default function DocumentsPanel() {
       const signJson = await sign.json().catch(() => ({} as any));
 
       if (!sign.ok) {
-        // IMPORTANT: show real server message + status so we stop guessing
-        const msg = signJson?.message || "Upload authorization failed";
-        setStatus(`❌ ${msg} (HTTP ${sign.status})`);
+        setStatus(`❌ ${signJson?.message || "Upload authorization failed"} (HTTP ${sign.status})`);
         return;
       }
 
@@ -131,13 +161,13 @@ export default function DocumentsPanel() {
               <button
                 className="px-3 py-1 rounded bg-black text-white"
                 onClick={unlockUpload}
-                disabled={!uploadCode.trim()}
+                disabled={busy || !uploadCode.trim()}
               >
                 Enable Upload
               </button>
             </div>
             <div className="text-xs text-neutral-500 mt-1">
-              Enables uploading new files and publishing them.
+              Upload unlocks only after server verification.
             </div>
           </div>
         </div>
@@ -202,6 +232,10 @@ export default function DocumentsPanel() {
 
           {status && <div className="text-sm whitespace-pre-wrap">{status}</div>}
         </div>
+      )}
+
+      {!uploadUnlocked && status && (
+        <div className="text-sm whitespace-pre-wrap">{status}</div>
       )}
     </div>
   );

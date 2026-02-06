@@ -12,13 +12,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const rawCode = (body?.code ?? "") as string;
 
-    // IMPORTANT: trim BOTH sides to avoid invisible whitespace/newline issues in Railway vars
+    // Trim BOTH sides to eliminate invisible whitespace/newline issues
     const provided = String(rawCode).trim();
     const expected = String(process.env.UPLOAD_CODE ?? "").trim();
 
+    // Verify-only mode for "Enable Upload"
+    const verifyOnly = Boolean(body?.verifyOnly);
+
     if (!expected) {
-      // This means the server runtime does not see UPLOAD_CODE at all.
-      // (Even if Railway UI shows it, it may not be reaching this running service.)
       return NextResponse.json(
         { message: "Server missing UPLOAD_CODE (runtime env not loaded)" },
         { status: 500 }
@@ -26,17 +27,16 @@ export async function POST(req: NextRequest) {
     }
 
     if (!provided) {
-      return NextResponse.json(
-        { message: "Missing upload code" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Missing upload code" }, { status: 400 });
     }
 
     if (provided !== expected) {
-      return NextResponse.json(
-        { message: "Invalid upload code" },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Invalid upload code" }, { status: 401 });
+    }
+
+    // If we're only verifying the code, stop here.
+    if (verifyOnly) {
+      return NextResponse.json({ ok: true });
     }
 
     const filename = String(body?.filename ?? "").trim();
@@ -45,21 +45,15 @@ export async function POST(req: NextRequest) {
     const title = body?.title;
 
     if (!filename) {
-      return NextResponse.json(
-        { message: "Missing filename" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Missing filename" }, { status: 400 });
     }
 
     const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
     const safeCategory = category.replace(/[^a-zA-Z0-9._-]/g, "_");
 
-    const key = `docs/${safeCategory}/${crypto
-      .randomBytes(8)
-      .toString("hex")}-${safeName}`;
+    const key = `docs/${safeCategory}/${crypto.randomBytes(8).toString("hex")}-${safeName}`;
 
     const bucket = String(process.env.S3_BUCKET || "fuzedocs").trim();
-    const region = String(process.env.AWS_REGION || "us-east-2").trim();
 
     const command = new PutObjectCommand({
       Bucket: bucket,
@@ -77,7 +71,7 @@ export async function POST(req: NextRequest) {
       title,
       category: safeCategory,
       bucket,
-      region,
+      region: String(process.env.AWS_REGION || "us-east-2").trim(),
     });
   } catch (err: any) {
     console.error("sign-upload error:", err?.message || err);
