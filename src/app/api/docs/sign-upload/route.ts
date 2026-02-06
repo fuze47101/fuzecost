@@ -1,48 +1,57 @@
-import { NextResponse } from "next/server";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { s3, DOCS_BUCKET, DOCS_PREFIX } from "@/lib/s3";
 
-const allowed = new Set([
-  "application/pdf",
-  "image/jpeg",
-  "image/png",
-  "video/mp4",
-  "application/vnd.ms-powerpoint",
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-]);
+const s3 = new S3Client({
+  region: process.env.AWS_REGION || "us-east-2",
+});
 
-function safeName(name: string) {
-  return (name || "file")
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { code, filename, contentType, category, title } = body || {};
 
-export async function POST(req: Request) {
-  const { code, filename, contentType, folder } = await req.json();
+    if (!code || code !== process.env.UPLOAD_CODE) {
+      return NextResponse.json(
+        { message: "Invalid upload code" },
+        { status: 401 }
+      );
+    }
 
-  if (!process.env.DOCS_UPLOAD_CODE || code !== process.env.DOCS_UPLOAD_CODE) {
-    return NextResponse.json({ error: "Invalid code" }, { status: 401 });
+    if (!filename) {
+      return NextResponse.json(
+        { message: "Missing filename" },
+        { status: 400 }
+      );
+    }
+
+    const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const key = `docs/${category || "general"}/${crypto
+      .randomBytes(8)
+      .toString("hex")}-${safeName}`;
+
+    const command = new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET || "fuzedocs",
+      Key: key,
+      ContentType: contentType || "application/octet-stream",
+    });
+
+    const uploadUrl = await getSignedUrl(s3, command, {
+      expiresIn: 60 * 10, // 10 minutes
+    });
+
+    return NextResponse.json({
+      uploadUrl,
+      key,
+      title,
+      category,
+    });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { message: "Failed to sign upload" },
+      { status: 500 }
+    );
   }
-
-  if (!allowed.has(contentType)) {
-    return NextResponse.json({ error: "File type not allowed" }, { status: 400 });
-  }
-
-  const ts = new Date().toISOString().replace(/[:.]/g, "-");
-  const cleanFolder = safeName(folder || "marketing");
-  const cleanFile = safeName(filename || "file");
-
-  const key = `${DOCS_PREFIX}/${cleanFolder}/${ts}-${cleanFile}`;
-
-  const cmd = new PutObjectCommand({
-    Bucket: DOCS_BUCKET,
-    Key: key,
-    ContentType: contentType,
-  });
-
-  const url = await getSignedUrl(s3, cmd, { expiresIn: 60 * 10 });
-  return NextResponse.json({ url, key });
 }
