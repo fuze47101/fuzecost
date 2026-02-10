@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import crypto from "crypto";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export const runtime = "nodejs";
 
@@ -11,75 +13,88 @@ function clean(s: any) {
   return String(s ?? "").trim();
 }
 
-function safeCategoryName(raw: string) {
-  return clean(raw || "General").replace(/[^a-zA-Z0-9._-]/g, "_");
+function safeName(s: string) {
+  return clean(s).replace(/[^a-zA-Z0-9._-]/g, "_");
 }
 
-function extractViewCode(req: NextRequest) {
-  const h = req.headers;
-  const direct = clean(h.get("x-view-code")) || clean(h.get("x-docs-code"));
-  if (direct) return direct;
-
-  const auth = clean(h.get("authorization"));
-  const m = auth.match(/^Bearer\s+(.+)$/i);
-  if (m?.[1]) return clean(m[1]);
-
-  return clean(req.nextUrl.searchParams.get("code"));
+function getBucket() {
+  // Prefer DOCS_BUCKET (matches your Railway vars), fall back to S3_BUCKET for legacy
+  return clean(process.env.DOCS_BUCKET ?? process.env.S3_BUCKET ?? "fuzedocs");
 }
 
-function expectedViewCode() {
-  return clean(process.env.DOCS_VIEW_CODE ?? process.env.VIEW_CODE ?? "");
+function getPrefix() {
+  // Prefer DOCS_PREFIX; default to "docs/"
+  const p = clean(process.env.DOCS_PREFIX ?? "docs/");
+  return p.replace(/^\/+/, "").replace(/\/?$/, "/");
 }
 
-export async function GET(req: NextRequest) {
+export async function OPTIONS() {
+  // Safe no-op for any unexpected preflight behavior
+  return new NextResponse(null, { status: 204 });
+}
+
+export async function POST(req: NextRequest) {
   try {
-    const expected = expectedViewCode();
-    const provided = extractViewCode(req);
+    const body = await req.json().catch(() => ({}));
+
+    const provided = clean(body?.code);
+    const expected = clean(process.env.DOCS_UPLOAD_CODE ?? process.env.UPLOAD_CODE ?? "");
+    const verifyOnly = Boolean(body?.verifyOnly);
 
     if (!expected) {
       return NextResponse.json(
-        { message: "Server missing DOCS_VIEW_CODE/VIEW_CODE (runtime env not loaded)" },
+        { message: "Server missing DOCS_UPLOAD_CODE/UPLOAD_CODE" },
         { status: 500 }
       );
     }
     if (!provided) {
-      return NextResponse.json({ message: "Missing view code" }, { status: 400 });
+      return NextResponse.json({ message: "Missing upload code" }, { status: 400 });
     }
     if (provided !== expected) {
-      return NextResponse.json({ message: "Invalid view code" }, { status: 401 });
+      return NextResponse.json({ message: "Invalid upload code" }, { status: 401 });
     }
 
-    const rawCategory = clean(req.nextUrl.searchParams.get("category"));
-    if (!rawCategory) {
-      return NextResponse.json({ message: "Missing category" }, { status: 400 });
+    // Verify-only mode
+    if (verifyOnly) {
+      return NextResponse.json({ ok: true });
     }
 
-    const category = safeCategoryName(rawCategory);
+    const filename = clean(body?.filename);
+    if (!filename) {
+      return NextResponse.json({ message: "Missing filename" }, { status: 400 });
+    }
 
-    // IMPORTANT: match sign-upload bucket usage
-    const bucket = clean(process.env.S3_BUCKET ?? process.env.DOCS_BUCKET ?? "fuzedocs");
-    const prefix = `docs/${category}/`;
+    const contentType = clean(body?.contentType) || "application/octet-stream";
 
-    const out = await s3.send(
-      new ListObjectsV2Command({
-        Bucket: bucket,
-        Prefix: prefix,
-        MaxKeys: 1000,
-      })
-    );
+    const rawCategory = clean(body?.category) || "General";
+    const category = safeName(rawCategory);
 
-    const files =
-      (out.Contents ?? [])
-        .map((o) => o.Key || "")
-        .filter((k) => k && !k.endsWith("/"))
-        .map((k) => ({ key: k, name: k.slice(prefix.length) }))
-        .filter((f) => f.name);
+    const bucket = getBucket();
+    const prefix = getPrefix();
 
-    return NextResponse.json({ bucket, category, prefix, files });
+    const finalName = safeName(filename);
+    const key = `${prefix}${category}/${crypto.randomBytes(8).toString("hex")}-${finalName}`;
+
+    const command = new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      ContentType: contentType,
+    });
+
+    const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 60 * 10 });
+
+    return NextResponse.json({
+      ok: true,
+      uploadUrl,
+      key,
+      bucket,
+      category,
+      contentType,
+    });
   } catch (err: any) {
-    console.error("files list error:", err?.message || err);
+    console.error("sign-upload error:", err?.message || err);
     return NextResponse.json(
-      { message: `Failed to list files: ${err?.message || "unknown error"}` },
+      { message: `Failed to sign upload: ${err?.message || "unknown error"}` },
       { status: 500 }
     );
   }
