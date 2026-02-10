@@ -6,9 +6,6 @@ type CategoriesResponse = { categories: string[] };
 type FilesResponse = { files: { key: string; name: string }[] };
 
 function normalizeCategoriesPayload(data: any): string[] {
-  // Accept a few shapes so we never silently fail:
-  // 1) { categories: string[] }
-  // 2) string[]
   if (Array.isArray(data)) return data.filter((x) => typeof x === "string");
   if (data && Array.isArray(data.categories)) return data.categories.filter((x: any) => typeof x === "string");
   return [];
@@ -66,7 +63,6 @@ export default function DocumentsPanel() {
       }
 
       const data = await res.json().catch(() => ({}));
-      // accept { ok: true } or { valid: true } patterns
       const ok = Boolean((data && (data.ok || data.valid)) ?? true);
 
       if (ok) {
@@ -128,14 +124,16 @@ export default function DocumentsPanel() {
     return () => {
       cancelled = true;
     };
-    // activeCategory intentionally not a dependency here
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canView]);
 
   // ---- Load files when category changes ----
   useEffect(() => {
     if (!canView) return;
-    if (!activeCategory) {
+
+    // Capture a non-null local copy so TS is happy inside async scope
+    const category = activeCategory;
+    if (!category) {
       setFiles([]);
       return;
     }
@@ -147,7 +145,7 @@ export default function DocumentsPanel() {
       setStatus("");
 
       try {
-        const url = `/api/docs/files?category=${encodeURIComponent(activeCategory)}`;
+        const url = `/api/docs/files?category=${encodeURIComponent(category)}`;
         const res = await fetch(url, { cache: "no-store" });
 
         if (!res.ok) {
@@ -179,7 +177,6 @@ export default function DocumentsPanel() {
     };
   }, [canView, activeCategory]);
 
-  // ---- Minimal styling (Tailwind classes are fine, but keep it predictable) ----
   return (
     <div className="w-full">
       <div className="rounded-xl border border-gray-200 p-4">
@@ -278,9 +275,11 @@ export default function DocumentsPanel() {
             ) : (
               <div className="flex flex-col gap-2">
                 {files.map((f) => (
-                  <div key={f.key} className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2">
+                  <div
+                    key={f.key}
+                    className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2"
+                  >
                     <div className="text-sm font-semibold">{f.name}</div>
-                    {/* If you have a download endpoint, this will work. If not, we add it next. */}
                     <a
                       className="rounded-lg border border-black px-3 py-1 text-sm font-bold"
                       href={`/api/docs/download?key=${encodeURIComponent(f.key)}`}
