@@ -131,12 +131,13 @@ export default function DocumentsPanel() {
   useEffect(() => {
     if (!canView) return;
 
-    // Capture a non-null local copy so TS is happy inside async scope
-    const category = activeCategory;
-    if (!category) {
+    if (!activeCategory) {
       setFiles([]);
       return;
     }
+
+    // FORCE a non-null string for TS (fixes Railway build)
+    const category: string = activeCategory;
 
     let cancelled = false;
 
