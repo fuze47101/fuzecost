@@ -19,7 +19,7 @@ function normalizeFilesPayload(data: any): { key: string; name: string }[] {
 }
 
 function prettyFileName(raw: string) {
-  let name = raw.replace(/^[a-f0-9]{8,}-/i, ""); // strip hash-
+  let name = raw.replace(/^[a-f0-9]{8,}-/i, "");
   name = name.replace(/[_-]+/g, " ");
   name = name.replace(/\s+/g, " ").trim();
   return name;
@@ -43,7 +43,9 @@ export default function DocumentsPanel() {
   const [uploadCategory, setUploadCategory] = useState<string>("General");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [uploadResults, setUploadResults] = useState<{ name: string; ok: boolean; message?: string }[]>([]);
+  const [uploadResults, setUploadResults] = useState<
+    { name: string; ok: boolean; message?: string }[]
+  >([]);
 
   // Status
   const [status, setStatus] = useState("");
@@ -57,6 +59,10 @@ export default function DocumentsPanel() {
       "x-view-code": code,
       authorization: `Bearer ${code}`,
     } as Record<string, string>;
+  }
+
+  function safeEq(a: string, b: string) {
+    return String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
   }
 
   // ---- Unlock view (server verified) ----
@@ -116,6 +122,8 @@ export default function DocumentsPanel() {
       if (!res.ok) {
         const txt = await res.text().catch(() => "");
         setUploadUnlocked(false);
+        setSelectedFiles([]);
+        setUploadResults([]);
         setStatus(`Upload verify failed (${res.status}) ${txt}`.trim());
         return;
       }
@@ -123,13 +131,19 @@ export default function DocumentsPanel() {
       const data = await res.json().catch(() => ({}));
       if (data?.ok) {
         setUploadUnlocked(true);
+        setSelectedFiles([]);
+        setUploadResults([]);
         setStatus("Upload enabled.");
       } else {
         setUploadUnlocked(false);
+        setSelectedFiles([]);
+        setUploadResults([]);
         setStatus("Upload verify failed.");
       }
     } catch (e: any) {
       setUploadUnlocked(false);
+      setSelectedFiles([]);
+      setUploadResults([]);
       setStatus(e?.message ?? "Upload verify failed.");
     }
   };
@@ -214,7 +228,11 @@ export default function DocumentsPanel() {
 
         if (!signRes.ok) {
           const txt = await signRes.text().catch(() => "");
-          results.push({ name: file.name, ok: false, message: `sign failed (${signRes.status}) ${txt}`.trim() });
+          results.push({
+            name: file.name,
+            ok: false,
+            message: `sign failed (${signRes.status}) ${txt}`.trim(),
+          });
           continue;
         }
 
@@ -226,12 +244,10 @@ export default function DocumentsPanel() {
           continue;
         }
 
-        // 2) Upload to S3 via presigned URL
+        // 2) Upload to S3
         const putRes = await fetch(uploadUrl, {
           method: "PUT",
-          headers: {
-            "content-type": file.type || "application/octet-stream",
-          },
+          headers: { "content-type": file.type || "application/octet-stream" },
           body: file,
         });
 
@@ -251,22 +267,21 @@ export default function DocumentsPanel() {
     const okCount = results.filter((r) => r.ok).length;
     const failCount = results.length - okCount;
 
-    setStatus(failCount === 0 ? `Uploaded ${okCount}/${results.length} successfully.` : `Uploaded ${okCount}/${results.length}. ${failCount} failed.`);
+    setStatus(
+      failCount === 0
+        ? `Uploaded ${okCount}/${results.length} successfully.`
+        : `Uploaded ${okCount}/${results.length}. ${failCount} failed.`
+    );
 
     setUploading(false);
 
-    // Refresh files list if you're currently viewing the same category
+    // Refresh files list if you’re viewing the same category
     if (viewCode && activeCategory && safeEq(activeCategory, uploadCategory)) {
-      // trigger reload by resetting activeCategory briefly
       const current = activeCategory;
       setActiveCategory(null);
       setTimeout(() => setActiveCategory(current), 0);
     }
   };
-
-  function safeEq(a: string, b: string) {
-    return String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
-  }
 
   return (
     <div className="w-full">
@@ -282,7 +297,10 @@ export default function DocumentsPanel() {
                 onChange={(e) => setViewCodeInput(e.target.value)}
                 placeholder="Enter view code"
               />
-              <button onClick={onUnlockView} className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white">
+              <button
+                onClick={onUnlockView}
+                className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white"
+              >
                 Unlock
               </button>
             </div>
@@ -290,7 +308,7 @@ export default function DocumentsPanel() {
             {viewUnlocked && <div className="mt-2 text-sm font-semibold text-green-600">✅ View enabled</div>}
           </div>
 
-          {/* Upload */}
+          {/* Upload gate */}
           <div>
             <label className="text-sm font-medium">Upload code</label>
             <div className="mt-1 flex gap-2">
@@ -300,57 +318,74 @@ export default function DocumentsPanel() {
                 onChange={(e) => setUploadCode(e.target.value)}
                 placeholder="Enter upload code"
               />
-              <button onClick={onEnableUpload} className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white">
+              <button
+                onClick={onEnableUpload}
+                className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white"
+              >
                 Enable Upload
               </button>
             </div>
             <div className="mt-1 text-xs text-gray-500">Upload unlocks only after server verification.</div>
-            {uploadUnlocked && <div className="mt-2 text-sm font-semibold text-green-600">✅ Upload enabled</div>}
 
-            {/* Multi-file upload UI */}
-            <div className="mt-3 rounded-lg border border-gray-200 p-3">
-              <div className="mb-2 flex items-center gap-2">
-                <span className="text-sm font-semibold">Category</span>
-                <select
-                  className="rounded-md border border-gray-300 px-2 py-1 text-sm"
-                  value={uploadCategory}
-                  onChange={(e) => setUploadCategory(e.target.value)}
-                  disabled={!uploadUnlocked || uploading}
-                >
-                  {(categories.length ? categories : ["Regulatory", "Technical", "Marketing", "Training", "General"]).map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            {/* IMPORTANT: Do NOT show any upload controls until unlocked */}
+            {uploadUnlocked && (
+              <>
+                <div className="mt-2 text-sm font-semibold text-green-600">✅ Upload enabled</div>
 
-              <input
-                type="file"
-                multiple
-                disabled={!uploadUnlocked || uploading}
-                onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
-                className="block w-full text-sm"
-              />
+                <div className="mt-3 rounded-lg border border-gray-200 p-3">
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="text-sm font-semibold">Category</span>
+                    <select
+                      className="rounded-md border border-gray-300 px-2 py-1 text-sm"
+                      value={uploadCategory}
+                      onChange={(e) => setUploadCategory(e.target.value)}
+                      disabled={uploading}
+                    >
+                      {(categories.length ? categories : ["Regulatory", "Technical", "Marketing", "Training", "General"]).map(
+                        (c) => (
+                          <option key={c} value={c}>
+                            {c}
+                          </option>
+                        )
+                      )}
+                    </select>
+                  </div>
 
-              <button
-                onClick={onUploadFiles}
-                disabled={!uploadUnlocked || uploading || selectedFiles.length === 0}
-                className="mt-2 rounded-md bg-black px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-              >
-                {uploading ? "Uploading…" : `Upload ${selectedFiles.length || ""}`.trim()}
-              </button>
+                  {/* File picker should ALWAYS be clickable when uploadUnlocked */}
+                  <input
+                    type="file"
+                    multiple
+                    disabled={uploading}
+                    onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
+                    className="block w-full text-sm"
+                  />
 
-              {uploadResults.length > 0 && (
-                <div className="mt-2 text-sm">
-                  {uploadResults.map((r) => (
-                    <div key={r.name} className={r.ok ? "text-green-700" : "text-red-700"}>
-                      {r.ok ? "✅" : "❌"} {r.name} {r.message ? `— ${r.message}` : ""}
+                  <button
+                    onClick={onUploadFiles}
+                    disabled={uploading || selectedFiles.length === 0}
+                    className="mt-2 rounded-md bg-black px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                  >
+                    {uploading ? "Uploading…" : `Upload ${selectedFiles.length || ""}`.trim()}
+                  </button>
+
+                  {selectedFiles.length > 0 && (
+                    <div className="mt-2 text-xs text-gray-600">
+                      Selected: {selectedFiles.map((f) => f.name).join(", ")}
                     </div>
-                  ))}
+                  )}
+
+                  {uploadResults.length > 0 && (
+                    <div className="mt-2 text-sm">
+                      {uploadResults.map((r) => (
+                        <div key={r.name} className={r.ok ? "text-green-700" : "text-red-700"}>
+                          {r.ok ? "✅" : "❌"} {r.name} {r.message ? `— ${r.message}` : ""}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -405,7 +440,10 @@ export default function DocumentsPanel() {
             ) : (
               <div className="flex flex-col gap-2">
                 {files.map((f) => (
-                  <div key={f.key} className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2">
+                  <div
+                    key={f.key}
+                    className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2"
+                  >
                     <div className="text-sm font-semibold">{prettyFileName(f.name)}</div>
                     <a
                       className="rounded-lg border border-black px-3 py-1 text-sm font-bold"
