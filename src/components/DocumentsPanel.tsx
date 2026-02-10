@@ -6,15 +6,36 @@ type FilesResponse = { files: { key: string; name: string }[] };
 
 function normalizeCategoriesPayload(data: any): string[] {
   if (Array.isArray(data)) return data.filter((x) => typeof x === "string");
-  if (data && Array.isArray(data.categories)) return data.categories.filter((x: any) => typeof x === "string");
+  if (data && Array.isArray(data.categories))
+    return data.categories.filter((x: any) => typeof x === "string");
   return [];
 }
 
 function normalizeFilesPayload(data: any): { key: string; name: string }[] {
   if (!data || !Array.isArray(data.files)) return [];
   return data.files
-    .filter((x: any) => x && typeof x.key === "string" && typeof x.name === "string")
+    .filter(
+      (x: any) =>
+        x && typeof x.key === "string" && typeof x.name === "string"
+    )
     .map((x: any) => ({ key: x.key, name: x.name }));
+}
+
+/**
+ * User-friendly display name (frontend-only)
+ * Keeps S3 keys intact for download
+ */
+function prettyFileName(raw: string) {
+  // Remove leading hex/hash prefix + dash
+  let name = raw.replace(/^[a-f0-9]{8,}-/i, "");
+
+  // Replace underscores and dashes with spaces
+  name = name.replace(/[_-]+/g, " ");
+
+  // Collapse extra spaces
+  name = name.replace(/\s+/g, " ").trim();
+
+  return name;
 }
 
 export default function DocumentsPanel() {
@@ -22,9 +43,8 @@ export default function DocumentsPanel() {
   const [viewCodeInput, setViewCodeInput] = useState("");
   const [uploadCode, setUploadCode] = useState("");
 
-  // Gate: we only set this AFTER server accepts the code
+  // View gate (set only after server accepts code)
   const [viewCode, setViewCode] = useState<string | null>(null);
-
   const [uploadUnlocked, setUploadUnlocked] = useState(false);
 
   // Data
@@ -32,34 +52,25 @@ export default function DocumentsPanel() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [files, setFiles] = useState<{ key: string; name: string }[]>([]);
 
-  // UI status
+  // UI state
   const [status, setStatus] = useState("");
   const [loadingCats, setLoadingCats] = useState(false);
   const [loadingFiles, setLoadingFiles] = useState(false);
 
   const viewUnlocked = useMemo(() => viewCode !== null, [viewCode]);
 
-  // Helper: include view code in all docs calls
   function viewHeaders(code: string) {
-    // Server is clearly expecting SOME view code signal.
-    // We send it in the most common patterns so we match your backend without guessing:
-    // - x-view-code header (preferred)
-    // - authorization bearer (fallback)
     return {
       "x-view-code": code,
       authorization: `Bearer ${code}`,
     } as Record<string, string>;
   }
 
-  // ---- Unlock View (SERVER VERIFIED) ----
+  // ---- Unlock view (server verified) ----
   const onUnlockView = async () => {
     const code = viewCodeInput.trim();
     if (!code) {
       setStatus("Enter a view code.");
-      setViewCode(null);
-      setCategories([]);
-      setActiveCategory(null);
-      setFiles([]);
       return;
     }
 
@@ -68,16 +79,12 @@ export default function DocumentsPanel() {
       setLoadingCats(true);
 
       const res = await fetch("/api/docs/categories", {
-        method: "GET",
         cache: "no-store",
-        headers: {
-          ...viewHeaders(code),
-        },
+        headers: viewHeaders(code),
       });
 
       if (!res.ok) {
         const txt = await res.text().catch(() => "");
-        // Lock view if server rejects
         setViewCode(null);
         setCategories([]);
         setActiveCategory(null);
@@ -89,7 +96,6 @@ export default function DocumentsPanel() {
       const raw = await res.json().catch(() => null);
       const list = normalizeCategoriesPayload(raw);
 
-      // Server accepted the code
       setViewCode(code);
       setCategories(list);
       setActiveCategory(list.length ? list[0] : null);
@@ -97,19 +103,16 @@ export default function DocumentsPanel() {
       setStatus(list.length ? "" : "No categories found.");
     } catch (e: any) {
       setViewCode(null);
-      setCategories([]);
-      setActiveCategory(null);
-      setFiles([]);
       setStatus(e?.message ?? "Failed to verify view code.");
     } finally {
       setLoadingCats(false);
     }
   };
 
-  // ---- Upload unlock (server verification) ----
+  // ---- Upload unlock ----
   const onEnableUpload = async () => {
     try {
-      setStatus("Verifying upload code...");
+      setStatus("Verifying upload code…");
       const res = await fetch("/api/docs/sign-upload", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -119,38 +122,27 @@ export default function DocumentsPanel() {
       if (!res.ok) {
         const txt = await res.text().catch(() => "");
         setUploadUnlocked(false);
-        setStatus(`Upload verify failed (${res.status}). ${txt}`.trim());
+        setStatus(`Upload verify failed (${res.status}) ${txt}`.trim());
         return;
       }
 
-      const data = await res.json().catch(() => ({}));
-      const ok = Boolean((data && (data.ok || data.valid)) ?? true);
-
-      if (ok) {
-        setUploadUnlocked(true);
-        setStatus("Upload enabled.");
-      } else {
-        setUploadUnlocked(false);
-        setStatus("Upload verify failed.");
-      }
+      setUploadUnlocked(true);
+      setStatus("Upload enabled.");
     } catch (e: any) {
       setUploadUnlocked(false);
       setStatus(e?.message ?? "Upload verify failed.");
     }
   };
 
-  // ---- Load files when category changes (requires viewCode) ----
+  // ---- Load files when category changes ----
   useEffect(() => {
-    if (!viewCode) return;
-
-    if (!activeCategory) {
+    if (!viewCode || !activeCategory) {
       setFiles([]);
       return;
     }
 
-    const code: string = viewCode;
-    const category: string = activeCategory;
-
+    const code = viewCode;
+    const category = activeCategory;
     let cancelled = false;
 
     async function run() {
@@ -158,28 +150,25 @@ export default function DocumentsPanel() {
       setStatus("");
 
       try {
-        const url = `/api/docs/files?category=${encodeURIComponent(category)}`;
-        const res = await fetch(url, {
-          cache: "no-store",
-          headers: {
-            ...viewHeaders(code),
-          },
-        });
+        const res = await fetch(
+          `/api/docs/files?category=${encodeURIComponent(category)}`,
+          { cache: "no-store", headers: viewHeaders(code) }
+        );
 
         if (!res.ok) {
           const txt = await res.text().catch(() => "");
           throw new Error(`files request failed (${res.status}) ${txt}`.trim());
         }
 
-        const data = (await res.json().catch(() => null)) as FilesResponse | any;
+        const data = (await res.json().catch(() => null)) as FilesResponse;
         const list = normalizeFilesPayload(data);
 
-        if (cancelled) return;
-        setFiles(list);
+        if (!cancelled) setFiles(list);
       } catch (e: any) {
-        if (cancelled) return;
-        setFiles([]);
-        setStatus(e?.message ?? "Failed to load files.");
+        if (!cancelled) {
+          setFiles([]);
+          setStatus(e?.message ?? "Failed to load files.");
+        }
       } finally {
         if (!cancelled) setLoadingFiles(false);
       }
@@ -212,9 +201,11 @@ export default function DocumentsPanel() {
                 Unlock
               </button>
             </div>
-            <div className="mt-1 text-xs text-gray-500">Unlocks the document list and downloads.</div>
-
-            {viewUnlocked && <div className="mt-2 text-sm font-semibold text-green-600">✅ View enabled</div>}
+            {viewUnlocked && (
+              <div className="mt-2 text-sm font-semibold text-green-600">
+                ✅ View enabled
+              </div>
+            )}
           </div>
 
           {/* Upload */}
@@ -234,13 +225,16 @@ export default function DocumentsPanel() {
                 Enable Upload
               </button>
             </div>
-            <div className="mt-1 text-xs text-gray-500">Upload unlocks only after server verification.</div>
-            {uploadUnlocked && <div className="mt-2 text-sm font-semibold text-green-600">✅ Upload enabled</div>}
+            {uploadUnlocked && (
+              <div className="mt-2 text-sm font-semibold text-green-600">
+                ✅ Upload enabled
+              </div>
+            )}
           </div>
         </div>
 
         {status && (
-          <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+          <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm">
             {status}
           </div>
         )}
@@ -251,63 +245,50 @@ export default function DocumentsPanel() {
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[320px_1fr]">
           <div className="rounded-xl border border-gray-200 p-3">
             <div className="mb-2 text-sm font-bold">Categories</div>
-            {loadingCats ? (
-              <div className="text-sm text-gray-500">Loading…</div>
-            ) : categories.length === 0 ? (
-              <div className="text-sm text-gray-500">No categories.</div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {categories.map((c) => {
-                  const active = c === activeCategory;
-                  return (
-                    <button
-                      key={c}
-                      onClick={() => setActiveCategory(c)}
-                      className={[
-                        "rounded-lg border px-3 py-2 text-left text-sm font-semibold",
-                        active ? "border-black bg-black text-white" : "border-gray-200 bg-white text-black",
-                      ].join(" ")}
-                    >
-                      {c}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+            {categories.map((c) => (
+              <button
+                key={c}
+                onClick={() => setActiveCategory(c)}
+                className={[
+                  "mb-2 w-full rounded-lg border px-3 py-2 text-left text-sm font-semibold",
+                  c === activeCategory
+                    ? "border-black bg-black text-white"
+                    : "border-gray-200 bg-white",
+                ].join(" ")}
+              >
+                {c}
+              </button>
+            ))}
           </div>
 
           <div className="rounded-xl border border-gray-200 p-3">
             <div className="mb-2 text-sm font-bold">
-              Files {activeCategory ? <span className="text-gray-500">— {activeCategory}</span> : null}
+              Files {activeCategory && `— ${activeCategory}`}
             </div>
 
             {loadingFiles ? (
               <div className="text-sm text-gray-500">Loading…</div>
-            ) : !activeCategory ? (
-              <div className="text-sm text-gray-500">Select a category.</div>
             ) : files.length === 0 ? (
               <div className="text-sm text-gray-500">No files found.</div>
             ) : (
-              <div className="flex flex-col gap-2">
-                {files.map((f) => (
-                  <div
-                    key={f.key}
-                    className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2"
-                  >
-                    <div className="text-sm font-semibold">{f.name}</div>
-
-                    {/* Download endpoint may also require view code; we pass it as query too */}
-                    <a
-                      className="rounded-lg border border-black px-3 py-1 text-sm font-bold"
-                      href={`/api/docs/download?key=${encodeURIComponent(f.key)}&code=${encodeURIComponent(
-                        viewCode ?? ""
-                      )}`}
-                    >
-                      Download
-                    </a>
+              files.map((f) => (
+                <div
+                  key={f.key}
+                  className="mb-2 flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2"
+                >
+                  <div className="text-sm font-semibold">
+                    {prettyFileName(f.name)}
                   </div>
-                ))}
-              </div>
+                  <a
+                    href={`/api/docs/download?key=${encodeURIComponent(
+                      f.key
+                    )}&code=${encodeURIComponent(viewCode ?? "")}`}
+                    className="rounded-lg border border-black px-3 py-1 text-sm font-bold"
+                  >
+                    Download
+                  </a>
+                </div>
+              ))
             )}
           </div>
         </div>
