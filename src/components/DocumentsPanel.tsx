@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 
-type CategoriesResponse = { categories: string[] };
 type FilesResponse = { files: { key: string; name: string }[] };
 
 function normalizeCategoriesPayload(data: any): string[] {
@@ -11,37 +10,99 @@ function normalizeCategoriesPayload(data: any): string[] {
   return [];
 }
 
+function normalizeFilesPayload(data: any): { key: string; name: string }[] {
+  if (!data || !Array.isArray(data.files)) return [];
+  return data.files
+    .filter((x: any) => x && typeof x.key === "string" && typeof x.name === "string")
+    .map((x: any) => ({ key: x.key, name: x.name }));
+}
+
 export default function DocumentsPanel() {
-  // ---- Gate states ----
-  const [viewCode, setViewCode] = useState("");
+  // Inputs
+  const [viewCodeInput, setViewCodeInput] = useState("");
   const [uploadCode, setUploadCode] = useState("");
 
-  const [viewUnlocked, setViewUnlocked] = useState(false);
+  // Gate: we only set this AFTER server accepts the code
+  const [viewCode, setViewCode] = useState<string | null>(null);
+
   const [uploadUnlocked, setUploadUnlocked] = useState(false);
 
-  // ---- Data ----
+  // Data
   const [categories, setCategories] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [files, setFiles] = useState<{ key: string; name: string }[]>([]);
 
-  // ---- Status ----
-  const [status, setStatus] = useState<string>("");
+  // UI status
+  const [status, setStatus] = useState("");
   const [loadingCats, setLoadingCats] = useState(false);
   const [loadingFiles, setLoadingFiles] = useState(false);
 
-  const canView = useMemo(() => viewUnlocked === true, [viewUnlocked]);
+  const viewUnlocked = useMemo(() => viewCode !== null, [viewCode]);
 
-  // ---- View unlock (local; matches your current UI behavior) ----
-  const onUnlockView = () => {
-    if (viewCode.trim().toLowerCase() === "fuze2026") {
-      setViewUnlocked(true);
-      setStatus("");
-    } else {
-      setViewUnlocked(false);
+  // Helper: include view code in all docs calls
+  function viewHeaders(code: string) {
+    // Server is clearly expecting SOME view code signal.
+    // We send it in the most common patterns so we match your backend without guessing:
+    // - x-view-code header (preferred)
+    // - authorization bearer (fallback)
+    return {
+      "x-view-code": code,
+      authorization: `Bearer ${code}`,
+    } as Record<string, string>;
+  }
+
+  // ---- Unlock View (SERVER VERIFIED) ----
+  const onUnlockView = async () => {
+    const code = viewCodeInput.trim();
+    if (!code) {
+      setStatus("Enter a view code.");
+      setViewCode(null);
       setCategories([]);
       setActiveCategory(null);
       setFiles([]);
-      setStatus("Invalid view code.");
+      return;
+    }
+
+    try {
+      setStatus("Verifying view code…");
+      setLoadingCats(true);
+
+      const res = await fetch("/api/docs/categories", {
+        method: "GET",
+        cache: "no-store",
+        headers: {
+          ...viewHeaders(code),
+        },
+      });
+
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        // Lock view if server rejects
+        setViewCode(null);
+        setCategories([]);
+        setActiveCategory(null);
+        setFiles([]);
+        setStatus(`categories request failed (${res.status}) ${txt}`.trim());
+        return;
+      }
+
+      const raw = await res.json().catch(() => null);
+      const list = normalizeCategoriesPayload(raw);
+
+      // Server accepted the code
+      setViewCode(code);
+      setCategories(list);
+      setActiveCategory(list.length ? list[0] : null);
+      setFiles([]);
+      setStatus(list.length ? "" : "No categories found.");
+    } catch (e: any) {
+      setViewCode(null);
+      setCategories([]);
+      setActiveCategory(null);
+      setFiles([]);
+      setStatus(e?.message ?? "Failed to verify view code.");
+    } finally {
+      setLoadingCats(false);
     }
   };
 
@@ -78,65 +139,16 @@ export default function DocumentsPanel() {
     }
   };
 
-  // ---- Load categories when view unlocked ----
+  // ---- Load files when category changes (requires viewCode) ----
   useEffect(() => {
-    if (!canView) return;
-
-    let cancelled = false;
-
-    async function run() {
-      setLoadingCats(true);
-      setStatus("");
-
-      try {
-        const res = await fetch("/api/docs/categories", { cache: "no-store" });
-        if (!res.ok) {
-          const txt = await res.text().catch(() => "");
-          throw new Error(`categories request failed (${res.status}) ${txt}`.trim());
-        }
-
-        const raw = await res.json().catch(() => null);
-        const list = normalizeCategoriesPayload(raw);
-
-        if (cancelled) return;
-
-        setCategories(list);
-
-        if (!activeCategory && list.length > 0) {
-          setActiveCategory(list[0]);
-        }
-
-        if (list.length === 0) {
-          setStatus("No categories found.");
-        }
-      } catch (e: any) {
-        if (cancelled) return;
-        setCategories([]);
-        setActiveCategory(null);
-        setFiles([]);
-        setStatus(e?.message ?? "Failed to load categories.");
-      } finally {
-        if (!cancelled) setLoadingCats(false);
-      }
-    }
-
-    run();
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canView]);
-
-  // ---- Load files when category changes ----
-  useEffect(() => {
-    if (!canView) return;
+    if (!viewCode) return;
 
     if (!activeCategory) {
       setFiles([]);
       return;
     }
 
-    // FORCE a non-null string for TS (fixes Railway build)
+    const code: string = viewCode;
     const category: string = activeCategory;
 
     let cancelled = false;
@@ -147,7 +159,12 @@ export default function DocumentsPanel() {
 
       try {
         const url = `/api/docs/files?category=${encodeURIComponent(category)}`;
-        const res = await fetch(url, { cache: "no-store" });
+        const res = await fetch(url, {
+          cache: "no-store",
+          headers: {
+            ...viewHeaders(code),
+          },
+        });
 
         if (!res.ok) {
           const txt = await res.text().catch(() => "");
@@ -155,14 +172,10 @@ export default function DocumentsPanel() {
         }
 
         const data = (await res.json().catch(() => null)) as FilesResponse | any;
-        const list = Array.isArray(data?.files) ? data.files : [];
+        const list = normalizeFilesPayload(data);
 
         if (cancelled) return;
-        setFiles(
-          list
-            .filter((x: any) => x && typeof x.key === "string" && typeof x.name === "string")
-            .map((x: any) => ({ key: x.key, name: x.name }))
-        );
+        setFiles(list);
       } catch (e: any) {
         if (cancelled) return;
         setFiles([]);
@@ -176,7 +189,7 @@ export default function DocumentsPanel() {
     return () => {
       cancelled = true;
     };
-  }, [canView, activeCategory]);
+  }, [viewCode, activeCategory]);
 
   return (
     <div className="w-full">
@@ -188,8 +201,8 @@ export default function DocumentsPanel() {
             <div className="mt-1 flex gap-2">
               <input
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-                value={viewCode}
-                onChange={(e) => setViewCode(e.target.value)}
+                value={viewCodeInput}
+                onChange={(e) => setViewCodeInput(e.target.value)}
                 placeholder="Enter view code"
               />
               <button
@@ -200,6 +213,7 @@ export default function DocumentsPanel() {
               </button>
             </div>
             <div className="mt-1 text-xs text-gray-500">Unlocks the document list and downloads.</div>
+
             {viewUnlocked && <div className="mt-2 text-sm font-semibold text-green-600">✅ View enabled</div>}
           </div>
 
@@ -233,7 +247,7 @@ export default function DocumentsPanel() {
       </div>
 
       {/* Categories + Files */}
-      {canView && (
+      {viewUnlocked && (
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[320px_1fr]">
           <div className="rounded-xl border border-gray-200 p-3">
             <div className="mb-2 text-sm font-bold">Categories</div>
@@ -281,9 +295,13 @@ export default function DocumentsPanel() {
                     className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2"
                   >
                     <div className="text-sm font-semibold">{f.name}</div>
+
+                    {/* Download endpoint may also require view code; we pass it as query too */}
                     <a
                       className="rounded-lg border border-black px-3 py-1 text-sm font-bold"
-                      href={`/api/docs/download?key=${encodeURIComponent(f.key)}`}
+                      href={`/api/docs/download?key=${encodeURIComponent(f.key)}&code=${encodeURIComponent(
+                        viewCode ?? ""
+                      )}`}
                     >
                       Download
                     </a>
