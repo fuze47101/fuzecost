@@ -11,6 +11,7 @@ function clean(s: any) {
   return String(s ?? "").trim();
 }
 
+// MUST match sign-upload route logic
 function safeCategoryName(raw: string) {
   return clean(raw || "General").replace(/[^a-zA-Z0-9._-]/g, "_");
 }
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
 
     if (!expected) {
       return NextResponse.json(
-        { message: "Server missing DOCS_VIEW_CODE/VIEW_CODE (runtime env not loaded)" },
+        { message: "Server missing DOCS_VIEW_CODE/VIEW_CODE" },
         { status: 500 }
       );
     }
@@ -56,7 +57,7 @@ export async function GET(req: NextRequest) {
 
     const category = safeCategoryName(rawCategory);
 
-    // IMPORTANT: match sign-upload bucket usage
+    // Match sign-upload bucket behavior
     const bucket = clean(process.env.S3_BUCKET ?? process.env.DOCS_BUCKET ?? "fuzedocs");
     const prefix = `docs/${category}/`;
 
