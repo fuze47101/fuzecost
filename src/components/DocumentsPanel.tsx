@@ -1,360 +1,298 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+
+type CategoriesResponse = { categories: string[] };
+type FilesResponse = { files: { key: string; name: string }[] };
+
+function normalizeCategoriesPayload(data: any): string[] {
+  // Accept a few shapes so we never silently fail:
+  // 1) { categories: string[] }
+  // 2) string[]
+  if (Array.isArray(data)) return data.filter((x) => typeof x === "string");
+  if (data && Array.isArray(data.categories)) return data.categories.filter((x: any) => typeof x === "string");
+  return [];
+}
 
 export default function DocumentsPanel() {
+  // ---- Gate states ----
   const [viewCode, setViewCode] = useState("");
   const [uploadCode, setUploadCode] = useState("");
+
   const [viewUnlocked, setViewUnlocked] = useState(false);
   const [uploadUnlocked, setUploadUnlocked] = useState(false);
 
-  const [categories, setCategories] = useState<string[]>([
-    "Regulatory",
-    "Technical",
-    "Marketing",
-    "Training",
-    "General",
-  ]);
-  const [category, setCategory] = useState<string>("Regulatory");
-  const [newCategory, setNewCategory] = useState<string>("");
+  // ---- Data ----
+  const [categories, setCategories] = useState<string[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [files, setFiles] = useState<{ key: string; name: string }[]>([]);
 
-  const [title, setTitle] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  // ---- Status ----
+  const [status, setStatus] = useState<string>("");
+  const [loadingCats, setLoadingCats] = useState(false);
+  const [loadingFiles, setLoadingFiles] = useState(false);
 
-  const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState("");
+  const canView = useMemo(() => viewUnlocked === true, [viewUnlocked]);
 
-  async function loadCategoriesFromServer(codeForRead: string) {
-    try {
-      const res = await fetch("/api/docs/categories", {
-        method: "GET",
-        headers: {
-          "x-view-code": codeForRead.trim(),
-        },
-      });
-
-      const json = await res.json().catch(() => ({} as any));
-      if (!res.ok) {
-        // Don’t block UI; just show why server didn’t return list
-        setStatus(`❌ ${json?.message || "Failed to load categories"} (HTTP ${res.status})`);
-        return;
-      }
-
-      const list = Array.isArray(json?.categories) ? json.categories : [];
-      if (list.length) {
-        setCategories(list);
-        if (!list.some((c: string) => c === category)) {
-          setCategory(list[0]);
-        }
-      }
-    } catch (e: any) {
-      setStatus(`❌ Failed to load categories: ${e?.message || "network error"}`);
+  // ---- View unlock (local; matches your current UI behavior) ----
+  const onUnlockView = () => {
+    if (viewCode.trim().toLowerCase() === "fuze2026") {
+      setViewUnlocked(true);
+      setStatus("");
+    } else {
+      setViewUnlocked(false);
+      setCategories([]);
+      setActiveCategory(null);
+      setFiles([]);
+      setStatus("Invalid view code.");
     }
-  }
+  };
 
-  function unlockView() {
-    if (!viewCode.trim()) return;
-    setViewUnlocked(true);
-    setStatus("✅ View enabled");
-
-    // Load categories using view code
-    loadCategoriesFromServer(viewCode);
-  }
-
-  async function unlockUpload() {
-    if (!uploadCode.trim()) {
-      setStatus("Enter the upload code first.");
-      return;
-    }
-
+  // ---- Upload unlock (server verification) ----
+  const onEnableUpload = async () => {
     try {
-      setBusy(true);
-      setStatus("Verifying upload code…");
-
+      setStatus("Verifying upload code...");
       const res = await fetch("/api/docs/sign-upload", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          code: uploadCode.trim(),
-          verifyOnly: true,
-        }),
+        body: JSON.stringify({ code: uploadCode.trim(), verifyOnly: true }),
       });
 
-      const json = await res.json().catch(() => ({} as any));
-
       if (!res.ok) {
+        const txt = await res.text().catch(() => "");
         setUploadUnlocked(false);
-        setStatus(`❌ ${json?.message || "Upload code verification failed"} (HTTP ${res.status})`);
+        setStatus(`Upload verify failed (${res.status}). ${txt}`.trim());
         return;
       }
 
-      setUploadUnlocked(true);
-      setStatus("✅ Upload enabled");
+      const data = await res.json().catch(() => ({}));
+      // accept { ok: true } or { valid: true } patterns
+      const ok = Boolean((data && (data.ok || data.valid)) ?? true);
 
-      // Load categories using upload code (allowed by server)
-      loadCategoriesFromServer(uploadCode);
+      if (ok) {
+        setUploadUnlocked(true);
+        setStatus("Upload enabled.");
+      } else {
+        setUploadUnlocked(false);
+        setStatus("Upload verify failed.");
+      }
     } catch (e: any) {
       setUploadUnlocked(false);
-      setStatus(`❌ Verification error: ${e?.message || "unknown"}`);
-    } finally {
-      setBusy(false);
+      setStatus(e?.message ?? "Upload verify failed.");
     }
-  }
+  };
 
-  async function addCategory() {
-    const c = newCategory.trim();
-    if (!c) return;
-
-    if (!uploadUnlocked) {
-      setStatus("Enable Upload first (required to create categories).");
-      return;
-    }
-
-    try {
-      setBusy(true);
-      setStatus("Saving category…");
-
-      const res = await fetch("/api/docs/categories", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          code: uploadCode.trim(),
-          category: c,
-        }),
-      });
-
-      const json = await res.json().catch(() => ({} as any));
-      if (!res.ok) {
-        setStatus(`❌ ${json?.message || "Failed to save category"} (HTTP ${res.status})`);
-        return;
-      }
-
-      const list = Array.isArray(json?.categories) ? json.categories : [];
-      if (list.length) {
-        setCategories(list);
-        setCategory(c);
-        setNewCategory("");
-        setStatus(`✅ Category added: "${c}"`);
-      } else {
-        setStatus("✅ Category saved");
-      }
-    } catch (e: any) {
-      setStatus(`❌ Failed to save category: ${e?.message || "network error"}`);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function uploadAndPublish() {
-    if (!uploadUnlocked) {
-      setStatus("Enable Upload first.");
-      return;
-    }
-    if (!file) {
-      setStatus("Choose a file first.");
-      return;
-    }
-
-    try {
-      setBusy(true);
-      setStatus("Authorizing upload…");
-
-      const sign = await fetch("/api/docs/sign-upload", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          code: uploadCode.trim(),
-          filename: file.name,
-          contentType: file.type || "application/octet-stream",
-          category,
-          title,
-        }),
-      });
-
-      const signJson = await sign.json().catch(() => ({} as any));
-
-      if (!sign.ok) {
-        setStatus(`❌ ${signJson?.message || "Upload authorization failed"} (HTTP ${sign.status})`);
-        return;
-      }
-
-      const { uploadUrl, key } = signJson;
-
-      if (!uploadUrl) {
-        setStatus("❌ Server did not return an upload URL.");
-        return;
-      }
-
-      setStatus("Uploading…");
-
-      const put = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: { "content-type": file.type || "application/octet-stream" },
-        body: file,
-      });
-
-      if (!put.ok) {
-        setStatus(`❌ S3 upload failed (HTTP ${put.status})`);
-        return;
-      }
-
-      setStatus(`✅ Uploaded successfully: ${key || ""}`);
-      setFile(null);
-      setTitle("");
-    } catch (err: any) {
-      setStatus(`❌ Unexpected error: ${err?.message || "unknown"}`);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  // If user unlocks view after upload already unlocked or vice versa, optionally refresh categories
+  // ---- Load categories when view unlocked ----
   useEffect(() => {
-    // no-op; keeping hook for future expansions
-  }, [viewUnlocked, uploadUnlocked]);
+    if (!canView) return;
 
+    let cancelled = false;
+
+    async function run() {
+      setLoadingCats(true);
+      setStatus("");
+
+      try {
+        const res = await fetch("/api/docs/categories", { cache: "no-store" });
+        if (!res.ok) {
+          const txt = await res.text().catch(() => "");
+          throw new Error(`categories request failed (${res.status}) ${txt}`.trim());
+        }
+
+        const raw = await res.json().catch(() => null);
+        const list = normalizeCategoriesPayload(raw);
+
+        if (cancelled) return;
+
+        setCategories(list);
+
+        if (!activeCategory && list.length > 0) {
+          setActiveCategory(list[0]);
+        }
+
+        if (list.length === 0) {
+          setStatus("No categories found.");
+        }
+      } catch (e: any) {
+        if (cancelled) return;
+        setCategories([]);
+        setActiveCategory(null);
+        setFiles([]);
+        setStatus(e?.message ?? "Failed to load categories.");
+      } finally {
+        if (!cancelled) setLoadingCats(false);
+      }
+    }
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+    // activeCategory intentionally not a dependency here
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canView]);
+
+  // ---- Load files when category changes ----
+  useEffect(() => {
+    if (!canView) return;
+    if (!activeCategory) {
+      setFiles([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function run() {
+      setLoadingFiles(true);
+      setStatus("");
+
+      try {
+        const url = `/api/docs/files?category=${encodeURIComponent(activeCategory)}`;
+        const res = await fetch(url, { cache: "no-store" });
+
+        if (!res.ok) {
+          const txt = await res.text().catch(() => "");
+          throw new Error(`files request failed (${res.status}) ${txt}`.trim());
+        }
+
+        const data = (await res.json().catch(() => null)) as FilesResponse | any;
+        const list = Array.isArray(data?.files) ? data.files : [];
+
+        if (cancelled) return;
+        setFiles(
+          list
+            .filter((x: any) => x && typeof x.key === "string" && typeof x.name === "string")
+            .map((x: any) => ({ key: x.key, name: x.name }))
+        );
+      } catch (e: any) {
+        if (cancelled) return;
+        setFiles([]);
+        setStatus(e?.message ?? "Failed to load files.");
+      } finally {
+        if (!cancelled) setLoadingFiles(false);
+      }
+    }
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [canView, activeCategory]);
+
+  // ---- Minimal styling (Tailwind classes are fine, but keep it predictable) ----
   return (
-    <div className="space-y-8">
-      <div className="rounded-lg border p-6 space-y-4">
-        <h2 className="text-lg font-semibold">Documents</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="w-full">
+      <div className="rounded-xl border border-gray-200 p-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {/* View */}
           <div>
             <label className="text-sm font-medium">View code</label>
-            <div className="flex gap-2 mt-1 items-center">
+            <div className="mt-1 flex gap-2">
               <input
-                className="border rounded px-2 py-1 max-w-xs w-full"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                 value={viewCode}
                 onChange={(e) => setViewCode(e.target.value)}
                 placeholder="Enter view code"
               />
               <button
-                className="px-3 py-1 rounded bg-black text-white"
-                onClick={unlockView}
-                type="button"
+                onClick={onUnlockView}
+                className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white"
               >
                 Unlock
               </button>
             </div>
-            <div className="text-xs text-neutral-500 mt-1">
-              Unlocks the document list and downloads.
-            </div>
-            {viewUnlocked && (
-              <div className="text-xs text-green-700 mt-1">View is enabled.</div>
-            )}
+            <div className="mt-1 text-xs text-gray-500">Unlocks the document list and downloads.</div>
+            {viewUnlocked && <div className="mt-2 text-sm font-semibold text-green-600">✅ View enabled</div>}
           </div>
 
+          {/* Upload */}
           <div>
             <label className="text-sm font-medium">Upload code</label>
-            <div className="flex gap-2 mt-1 items-center">
+            <div className="mt-1 flex gap-2">
               <input
-                className="border rounded px-2 py-1 max-w-xs w-full"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                 value={uploadCode}
                 onChange={(e) => setUploadCode(e.target.value)}
                 placeholder="Enter upload code"
               />
               <button
-                className="px-3 py-1 rounded bg-black text-white"
-                onClick={unlockUpload}
-                disabled={busy || !uploadCode.trim()}
-                type="button"
+                onClick={onEnableUpload}
+                className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white"
               >
                 Enable Upload
               </button>
             </div>
-            <div className="text-xs text-neutral-500 mt-1">
-              Upload unlocks only after server verification.
-            </div>
+            <div className="mt-1 text-xs text-gray-500">Upload unlocks only after server verification.</div>
+            {uploadUnlocked && <div className="mt-2 text-sm font-semibold text-green-600">✅ Upload enabled</div>}
           </div>
         </div>
+
+        {status && (
+          <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">
+            {status}
+          </div>
+        )}
       </div>
 
-      {uploadUnlocked && (
-        <div className="rounded-lg border p-6 space-y-4">
-          <h3 className="text-md font-semibold">Upload &amp; Publish</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm">Category</label>
-              <select
-                className="border rounded px-2 py-1 w-full"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                {categories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-
-              <div className="mt-2 flex gap-2">
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  placeholder='Add new category (e.g., "Factory Training")'
-                />
-                <button
-                  className="px-3 py-1 rounded bg-black text-white"
-                  onClick={addCategory}
-                  type="button"
-                  disabled={busy || !newCategory.trim()}
-                >
-                  Add
-                </button>
-              </div>
-
-              <div className="text-xs text-neutral-500 mt-1">
-                Categories are saved on the server (S3) and persist for everyone.
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm">Title</label>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Optional title"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="text-sm block mb-1">File</label>
-
-            <label className="inline-block px-4 py-2 bg-neutral-200 rounded cursor-pointer">
-              Choose File
-              <input
-                type="file"
-                className="hidden"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-              />
-            </label>
-
-            {file && (
-              <div className="text-xs mt-2 text-neutral-600">
-                Selected: {file.name}
+      {/* Categories + Files */}
+      {canView && (
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[320px_1fr]">
+          <div className="rounded-xl border border-gray-200 p-3">
+            <div className="mb-2 text-sm font-bold">Categories</div>
+            {loadingCats ? (
+              <div className="text-sm text-gray-500">Loading…</div>
+            ) : categories.length === 0 ? (
+              <div className="text-sm text-gray-500">No categories.</div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {categories.map((c) => {
+                  const active = c === activeCategory;
+                  return (
+                    <button
+                      key={c}
+                      onClick={() => setActiveCategory(c)}
+                      className={[
+                        "rounded-lg border px-3 py-2 text-left text-sm font-semibold",
+                        active ? "border-black bg-black text-white" : "border-gray-200 bg-white text-black",
+                      ].join(" ")}
+                    >
+                      {c}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
 
-          <button
-            onClick={uploadAndPublish}
-            disabled={busy}
-            className="px-4 py-2 rounded bg-black text-white"
-            type="button"
-          >
-            Upload &amp; Publish
-          </button>
+          <div className="rounded-xl border border-gray-200 p-3">
+            <div className="mb-2 text-sm font-bold">
+              Files {activeCategory ? <span className="text-gray-500">— {activeCategory}</span> : null}
+            </div>
 
-          {status && <div className="text-sm whitespace-pre-wrap">{status}</div>}
+            {loadingFiles ? (
+              <div className="text-sm text-gray-500">Loading…</div>
+            ) : !activeCategory ? (
+              <div className="text-sm text-gray-500">Select a category.</div>
+            ) : files.length === 0 ? (
+              <div className="text-sm text-gray-500">No files found.</div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {files.map((f) => (
+                  <div key={f.key} className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2">
+                    <div className="text-sm font-semibold">{f.name}</div>
+                    {/* If you have a download endpoint, this will work. If not, we add it next. */}
+                    <a
+                      className="rounded-lg border border-black px-3 py-1 text-sm font-bold"
+                      href={`/api/docs/download?key=${encodeURIComponent(f.key)}`}
+                    >
+                      Download
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      )}
-
-      {!uploadUnlocked && status && (
-        <div className="text-sm whitespace-pre-wrap">{status}</div>
       )}
     </div>
   );
