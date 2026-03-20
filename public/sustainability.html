@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Environmental Sustainability | FUZE Biotech</title>
+  <meta name="description" content="See how FUZE's laser-produced silver nanoparticles eliminate VOCs, reduce water use by up to 90%, and require zero chemical binders — produced from recycled electronics on a 1m table.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --slate-50: #f8fafc; --slate-100: #f1f5f9; --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1; --slate-400: #94a3b8; --slate-500: #64748b;
+      --slate-600: #475569; --slate-700: #334155; --slate-800: #1e293b;
+      --slate-900: #0f172a; --slate-950: #020617;
+      --teal-400: #2dd4bf; --teal-500: #14b8a6; --teal-600: #0d9488;
+      --teal-700: #0f766e;
+      --emerald-400: #34d399; --emerald-500: #10b981;
+      --amber-400: #fbbf24; --red-400: #f87171; --red-500: #ef4444;
+      --blue-400: #60a5fa;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: var(--slate-100); background: var(--slate-950); line-height: 1.6;
+    }
+    a { color: var(--teal-400); text-decoration: none; }
+
+    /* NAV */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(45, 212, 191, 0.15);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0.75rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
+    .nav-logo span { color: var(--teal-400); }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--slate-300); font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--teal-400); }
+    .nav-cta {
+      background: var(--teal-600); color: white !important; padding: 0.5rem 1.25rem;
+      border-radius: 8px; font-weight: 600; transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--teal-700); }
+
+    /* HERO */
+    .hero {
+      padding: 8rem 1.5rem 4rem; text-align: center;
+      background: linear-gradient(135deg, var(--slate-950) 0%, #071a12 50%, var(--slate-950) 100%);
+      position: relative;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at center top, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+    .hero h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -1px; }
+    .hero h1 span { color: var(--emerald-400); }
+    .hero p { font-size: 1.2rem; color: var(--slate-400); max-width: 650px; margin: 0 auto; line-height: 1.7; }
+
+    /* SECTIONS */
+    .section { padding: 5rem 1.5rem; max-width: 1200px; margin: 0 auto; }
+    .section-full { max-width: 100%; background: var(--slate-900); }
+    .section-header { text-align: center; margin-bottom: 3.5rem; }
+    .section-header h2 { font-size: 2.25rem; font-weight: 700; margin-bottom: 0.75rem; letter-spacing: -0.5px; }
+    .section-header p { color: var(--slate-400); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+
+    /* IMPACT DASHBOARD */
+    .impact-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem; max-width: 1100px; margin: 0 auto;
+    }
+    .impact-card {
+      background: var(--slate-800); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 2.5rem 2rem; position: relative; overflow: hidden;
+    }
+    .impact-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .impact-card.water::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .impact-card.co2::before { background: linear-gradient(90deg, #10b981, #34d399); }
+    .impact-card.voc::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .impact-card.binder::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+    .impact-card.waste::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .impact-card.energy::before { background: linear-gradient(90deg, #14b8a6, #2dd4bf); }
+    .impact-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .impact-metric { font-size: 3rem; font-weight: 800; line-height: 1; margin-bottom: 0.5rem; }
+    .impact-card.water .impact-metric { color: var(--blue-400); }
+    .impact-card.co2 .impact-metric { color: var(--emerald-400); }
+    .impact-card.voc .impact-metric { color: var(--amber-400); }
+    .impact-card.binder .impact-metric { color: #a78bfa; }
+    .impact-card.waste .impact-metric { color: var(--red-400); }
+    .impact-card.energy .impact-metric { color: var(--teal-400); }
+    .impact-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .impact-detail { font-size: 0.9rem; color: var(--slate-400); line-height: 1.7; }
+
+    /* LIFECYCLE COMPARISON */
+    .lifecycle { max-width: 1000px; margin: 0 auto; }
+    .lc-row {
+      display: grid; grid-template-columns: 200px 1fr 1fr; gap: 1px;
+      background: rgba(255,255,255,0.05); margin-bottom: 1px;
+    }
+    .lc-row.header { background: var(--slate-900); position: sticky; top: 56px; z-index: 10; }
+    .lc-cell {
+      padding: 1rem 1.25rem; background: var(--slate-800); font-size: 0.9rem;
+    }
+    .lc-row.header .lc-cell {
+      background: var(--slate-900); font-weight: 700; font-size: 0.85rem;
+      color: var(--slate-400); letter-spacing: 0.5px;
+    }
+    .lc-cell.label { font-weight: 600; color: var(--slate-300); }
+    .lc-cell.fuze { background: rgba(20, 184, 166, 0.06); }
+    .lc-cell.fuze-header { color: var(--teal-400); background: var(--slate-900); }
+    .good { color: var(--emerald-400); font-weight: 600; }
+    .bad { color: var(--red-400); font-weight: 600; }
+    .mid { color: var(--amber-400); font-weight: 600; }
+    @media (max-width: 700px) {
+      .lc-row { grid-template-columns: 1fr; }
+      .lc-cell::before { content: attr(data-label); display: block; font-size: 0.75rem; color: var(--slate-500); font-weight: 600; margin-bottom: 0.25rem; }
+      .lc-row.header { display: none; }
+    }
+
+    /* PRODUCTION COMPARISON */
+    .prod-split {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+      max-width: 1000px; margin: 2.5rem auto 0;
+    }
+    @media (max-width: 700px) { .prod-split { grid-template-columns: 1fr; } }
+    .prod-card {
+      background: var(--slate-800); border-radius: 16px; padding: 2.5rem;
+      border: 1px solid rgba(255,255,255,0.08); position: relative;
+    }
+    .prod-card.fuze { border-color: rgba(45, 212, 191, 0.3); }
+    .prod-card.trad { border-color: rgba(248, 113, 113, 0.15); }
+    .prod-card h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .prod-card.fuze h3 { color: var(--teal-400); }
+    .prod-card.trad h3 { color: var(--red-400); }
+    .prod-card .subtitle { color: var(--slate-400); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .prod-list { list-style: none; padding: 0; }
+    .prod-list li {
+      display: flex; align-items: start; gap: 0.75rem; padding: 0.75rem 0;
+      border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.95rem; color: var(--slate-300);
+    }
+    .prod-list li:first-child { border-top: none; }
+    .prod-list .icon { flex-shrink: 0; font-size: 1.1rem; line-height: 1.5; }
+
+    /* VISUAL BAR CHART */
+    .bar-section { max-width: 800px; margin: 0 auto; }
+    .bar-group { margin-bottom: 2rem; }
+    .bar-label { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--slate-200); }
+    .bar-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .bar-name { width: 140px; font-size: 0.85rem; color: var(--slate-400); text-align: right; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 28px; background: var(--slate-700); border-radius: 6px; overflow: hidden; position: relative; }
+    .bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; padding-right: 0.75rem; font-size: 0.8rem; font-weight: 700; color: white; transition: width 1s ease; }
+    .bar-fill.fuze-bar { background: linear-gradient(90deg, var(--teal-600), var(--teal-400)); }
+    .bar-fill.trad-bar { background: linear-gradient(90deg, #7f1d1d, var(--red-400)); }
+    .bar-fill.quat-bar { background: linear-gradient(90deg, #78350f, var(--amber-400)); }
+
+    /* CTA */
+    .cta-section { padding: 5rem 1.5rem; text-align: center; }
+    .cta-box {
+      max-width: 700px; margin: 0 auto;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(20, 184, 166, 0.05));
+      border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 20px; padding: 3.5rem 2.5rem;
+    }
+    .cta-box h2 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+    .cta-box p { color: var(--slate-400); font-size: 1.1rem; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .btn {
+      padding: 0.85rem 2rem; border-radius: 10px; font-size: 1rem; font-weight: 600;
+      cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s;
+    }
+    .btn-primary { background: var(--teal-600); color: white; }
+    .btn-primary:hover { background: var(--teal-700); transform: translateY(-1px); box-shadow: 0 8px 25px rgba(20, 184, 166, 0.3); }
+
+    /* FOOTER */
+    .footer {
+      padding: 2.5rem 1.5rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.06);
+      color: var(--slate-500); font-size: 0.85rem;
+    }
+    .footer a { color: var(--slate-400); }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .impact-metric { font-size: 2.5rem; }
+      [style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr !important; }
+      [style*="grid-template-columns: 1fr 1fr;"] { grid-template-columns: 1fr !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo"><span>FUZE</span> Biotech</div>
+    <div class="nav-links">
+      <a href="/">Calculator</a>
+      <a href="/#tiers">Treatment Tiers</a>
+      <a href="/#compare">vs Competition</a>
+      <a href="#impact">Impact Data</a>
+      <a href="https://fuzeatlas.com" target="_blank" class="nav-cta">Try FUZE Atlas</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <h1>The <span>Greenest Antimicrobial</span> on the Planet</h1>
+    <p>99.998% ultrapure water. Produced by laser from recycled electronics. Zero binders, zero VOCs, zero effluent, zero waste. This is what responsible antimicrobial treatment looks like.</p>
+  </div>
+</section>
+
+<!-- IMPACT DASHBOARD -->
+<section id="impact" class="section">
+  <div class="section-header">
+    <h2>Environmental Impact at a Glance</h2>
+    <p>Every metric that matters, compared to traditional antimicrobial treatments.</p>
+  </div>
+  <div class="impact-grid">
+    <div class="impact-card water">
+      <div class="impact-icon">&#128167;</div>
+      <div class="impact-metric">~90%</div>
+      <div class="impact-title">Water Reduction</div>
+      <div class="impact-detail">FUZE integrates directly into the existing dyebath &mdash; no additional rinse or wash-off cycles. Traditional silver chloride and quat treatments require 2-4 extra rinse cycles to remove unbound chemistry and binder residues.</div>
+    </div>
+    <div class="impact-card co2">
+      <div class="impact-icon">&#9729;</div>
+      <div class="impact-metric">Zero</div>
+      <div class="impact-title">Additional CO&#8322; from Curing</div>
+      <div class="impact-detail">Competitors require curing ovens at 130-180&deg;C to crosslink binders. FUZE needs no heat curing step &mdash; nanoparticles bond to fibers at ambient temperature. Our production laser runs on 30 amps and is solar-compatible.</div>
+    </div>
+    <div class="impact-card voc">
+      <div class="impact-icon">&#127811;</div>
+      <div class="impact-metric">0.000%</div>
+      <div class="impact-title">Volatile Organic Compounds</div>
+      <div class="impact-detail">FUZE contains zero binders, zero surfactants, zero solvents. The formulation is 99.998% 18-megaohm deionized water and 0.002% pure silver nanoparticles. There are no volatile organic compounds to off-gas &mdash; in production, application, or use.</div>
+    </div>
+    <div class="impact-card binder">
+      <div class="impact-icon">&#128300;</div>
+      <div class="impact-metric">0</div>
+      <div class="impact-title">Chemical Binders or Additives</div>
+      <div class="impact-detail">Silver chloride, zeolite, and quat-based antimicrobials all require polymer binders (acrylic, polyurethane, or silicone) to adhere to fabric. FUZE nanoparticles bond directly to fiber surfaces through van der Waals forces &mdash; no coating, no film, unchanged hand feel.</div>
+    </div>
+    <div class="impact-card waste">
+      <div class="impact-icon">&#9851;</div>
+      <div class="impact-metric">Zero</div>
+      <div class="impact-title">Production Waste & Effluent</div>
+      <div class="impact-detail">FUZE is produced via liquid laser ablation &mdash; a physical process that produces zero chemical by-products. Nothing goes down the drain. Raw material: recycled electronics silver and gold. Competitors rely on chemical reduction with toxic reagents and heavy effluent streams.</div>
+    </div>
+    <div class="impact-card energy">
+      <div class="impact-icon">&#9889;</div>
+      <div class="impact-metric">30A</div>
+      <div class="impact-title">Production Energy (Solar-Ready)</div>
+      <div class="impact-detail">The entire FUZE production system runs on a 30-amp laser on a 1m &times; 1m table. It can be powered entirely by solar panels. Compare this to the industrial-scale chemical reduction facilities required for silver chloride production.</div>
+    </div>
+  </div>
+</section>
+
+<!-- VISUAL BAR COMPARISONS -->
+<section class="section section-full" style="padding-left: 1.5rem; padding-right: 1.5rem;">
+  <div class="section-header">
+    <h2>Side-by-Side Comparison</h2>
+    <p>How FUZE stacks up against silver chloride/zeolite and quaternary ammonium compounds across key environmental metrics.</p>
+  </div>
+  <div class="bar-section">
+
+    <div class="bar-group">
+      <div class="bar-label">Water Consumption (relative)</div>
+      <div class="bar-row">
+        <div class="bar-name">FUZE</div>
+        <div class="bar-track"><div class="bar-fill fuze-bar" style="width: 10%;">Low</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Silver Chloride</div>
+        <div class="bar-track"><div class="bar-fill trad-bar" style="width: 85%;">High</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Quats</div>
+        <div class="bar-track"><div class="bar-fill quat-bar" style="width: 95%;">Very High</div></div>
+      </div>
+    </div>
+
+    <div class="bar-group">
+      <div class="bar-label">VOC Emissions</div>
+      <div class="bar-row">
+        <div class="bar-name">FUZE</div>
+        <div class="bar-track"><div class="bar-fill fuze-bar" style="width: 2%;">&nbsp;</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Silver Chloride</div>
+        <div class="bar-track"><div class="bar-fill trad-bar" style="width: 55%;">Moderate</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Quats</div>
+        <div class="bar-track"><div class="bar-fill quat-bar" style="width: 90%;">High</div></div>
+      </div>
+    </div>
+
+    <div class="bar-group">
+      <div class="bar-label">Chemical Binder Content</div>
+      <div class="bar-row">
+        <div class="bar-name">FUZE</div>
+        <div class="bar-track"><div class="bar-fill fuze-bar" style="width: 2%;">&nbsp;</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Silver Chloride</div>
+        <div class="bar-track"><div class="bar-fill trad-bar" style="width: 70%;">Required</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Quats</div>
+        <div class="bar-track"><div class="bar-fill quat-bar" style="width: 80%;">Required</div></div>
+      </div>
+    </div>
+
+    <div class="bar-group">
+      <div class="bar-label">Thermal Energy Required (Curing)</div>
+      <div class="bar-row">
+        <div class="bar-name">FUZE</div>
+        <div class="bar-track"><div class="bar-fill fuze-bar" style="width: 2%;">&nbsp;</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Silver Chloride</div>
+        <div class="bar-track"><div class="bar-fill trad-bar" style="width: 75%;">150-180&deg;C</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Quats</div>
+        <div class="bar-track"><div class="bar-fill quat-bar" style="width: 65%;">130-160&deg;C</div></div>
+      </div>
+    </div>
+
+    <div class="bar-group">
+      <div class="bar-label">Production Waste / Effluent</div>
+      <div class="bar-row">
+        <div class="bar-name">FUZE</div>
+        <div class="bar-track"><div class="bar-fill fuze-bar" style="width: 2%;">&nbsp;</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Silver Chloride</div>
+        <div class="bar-track"><div class="bar-fill trad-bar" style="width: 80%;">Heavy</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Quats</div>
+        <div class="bar-track"><div class="bar-fill quat-bar" style="width: 85%;">Toxic</div></div>
+      </div>
+    </div>
+
+    <div class="bar-group">
+      <div class="bar-label">Production Facility Size</div>
+      <div class="bar-row">
+        <div class="bar-name">FUZE</div>
+        <div class="bar-track"><div class="bar-fill fuze-bar" style="width: 5%;">1m&sup2;</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Silver Chloride</div>
+        <div class="bar-track"><div class="bar-fill trad-bar" style="width: 90%;">Industrial Plant</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Quats</div>
+        <div class="bar-track"><div class="bar-fill quat-bar" style="width: 85%;">Chemical Facility</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIFECYCLE TABLE -->
+<section class="section">
+  <div class="section-header">
+    <h2>Full Lifecycle Comparison</h2>
+    <p>From raw material sourcing through production, application, and end-of-life.</p>
+  </div>
+  <div class="lifecycle">
+    <div class="lc-row header">
+      <div class="lc-cell label">Lifecycle Stage</div>
+      <div class="lc-cell fuze-header">FUZE</div>
+      <div class="lc-cell">Traditional Antimicrobials</div>
+    </div>
+    <div class="lc-row">
+      <div class="lc-cell label" data-label="">Raw Materials</div>
+      <div class="lc-cell fuze" data-label="FUZE"><span class="good">Recycled electronics</span> (silver/gold from e-waste)</div>
+      <div class="lc-cell" data-label="Traditional"><span class="bad">Mined silver ore</span> + petroleum-derived chemicals + polymer precursors</div>
+    </div>
+    <div class="lc-row">
+      <div class="lc-cell label" data-label="">Production Method</div>
+      <div class="lc-cell fuze" data-label="FUZE"><span class="good">Liquid laser ablation</span> &mdash; physical process, no reagents</div>
+      <div class="lc-cell" data-label="Traditional"><span class="bad">Chemical reduction</span> with sodium borohydride, citrate, or PVP</div>
+    </div>
+    <div class="lc-row">
+      <div class="lc-cell label" data-label="">Production Footprint</div>
+      <div class="lc-cell fuze" data-label="FUZE"><span class="good">1m &times; 1m table</span>, 30-amp laser, solar-capable</div>
+      <div class="lc-cell" data-label="Traditional"><span class="bad">Industrial facility</span> with fume hoods, reactors, waste treatment</div>
+    </div>
+    <div class="lc-row">
+      <div class="lc-cell label" data-label="">Production By-products</div>
+      <div class="lc-cell fuze" data-label="FUZE"><span class="good">None</span> &mdash; zero waste, zero effluent</div>
+      <div class="lc-cell" data-label="Traditional"><span class="bad">Chemical waste streams</span> requiring treatment and disposal</div>
+    </div>
+    <div class="lc-row">
+      <div class="lc-cell label" data-label="">Product Composition</div>
+      <div class="lc-cell fuze" data-label="FUZE"><span class="good">99.998% ultrapure water</span> + 20 ppm silver nanoparticles</div>
+      <div class="lc-cell" data-label="Traditional">Active agent + <span class="bad">binders, surfactants, solvents, stabilizers</span></div>
+    </div>
+    <div class="lc-row">
+      <div class="lc-cell label" data-label="">Application Process</div>
+      <div class="lc-cell fuze" data-label="FUZE"><span class="good">Add to existing dyebath</span> or spray &mdash; no extra steps</div>
+      <div class="lc-cell" data-label="Traditional">Separate padding step + <span class="bad">curing at 130-180&deg;C</span></div>
+    </div>
+    <div class="lc-row">
+      <div class="lc-cell label" data-label="">Water in Application</div>
+      <div class="lc-cell fuze" data-label="FUZE"><span class="good">No additional water</span> &mdash; uses existing bath</div>
+      <div class="lc-cell" data-label="Traditional"><span class="bad">2-4 extra rinse cycles</span> to remove unbound chemistry</div>
+    </div>
+    <div class="lc-row">
+      <div class="lc-cell label" data-label="">Energy in Application</div>
+      <div class="lc-cell fuze" data-label="FUZE"><span class="good">Zero additional energy</span> &mdash; ambient temperature</div>
+      <div class="lc-cell" data-label="Traditional"><span class="bad">Curing ovens</span> + additional dryer passes</div>
+    </div>
+    <div class="lc-row">
+      <div class="lc-cell label" data-label="">VOC Emissions</div>
+      <div class="lc-cell fuze" data-label="FUZE"><span class="good">Zero</span></div>
+      <div class="lc-cell" data-label="Traditional"><span class="bad">Released during curing</span> from binder solvents</div>
+    </div>
+    <div class="lc-row">
+      <div class="lc-cell label" data-label="">Fabric Hand Feel</div>
+      <div class="lc-cell fuze" data-label="FUZE"><span class="good">Unchanged</span> &mdash; no surface coating</div>
+      <div class="lc-cell" data-label="Traditional"><span class="mid">Altered</span> &mdash; binder film affects drape and softness</div>
+    </div>
+    <div class="lc-row">
+      <div class="lc-cell label" data-label="">Certification Path</div>
+      <div class="lc-cell fuze" data-label="FUZE"><span class="good">OEKO-TEX &amp; bluesign compatible</span></div>
+      <div class="lc-cell" data-label="Traditional"><span class="mid">Varies</span> &mdash; many quats restricted, binders flagged</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTION COMPARISON -->
+<section class="section section-full" style="padding-left: 1.5rem; padding-right: 1.5rem;">
+  <div class="section-header">
+    <h2>Production: FUZE vs Everyone Else</h2>
+    <p>One 1-meter table with a laser vs. an entire chemical plant.</p>
+  </div>
+  <div class="prod-split">
+    <div class="prod-card fuze">
+      <h3>FUZE Laser Ablation</h3>
+      <div class="subtitle">Clean. Simple. Solar-ready.</div>
+      <ul class="prod-list">
+        <li><span class="icon" style="color:var(--teal-400);">&#9889;</span> <div><strong>30-amp pulsed laser</strong><br>Physical process &mdash; no chemical reactions, no reagents</div></li>
+        <li><span class="icon" style="color:var(--teal-400);">&#9728;</span> <div><strong>Solar power compatible</strong><br>Entire system can run off-grid on renewable energy</div></li>
+        <li><span class="icon" style="color:var(--teal-400);">&#9851;</span> <div><strong>Recycled electronics feedstock</strong><br>Silver and gold recovered from e-waste &mdash; closing the loop</div></li>
+        <li><span class="icon" style="color:var(--teal-400);">&#10003;</span> <div><strong>1m &times; 1m production footprint</strong><br>Fits on a tabletop. No facility build-out required</div></li>
+        <li><span class="icon" style="color:var(--teal-400);">&#10003;</span> <div><strong>Zero by-products</strong><br>No chemical waste, no effluent, nothing to dispose of</div></li>
+        <li><span class="icon" style="color:var(--teal-400);">&#10003;</span> <div><strong>Nothing down the drain</strong><br>Zero discharge &mdash; no wastewater treatment needed</div></li>
+      </ul>
+    </div>
+    <div class="prod-card trad">
+      <h3>Chemical Reduction (Industry Standard)</h3>
+      <div class="subtitle">Complex. Energy-intensive. Wasteful.</div>
+      <ul class="prod-list">
+        <li><span class="icon" style="color:var(--red-400);">&#10007;</span> <div><strong>Industrial chemical reactors</strong><br>Requires fume hoods, mixers, temperature controls, safety systems</div></li>
+        <li><span class="icon" style="color:var(--red-400);">&#10007;</span> <div><strong>Grid-dependent high energy</strong><br>Cannot operate on renewable sources alone</div></li>
+        <li><span class="icon" style="color:var(--red-400);">&#10007;</span> <div><strong>Mined raw materials</strong><br>Virgin silver ore + sodium borohydride + PVP + surfactants</div></li>
+        <li><span class="icon" style="color:var(--red-400);">&#10007;</span> <div><strong>Large facility footprint</strong><br>Purpose-built chemical plant with permits and inspections</div></li>
+        <li><span class="icon" style="color:var(--red-400);">&#10007;</span> <div><strong>Chemical by-products</strong><br>Reducing agents produce waste that requires treatment</div></li>
+        <li><span class="icon" style="color:var(--red-400);">&#10007;</span> <div><strong>Effluent discharge</strong><br>Requires wastewater treatment systems and permits</div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- TEXTILE RECYCLING -->
+<section class="section">
+  <div class="section-header">
+    <h2>The Recycling Problem Nobody Talks About</h2>
+    <p>Embedded metals and chemical binders are making textiles unrecyclable at scale.</p>
+  </div>
+  <div class="impact-grid">
+    <div class="impact-card" style="grid-column: 1 / -1; max-width: 1100px; margin: 0 auto;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+          <h3 style="color: var(--red-400); font-size: 1.3rem; margin-bottom: 1rem;">Embedded Silver, Copper & Zinc</h3>
+          <p style="color: var(--slate-300); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1rem;">Noble metal antimicrobials (silver chloride, copper compounds, zinc pyrithione) embed metal particles deep in fabric fibers using polymer binders. When these textiles enter the recycling stream, the metals <strong style="color: var(--red-400);">cannot be separated</strong> from the fiber.</p>
+          <p style="color: var(--slate-300); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1rem;">This means treated textiles are <strong style="color: var(--red-400);">rejected by recyclers</strong> because metal contamination degrades the quality of recycled fiber, contaminates mechanical recycling equipment, and fails the chemical purity standards required for fiber-to-fiber recycling.</p>
+          <p style="color: var(--slate-300); font-size: 0.95rem; line-height: 1.8;">The result: billions of garments treated with "sustainable" antimicrobials go straight to landfill because they <em>can't</em> be recycled.</p>
+        </div>
+        <div>
+          <h3 style="color: var(--teal-400); font-size: 1.3rem; margin-bottom: 1rem;">FUZE Nanoparticles</h3>
+          <p style="color: var(--slate-300); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1rem;">FUZE silver nanoparticles sit on the fiber surface via van der Waals attraction &mdash; <strong style="color: var(--teal-400);">no binder, no embedding, no permanent alteration</strong> of the textile substrate.</p>
+          <p style="color: var(--slate-300); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1rem;">At concentrations of 0.25&ndash;1.0 mg/kg (parts per million), the silver loading is <strong style="color: var(--teal-400);">orders of magnitude lower</strong> than embedded silver technologies, which use 100&ndash;10,000x more metal per garment.</p>
+          <p style="color: var(--slate-300); font-size: 0.95rem; line-height: 1.8;">FUZE-treated textiles can enter standard recycling streams without metal contamination concerns. The fiber remains the fiber.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MUNICIPAL WATER / HOME LAUNDERING -->
+<section class="section section-full" style="padding-left: 1.5rem; padding-right: 1.5rem;">
+  <div class="section-header">
+    <h2>The Hidden Cost: Home Laundering &amp; Municipal Water</h2>
+    <p>What happens when antimicrobial-treated textiles get washed at home? The metals go somewhere.</p>
+  </div>
+  <div style="max-width: 1000px; margin: 0 auto;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 2.5rem;">
+      <div style="background: var(--slate-800); border-radius: 12px; padding: 2rem; border-top: 3px solid var(--red-400); text-align: center;">
+        <div style="font-size: 2.5rem; font-weight: 800; color: var(--red-400);">Silver</div>
+        <div style="font-size: 0.85rem; color: var(--slate-400); margin-top: 0.5rem;">EPA Secondary MCL: 0.1 mg/L</div>
+        <div style="font-size: 0.85rem; color: var(--slate-400);">Embedded silver treatments leach 10-100 &micro;g per wash cycle into municipal wastewater</div>
+      </div>
+      <div style="background: var(--slate-800); border-radius: 12px; padding: 2rem; border-top: 3px solid var(--amber-400); text-align: center;">
+        <div style="font-size: 2.5rem; font-weight: 800; color: var(--amber-400);">Copper</div>
+        <div style="font-size: 0.85rem; color: var(--slate-400); margin-top: 0.5rem;">EPA Action Level: 1.3 mg/L</div>
+        <div style="font-size: 0.85rem; color: var(--slate-400);">Copper antimicrobials are EPA-listed as pesticides with documented aquatic toxicity</div>
+      </div>
+      <div style="background: var(--slate-800); border-radius: 12px; padding: 2rem; border-top: 3px solid #a78bfa; text-align: center;">
+        <div style="font-size: 2.5rem; font-weight: 800; color: #a78bfa;">Zinc</div>
+        <div style="font-size: 0.85rem; color: var(--slate-400); margin-top: 0.5rem;">EPA Secondary MCL: 5.0 mg/L</div>
+        <div style="font-size: 0.85rem; color: var(--slate-400);">Zinc pyrithione breaks down into compounds toxic to aquatic organisms</div>
+      </div>
+    </div>
+    <div style="background: var(--slate-800); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 2.5rem;">
+      <h3 style="font-size: 1.2rem; color: var(--slate-200); margin-bottom: 1.25rem;">The Municipal Water Treatment Burden</h3>
+      <p style="color: var(--slate-300); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1rem;">Every time a consumer washes a garment treated with embedded silver, copper, or zinc antimicrobials, metal particles leach into household wastewater. This water flows to municipal treatment plants that were never designed to filter nanoparticles or dissolved heavy metals at these concentrations.</p>
+      <p style="color: var(--slate-300); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1rem;">Municipal water treatment facilities must then use chemical coagulants, activated carbon filtration, or advanced membrane systems to remove these metals before discharge &mdash; costs ultimately borne by <strong>taxpayers and ratepayers</strong>. Studies estimate the cost of removing dissolved metals from wastewater at $2&ndash;8 per 1,000 gallons treated, depending on the metal and concentration.</p>
+      <p style="color: var(--slate-300); font-size: 0.95rem; line-height: 1.8; margin-bottom: 1rem;">Copper compounds in particular are classified by the EPA as <strong style="color: var(--amber-400);">registered pesticides</strong>. When copper-treated textiles are laundered, these pesticide-class compounds enter the water supply. The EPA Aquatic Life Ambient Freshwater Quality Criteria for copper is just 1.45 &micro;g/L &mdash; a level easily exceeded by concentrated laundry effluent.</p>
+      <p style="color: var(--slate-300); font-size: 0.95rem; line-height: 1.8;"><strong style="color: var(--teal-400);">FUZE's approach:</strong> At 0.25&ndash;1.0 mg/kg loading with surface-bonded (not embedded) nanoparticles and no binder to degrade, FUZE-treated fabrics have negligible metal release during laundering. The nanoparticles that do release are in concentrations well below EPA secondary maximum contaminant levels for silver.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FACTORY WASTEWATER REMEDIATION -->
+<section class="section">
+  <div class="section-header">
+    <h2>Factory-Level Wastewater Costs</h2>
+    <p>What it actually costs factories to clean up after traditional antimicrobial treatments.</p>
+  </div>
+  <div style="max-width: 1000px; margin: 0 auto;">
+    <div class="vs-table-wrap">
+      <table class="vs-table">
+        <thead>
+          <tr>
+            <th>Remediation Factor</th>
+            <th class="fuze-col">FUZE</th>
+            <th>Silver Chloride / Zeolite</th>
+            <th>Copper Compounds</th>
+            <th>Zinc Pyrithione</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Effluent Treatment Required</td>
+            <td class="fuze-cell"><span class="check">NONE</span></td>
+            <td><span class="bad">Yes</span> &mdash; silver removal</td>
+            <td><span class="bad">Yes</span> &mdash; copper chelation</td>
+            <td><span class="bad">Yes</span> &mdash; zinc precipitation</td>
+          </tr>
+          <tr>
+            <td>Chemical Coagulants Needed</td>
+            <td class="fuze-cell"><span class="check">NONE</span></td>
+            <td>Ferric chloride or alum</td>
+            <td>Caustic soda + sodium sulfide</td>
+            <td>Soda ash + magnesium hydroxide</td>
+          </tr>
+          <tr>
+            <td>pH Adjustment</td>
+            <td class="fuze-cell"><span class="check">NONE</span></td>
+            <td>Required for precipitation</td>
+            <td>pH 9-11 for Cu(OH)&#8322; precipitation</td>
+            <td>pH 8-10 for Zn(OH)&#8322; precipitation</td>
+          </tr>
+          <tr>
+            <td>Sludge Generation</td>
+            <td class="fuze-cell"><span class="check">ZERO</span></td>
+            <td><span class="bad">Metal-laden sludge</span> (hazardous waste)</td>
+            <td><span class="bad">Copper hydroxide sludge</span> (hazmat)</td>
+            <td><span class="bad">Zinc hydroxide sludge</span> (hazmat)</td>
+          </tr>
+          <tr>
+            <td>Estimated Cost per 10,000L Effluent</td>
+            <td class="fuze-cell"><span class="check">$0</span></td>
+            <td><span class="bad">$15&ndash;40</span></td>
+            <td><span class="bad">$25&ndash;60</span></td>
+            <td><span class="bad">$20&ndash;50</span></td>
+          </tr>
+          <tr>
+            <td>Hazardous Waste Disposal</td>
+            <td class="fuze-cell"><span class="check">$0</span></td>
+            <td><span class="bad">$200&ndash;800/ton</span></td>
+            <td><span class="bad">$300&ndash;1,000/ton</span></td>
+            <td><span class="bad">$250&ndash;900/ton</span></td>
+          </tr>
+          <tr>
+            <td>ZDHC MRSL Compliance</td>
+            <td class="fuze-cell"><span class="check">Clean</span></td>
+            <td><span class="mid">Restricted levels</span></td>
+            <td><span class="bad">Copper listed</span></td>
+            <td><span class="bad">Zinc pyrithione listed</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="background: rgba(20, 184, 166, 0.08); border: 1px solid rgba(20, 184, 166, 0.2); border-radius: 12px; padding: 1.5rem; margin-top: 2rem;">
+      <p style="color: var(--slate-300); font-size: 0.95rem; line-height: 1.7;"><strong style="color: var(--teal-400);">The math is simple:</strong> FUZE adds nothing to factory effluent streams because the product is 99.998% ultrapure water and the silver loading on fabric is sub-ppm. Factories using FUZE eliminate the entire wastewater remediation cost chain &mdash; no coagulants (caustic soda, soda ash, ferric chloride, magnesium hydroxide), no pH adjustment chemicals, no settling tanks, no sludge handling, no hazardous waste manifests, no disposal fees.</p>
+    </div>
+  </div>
+</section>
+
+<!-- EPA & REGULATORY -->
+<section class="section section-full" style="padding-left: 1.5rem; padding-right: 1.5rem;">
+  <div class="section-header">
+    <h2>EPA &amp; Regulatory Reality Check</h2>
+    <p>What the regulators actually say about the active ingredients in antimicrobial textiles.</p>
+  </div>
+  <div style="max-width: 1000px; margin: 0 auto;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+      <div style="background: var(--slate-800); border-radius: 16px; padding: 2rem; border-left: 4px solid var(--amber-400);">
+        <h3 style="color: var(--amber-400); font-size: 1.1rem; margin-bottom: 1rem;">Copper &mdash; EPA Registered Pesticide</h3>
+        <p style="color: var(--slate-300); font-size: 0.9rem; line-height: 1.7; margin-bottom: 0.75rem;">Copper compounds used in antimicrobial textiles (copper oxide, cuprous oxide, copper sulfate) are <strong>registered with the EPA as pesticides</strong> under FIFRA. This means every product containing copper as an antimicrobial active must carry EPA registration and comply with pesticide labeling requirements.</p>
+        <p style="color: var(--slate-300); font-size: 0.9rem; line-height: 1.7;">EPA lists copper compounds with documented harmful toxicity including: aquatic organism toxicity (LC50 values in &micro;g/L range), human skin sensitization potential, and bioaccumulation in aquatic environments.</p>
+      </div>
+      <div style="background: var(--slate-800); border-radius: 16px; padding: 2rem; border-left: 4px solid #a78bfa;">
+        <h3 style="color: #a78bfa; font-size: 1.1rem; margin-bottom: 1rem;">Zinc Pyrithione &mdash; Restricted Globally</h3>
+        <p style="color: var(--slate-300); font-size: 0.9rem; line-height: 1.7; margin-bottom: 0.75rem;">Zinc pyrithione (ZPT) is classified as <strong>H400: Very toxic to aquatic life</strong> and <strong>H410: Very toxic to aquatic life with long lasting effects</strong> under GHS classification. The EU has placed restrictions on ZPT in cosmetics and is reviewing its use in textiles.</p>
+        <p style="color: var(--slate-300); font-size: 0.9rem; line-height: 1.7;">ZDHC MRSL lists zinc compounds with conformance limits. Factories using zinc-based antimicrobials face increasing regulatory pressure and audit risk.</p>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+      <div style="background: var(--slate-800); border-radius: 16px; padding: 2rem; border-left: 4px solid var(--red-400);">
+        <h3 style="color: var(--red-400); font-size: 1.1rem; margin-bottom: 1rem;">Quaternary Ammonium (Quats)</h3>
+        <p style="color: var(--slate-300); font-size: 0.9rem; line-height: 1.7; margin-bottom: 0.75rem;">EPA classifies quaternary ammonium compounds as antimicrobial pesticides. Full ingredient disclosure is required. Many quats are flagged for: respiratory sensitization, aquatic toxicity, contribution to antimicrobial resistance.</p>
+        <p style="color: var(--slate-300); font-size: 0.9rem; line-height: 1.7;">The EPA Safer Chemical Ingredients List (SCIL) excludes most quats used in textile applications.</p>
+      </div>
+      <div style="background: var(--slate-800); border-radius: 16px; padding: 2rem; border-left: 4px solid var(--teal-400);">
+        <h3 style="color: var(--teal-400); font-size: 1.1rem; margin-bottom: 1rem;">FUZE &mdash; Elemental Silver in Water</h3>
+        <p style="color: var(--slate-300); font-size: 0.9rem; line-height: 1.7; margin-bottom: 0.75rem;">FUZE's active ingredient is elemental silver (Ag, CAS 7440-22-4) &mdash; the same element used in medical devices, wound dressings, and water purification for decades. At 20 ppm in solution and sub-ppm on fabric, silver nanoparticles present a fundamentally different toxicity profile.</p>
+        <p style="color: var(--slate-300); font-size: 0.9rem; line-height: 1.7;">Full EPA ingredient review shows: <strong>two ingredients total</strong> (ultrapure water + silver). No binders, surfactants, solvents, preservatives, or adjuvants to disclose. Complete transparency &mdash; there is nothing to hide when your product is 99.998% water.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-box">
+    <h2>Want the Full Toolkit?</h2>
+    <p>FUZE Atlas gives you fabric management, lab testing, recipe development, compliance tracking, environmental calculators, and supply chain tools &mdash; all in one platform.</p>
+    <a href="https://fuzeatlas.com" target="_blank" class="btn btn-primary" style="font-size: 1.15rem; padding: 1rem 2.5rem;">
+      Register at FUZE Atlas &rarr;
+    </a>
+    <p style="margin-top: 1.25rem; font-size: 0.9rem; color: var(--slate-500);">Free for brands, factories, and laboratories.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>&copy; 2026 FUZE Biotech. All rights reserved. &nbsp;|&nbsp; <a href="/">Pricing Calculator</a> &nbsp;|&nbsp; <a href="https://fuzeatlas.com">FUZE Atlas Platform</a> &nbsp;|&nbsp; <a href="mailto:info@fuzebiotech.com">Contact</a></p>
+</footer>
+
+</body>
+</html>

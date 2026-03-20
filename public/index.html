@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FUZE Biotech — Antimicrobial Treatment Calculator & Pricing</title>
+  <meta name="description" content="Calculate FUZE antimicrobial treatment costs for your textiles. Compare F1-F4 tiers, see environmental impact, and explore the cleanest antimicrobial technology on the planet.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --slate-50: #f8fafc; --slate-100: #f1f5f9; --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1; --slate-400: #94a3b8; --slate-500: #64748b;
+      --slate-600: #475569; --slate-700: #334155; --slate-800: #1e293b;
+      --slate-900: #0f172a; --slate-950: #020617;
+      --teal-400: #2dd4bf; --teal-500: #14b8a6; --teal-600: #0d9488;
+      --teal-700: #0f766e; --teal-800: #115e59;
+      --emerald-400: #34d399; --emerald-500: #10b981;
+      --amber-400: #fbbf24; --amber-500: #f59e0b;
+      --red-400: #f87171; --red-500: #ef4444;
+      --blue-400: #60a5fa; --blue-500: #3b82f6;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: var(--slate-100); background: var(--slate-950); line-height: 1.6;
+    }
+    a { color: var(--teal-400); text-decoration: none; }
+    a:hover { color: var(--teal-500); }
+
+    /* NAV */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(45, 212, 191, 0.15);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0.75rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
+    .nav-logo span { color: var(--teal-400); }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--slate-300); font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--teal-400); }
+    .nav-cta {
+      background: var(--teal-600); color: white !important; padding: 0.5rem 1.25rem;
+      border-radius: 8px; font-weight: 600; transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--teal-700); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 6rem 1.5rem 4rem; position: relative; overflow: hidden;
+      background: linear-gradient(135deg, var(--slate-950) 0%, var(--slate-900) 40%, #0c1f2e 100%);
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -50%; right: -30%; width: 80%; height: 150%;
+      background: radial-gradient(ellipse, rgba(20, 184, 166, 0.08) 0%, transparent 70%);
+    }
+    .hero-inner { max-width: 900px; text-align: center; position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-block; background: rgba(20, 184, 166, 0.12); border: 1px solid rgba(20, 184, 166, 0.3);
+      color: var(--teal-400); padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.85rem;
+      font-weight: 600; margin-bottom: 1.5rem; letter-spacing: 0.5px;
+    }
+    .hero h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -1px; }
+    .hero h1 span { background: linear-gradient(135deg, var(--teal-400), var(--emerald-400)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { font-size: 1.25rem; color: var(--slate-400); max-width: 650px; margin: 0 auto 2.5rem; line-height: 1.7; }
+    .hero-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      padding: 0.85rem 2rem; border-radius: 10px; font-size: 1rem; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .btn-primary { background: var(--teal-600); color: white; }
+    .btn-primary:hover { background: var(--teal-700); transform: translateY(-1px); box-shadow: 0 8px 25px rgba(20, 184, 166, 0.3); }
+    .btn-secondary { background: rgba(255,255,255,0.08); color: var(--slate-200); border: 1px solid rgba(255,255,255,0.15); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+
+    /* PURITY BANNER */
+    .purity {
+      background: linear-gradient(90deg, var(--slate-900), var(--slate-800), var(--slate-900));
+      border-top: 1px solid rgba(45, 212, 191, 0.1); border-bottom: 1px solid rgba(45, 212, 191, 0.1);
+      padding: 3rem 1.5rem; text-align: center;
+    }
+    .purity-stats {
+      max-width: 1100px; margin: 0 auto; display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;
+    }
+    .purity-stat { padding: 1rem; }
+    .purity-num { font-size: 2.5rem; font-weight: 800; color: var(--teal-400); line-height: 1; }
+    .purity-label { font-size: 0.9rem; color: var(--slate-400); margin-top: 0.5rem; }
+
+    /* SECTIONS */
+    .section { padding: 5rem 1.5rem; max-width: 1200px; margin: 0 auto; }
+    .section-dark { background: var(--slate-900); }
+    .section-header { text-align: center; margin-bottom: 3.5rem; }
+    .section-header h2 { font-size: 2.25rem; font-weight: 700; margin-bottom: 0.75rem; letter-spacing: -0.5px; }
+    .section-header p { color: var(--slate-400); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+
+    /* CALCULATOR */
+    .calc-container {
+      background: var(--slate-800); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 2.5rem; max-width: 900px; margin: 0 auto;
+    }
+    .calc-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+    .calc-tab {
+      padding: 0.6rem 1.25rem; border-radius: 8px; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1); color: var(--slate-400); cursor: pointer;
+      font-size: 0.9rem; font-weight: 600; transition: all 0.2s;
+    }
+    .calc-tab.active { background: var(--teal-600); color: white; border-color: var(--teal-600); }
+    .calc-tab:hover:not(.active) { background: rgba(255,255,255,0.1); color: var(--slate-200); }
+    .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    @media (max-width: 600px) { .calc-grid { grid-template-columns: 1fr; } }
+    .calc-field label { display: block; font-size: 0.85rem; color: var(--slate-400); margin-bottom: 0.4rem; font-weight: 500; }
+    .calc-field input, .calc-field select {
+      width: 100%; padding: 0.7rem 1rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; color: var(--slate-100); font-size: 1rem; outline: none; transition: border 0.2s;
+    }
+    .calc-field input:focus, .calc-field select:focus { border-color: var(--teal-500); }
+    .calc-field select option { background: var(--slate-700); }
+    .calc-results {
+      margin-top: 2rem; padding: 1.5rem; background: rgba(20, 184, 166, 0.08);
+      border: 1px solid rgba(20, 184, 166, 0.2); border-radius: 12px;
+    }
+    .calc-results h3 { color: var(--teal-400); margin-bottom: 1rem; font-size: 1.1rem; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+    .result-item { background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; }
+    .result-value { font-size: 1.5rem; font-weight: 700; color: white; }
+    .result-label { font-size: 0.8rem; color: var(--slate-400); margin-top: 0.25rem; }
+
+    /* TIER COMPARISON */
+    .tiers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+    .tier-card {
+      background: var(--slate-800); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 2rem; position: relative; overflow: hidden; transition: transform 0.2s, border 0.2s;
+    }
+    .tier-card:hover { transform: translateY(-4px); border-color: rgba(45, 212, 191, 0.3); }
+    .tier-card.featured { border-color: var(--teal-500); }
+    .tier-card.featured::before {
+      content: 'MOST POPULAR'; position: absolute; top: 12px; right: -30px; background: var(--teal-600);
+      color: white; font-size: 0.7rem; font-weight: 700; padding: 0.25rem 2rem; transform: rotate(45deg);
+      letter-spacing: 0.5px;
+    }
+    .tier-badge { font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 0.75rem; }
+    .tier-name { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .tier-dose { font-size: 2rem; font-weight: 800; color: var(--teal-400); margin-bottom: 0.25rem; }
+    .tier-unit { font-size: 0.85rem; color: var(--slate-400); margin-bottom: 1.25rem; }
+    .tier-features { list-style: none; padding: 0; }
+    .tier-features li {
+      padding: 0.5rem 0; border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.9rem; color: var(--slate-300); display: flex; align-items: start; gap: 0.5rem;
+    }
+    .tier-features li::before { content: '\2713'; color: var(--teal-400); font-weight: 700; flex-shrink: 0; }
+
+    /* VS COMPARISON TABLE */
+    .vs-table-wrap { overflow-x: auto; max-width: 1100px; margin: 0 auto; }
+    .vs-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      background: var(--slate-800); border-radius: 12px; overflow: hidden;
+    }
+    .vs-table th {
+      padding: 1rem 1.25rem; text-align: left; font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.5px; color: var(--slate-400); background: var(--slate-900);
+      border-bottom: 2px solid rgba(45, 212, 191, 0.2);
+    }
+    .vs-table th.fuze-col { color: var(--teal-400); }
+    .vs-table td {
+      padding: 0.85rem 1.25rem; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .vs-table tr:last-child td { border-bottom: none; }
+    .vs-table .check { color: var(--emerald-400); font-weight: 700; }
+    .vs-table .cross { color: var(--red-400); font-weight: 700; }
+    .vs-table .warn { color: var(--amber-400); font-weight: 700; }
+    .vs-table .fuze-cell { background: rgba(20, 184, 166, 0.06); }
+
+    /* SUSTAINABILITY */
+    .sus-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+    .sus-card {
+      background: var(--slate-800); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 2rem; text-align: center;
+    }
+    .sus-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .sus-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .sus-value { font-size: 2rem; font-weight: 800; color: var(--emerald-400); margin-bottom: 0.5rem; }
+    .sus-desc { font-size: 0.9rem; color: var(--slate-400); line-height: 1.6; }
+
+    /* PROCESS COMPARISON */
+    .process-compare {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+      max-width: 1000px; margin: 2rem auto 0;
+    }
+    @media (max-width: 700px) { .process-compare { grid-template-columns: 1fr; } }
+    .process-card { background: var(--slate-800); border-radius: 16px; padding: 2rem; border: 1px solid rgba(255,255,255,0.08); }
+    .process-card.fuze-card { border-color: rgba(45, 212, 191, 0.3); }
+    .process-card.others-card { border-color: rgba(248, 113, 113, 0.2); }
+    .process-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; }
+    .process-card.fuze-card h3 { color: var(--teal-400); }
+    .process-card.others-card h3 { color: var(--red-400); }
+    .process-list { list-style: none; padding: 0; }
+    .process-list li { padding: 0.6rem 0; font-size: 0.9rem; color: var(--slate-300); display: flex; align-items: start; gap: 0.6rem; }
+
+    /* CTA SECTION */
+    .cta-section {
+      padding: 5rem 1.5rem; text-align: center;
+      background: linear-gradient(180deg, var(--slate-950), var(--slate-900));
+    }
+    .cta-box {
+      max-width: 700px; margin: 0 auto; background: linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(16, 185, 129, 0.05));
+      border: 1px solid rgba(20, 184, 166, 0.25); border-radius: 20px; padding: 3.5rem 2.5rem;
+    }
+    .cta-box h2 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+    .cta-box p { color: var(--slate-400); font-size: 1.1rem; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .cta-box .btn-primary { font-size: 1.15rem; padding: 1rem 2.5rem; }
+
+    /* FOOTER */
+    .footer {
+      padding: 2.5rem 1.5rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.06);
+      color: var(--slate-500); font-size: 0.85rem;
+    }
+    .footer a { color: var(--slate-400); }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero h1 { font-size: 2.2rem; }
+      .hero p { font-size: 1.05rem; }
+      .calc-container { padding: 1.5rem; }
+      .purity-num { font-size: 2rem; }
+      .tier-card { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo"><span>FUZE</span> Biotech</div>
+    <div class="nav-links">
+      <a href="#calculator">Calculator</a>
+      <a href="#tiers">Treatment Tiers</a>
+      <a href="#compare">vs Competition</a>
+      <a href="#sustainability">Sustainability</a>
+      <a href="/sustainability">Full Environmental Report</a>
+      <a href="https://fuzeatlas.com" target="_blank" class="nav-cta">Try FUZE Atlas</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">NY HOSPITALITY MARKET 2026</div>
+    <h1>The World's Cleanest <span>Antimicrobial Treatment</span></h1>
+    <p>99.998% ultrapure water. 20 ppm silver nanoparticles. No binders. No VOCs. No heat curing. Calculate your treatment costs and see why the world's leading textile manufacturers are switching to FUZE.</p>
+    <div class="hero-btns">
+      <a href="#calculator" class="btn btn-primary">Open Calculator</a>
+      <a href="/sustainability" class="btn btn-secondary">See Environmental Impact</a>
+    </div>
+  </div>
+</section>
+
+<!-- PURITY STATS -->
+<section class="purity">
+  <div class="purity-stats">
+    <div class="purity-stat">
+      <div class="purity-num">99.998%</div>
+      <div class="purity-label">Ultrapure 18 M&Omega; Water</div>
+    </div>
+    <div class="purity-stat">
+      <div class="purity-num">20 ppm</div>
+      <div class="purity-label">Silver Nanoparticles</div>
+    </div>
+    <div class="purity-stat">
+      <div class="purity-num">0</div>
+      <div class="purity-label">Binders, Surfactants, or VOCs</div>
+    </div>
+    <div class="purity-stat">
+      <div class="purity-num">1m&sup2;</div>
+      <div class="purity-label">Production Footprint</div>
+    </div>
+  </div>
+</section>
+
+<!-- CALCULATOR -->
+<section id="calculator" class="section">
+  <div class="section-header">
+    <h2>Treatment Calculator</h2>
+    <p>Calculate exact FUZE dosage, bath concentration, and cost for your specific fabric and application method.</p>
+  </div>
+  <div class="calc-container">
+    <div class="calc-tabs">
+      <button class="calc-tab active" onclick="switchMethod('exhaust')">Exhaust</button>
+      <button class="calc-tab" onclick="switchMethod('pad')">Pad-Dry-Cure</button>
+      <button class="calc-tab" onclick="switchMethod('spray')">Spray</button>
+    </div>
+
+    <!-- Tier Selector -->
+    <div class="calc-grid" style="margin-bottom: 1.25rem;">
+      <div class="calc-field" style="grid-column: 1 / -1;">
+        <label>Treatment Tier</label>
+        <select id="tier" onchange="calculate()">
+          <option value="1.0">F1 &mdash; Full Protection (1.0 mg/kg)</option>
+          <option value="0.75">F2 &mdash; Enhanced (0.75 mg/kg)</option>
+          <option value="0.5">F3 &mdash; Standard (0.5 mg/kg)</option>
+          <option value="0.25">F4 &mdash; Light (0.25 mg/kg)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- EXHAUST FIELDS -->
+    <div id="method-exhaust" class="calc-grid">
+      <div class="calc-field">
+        <label>Fabric GSM (g/m&sup2;)</label>
+        <input type="number" id="gsm" value="150" oninput="calculate()">
+      </div>
+      <div class="calc-field">
+        <label>Fabric Width (cm)</label>
+        <input type="number" id="width" value="150" oninput="calculate()">
+      </div>
+      <div class="calc-field">
+        <label>Batch Length (meters)</label>
+        <input type="number" id="length" value="1000" oninput="calculate()">
+      </div>
+      <div class="calc-field">
+        <label>Liquor Ratio (1:X)</label>
+        <input type="number" id="ratio" value="10" oninput="calculate()">
+      </div>
+      <div class="calc-field">
+        <label>Exhaustion Rate (%)</label>
+        <input type="number" id="exhaustion" value="85" oninput="calculate()">
+      </div>
+    </div>
+
+    <!-- PAD FIELDS -->
+    <div id="method-pad" class="calc-grid" style="display:none;">
+      <div class="calc-field">
+        <label>Fabric GSM (g/m&sup2;)</label>
+        <input type="number" id="pad-gsm" value="150" oninput="calculate()">
+      </div>
+      <div class="calc-field">
+        <label>Fabric Width (cm)</label>
+        <input type="number" id="pad-width" value="150" oninput="calculate()">
+      </div>
+      <div class="calc-field">
+        <label>Batch Length (meters)</label>
+        <input type="number" id="pad-length" value="1000" oninput="calculate()">
+      </div>
+      <div class="calc-field">
+        <label>Wet Pickup (%)</label>
+        <input type="number" id="pad-pickup" value="70" oninput="calculate()">
+      </div>
+    </div>
+
+    <!-- SPRAY FIELDS -->
+    <div id="method-spray" class="calc-grid" style="display:none;">
+      <div class="calc-field">
+        <label>Fabric GSM (g/m&sup2;)</label>
+        <input type="number" id="spray-gsm" value="150" oninput="calculate()">
+      </div>
+      <div class="calc-field">
+        <label>Fabric Width (inches)</label>
+        <input type="number" id="spray-width-in" value="60" oninput="calculate()">
+      </div>
+      <div class="calc-field">
+        <label>Fabric Speed (m/min)</label>
+        <input type="number" id="spray-speed" value="15" oninput="calculate()">
+      </div>
+      <div class="calc-field">
+        <label>Pump Rate (mL/min per head)</label>
+        <input type="number" id="spray-pump" value="50" oninput="calculate()">
+      </div>
+      <div class="calc-field">
+        <label>Run Length (meters)</label>
+        <input type="number" id="spray-length" value="1000" oninput="calculate()">
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="calc-results" id="results">
+      <h3>Calculation Results</h3>
+      <div class="result-grid" id="result-grid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- TIER COMPARISON -->
+<section id="tiers" class="section" style="background: var(--slate-900); max-width: 100%; padding-left: 1.5rem; padding-right: 1.5rem;">
+  <div class="section-header">
+    <h2>Treatment Tiers</h2>
+    <p>Four levels of antimicrobial protection to match your application requirements and budget.</p>
+  </div>
+  <div class="tiers-grid">
+    <div class="tier-card">
+      <div class="tier-badge" style="color: var(--teal-400);">TIER F1</div>
+      <div class="tier-name">Full Protection</div>
+      <div class="tier-dose">1.0 mg/kg</div>
+      <div class="tier-unit">silver on fabric</div>
+      <ul class="tier-features">
+        <li>Maximum antimicrobial efficacy</li>
+        <li>Hospitality & healthcare textiles</li>
+        <li>Meets strictest global standards</li>
+        <li>Ideal for direct skin contact items</li>
+        <li>Bed linens, towels, uniforms</li>
+      </ul>
+    </div>
+    <div class="tier-card featured">
+      <div class="tier-badge" style="color: var(--emerald-400);">TIER F2</div>
+      <div class="tier-name">Enhanced</div>
+      <div class="tier-dose">0.75 mg/kg</div>
+      <div class="tier-unit">silver on fabric</div>
+      <ul class="tier-features">
+        <li>Strong antimicrobial performance</li>
+        <li>Apparel & activewear</li>
+        <li>Excellent wash durability</li>
+        <li>Best value for premium brands</li>
+        <li>Athletic wear, intimates, socks</li>
+      </ul>
+    </div>
+    <div class="tier-card">
+      <div class="tier-badge" style="color: var(--blue-400);">TIER F3</div>
+      <div class="tier-name">Standard</div>
+      <div class="tier-dose">0.50 mg/kg</div>
+      <div class="tier-unit">silver on fabric</div>
+      <ul class="tier-features">
+        <li>Proven antimicrobial protection</li>
+        <li>General apparel & home textiles</li>
+        <li>Cost-effective treatment level</li>
+        <li>Odor control applications</li>
+        <li>Casual wear, bedding, curtains</li>
+      </ul>
+    </div>
+    <div class="tier-card">
+      <div class="tier-badge" style="color: var(--amber-400);">TIER F4</div>
+      <div class="tier-name">Light</div>
+      <div class="tier-dose">0.25 mg/kg</div>
+      <div class="tier-unit">silver on fabric</div>
+      <ul class="tier-features">
+        <li>Baseline antimicrobial benefit</li>
+        <li>High-volume production</li>
+        <li>Lowest treatment cost per meter</li>
+        <li>Freshness preservation</li>
+        <li>Basics, linings, packaging textiles</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- VS COMPETITORS -->
+<section id="compare" class="section">
+  <div class="section-header">
+    <h2>FUZE vs Traditional Antimicrobials</h2>
+    <p>See how FUZE's pure silver nanoparticle technology compares to conventional chemical treatments.</p>
+  </div>
+  <div class="vs-table-wrap">
+    <table class="vs-table">
+      <thead>
+        <tr>
+          <th>Property</th>
+          <th class="fuze-col">FUZE Silver Nanoparticles</th>
+          <th>Silver Chloride / Zeolite</th>
+          <th>Quaternary Ammonium (Quats)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Active Agent</td>
+          <td class="fuze-cell">Pure elemental silver in 18 M&Omega; water</td>
+          <td>Silver salt compounds in polymer matrix</td>
+          <td>Organic nitrogen compounds</td>
+        </tr>
+        <tr>
+          <td>Binders Required</td>
+          <td class="fuze-cell"><span class="check">NONE</span></td>
+          <td><span class="cross">YES</span> &mdash; polymer binders required</td>
+          <td><span class="cross">YES</span> &mdash; chemical binders required</td>
+        </tr>
+        <tr>
+          <td>VOC Emissions</td>
+          <td class="fuze-cell"><span class="check">ZERO</span></td>
+          <td><span class="warn">MODERATE</span> &mdash; from binder solvents</td>
+          <td><span class="cross">HIGH</span> &mdash; significant off-gassing</td>
+        </tr>
+        <tr>
+          <td>Heat Curing Required</td>
+          <td class="fuze-cell"><span class="check">NO</span></td>
+          <td><span class="cross">YES</span> &mdash; 150-180&deg;C</td>
+          <td><span class="cross">YES</span> &mdash; 130-160&deg;C</td>
+        </tr>
+        <tr>
+          <td>Application Process</td>
+          <td class="fuze-cell">Add to existing dyebath or spray</td>
+          <td>Separate padding + curing step</td>
+          <td>Separate padding + curing step</td>
+        </tr>
+        <tr>
+          <td>Production Facility</td>
+          <td class="fuze-cell"><span class="check">1m&sup2; table</span>, 30A laser, solar-capable</td>
+          <td><span class="cross">Chemical reduction plant</span></td>
+          <td><span class="cross">Chemical synthesis facility</span></td>
+        </tr>
+        <tr>
+          <td>Production Waste</td>
+          <td class="fuze-cell"><span class="check">ZERO</span> &mdash; no by-products</td>
+          <td><span class="cross">Chemical effluent</span> requiring treatment</td>
+          <td><span class="cross">Toxic by-products</span> requiring disposal</td>
+        </tr>
+        <tr>
+          <td>Raw Material Source</td>
+          <td class="fuze-cell"><span class="check">Recycled electronics</span> (silver/gold)</td>
+          <td>Mined silver ore + chemical reagents</td>
+          <td>Petroleum-derived chemicals</td>
+        </tr>
+        <tr>
+          <td>Effluent / Drain Impact</td>
+          <td class="fuze-cell"><span class="check">NOTHING</span> down the drain</td>
+          <td><span class="cross">Heavy metal</span> discharge concerns</td>
+          <td><span class="cross">Aquatic toxicity</span> concerns</td>
+        </tr>
+        <tr>
+          <td>Water Consumption</td>
+          <td class="fuze-cell"><span class="check">Minimal</span> &mdash; pure water carrier</td>
+          <td><span class="cross">High</span> &mdash; rinsing required</td>
+          <td><span class="cross">High</span> &mdash; multiple wash cycles</td>
+        </tr>
+        <tr>
+          <td>Fabric Hand Feel</td>
+          <td class="fuze-cell"><span class="check">UNCHANGED</span> &mdash; no coating</td>
+          <td><span class="warn">Slightly altered</span> &mdash; binder film</td>
+          <td><span class="warn">Altered</span> &mdash; surface coating</td>
+        </tr>
+        <tr>
+          <td>OEKO-TEX / bluesign</td>
+          <td class="fuze-cell"><span class="check">Compatible</span></td>
+          <td><span class="warn">Varies</span> by formulation</td>
+          <td><span class="cross">Restrictions</span> on many compounds</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PROCESS COMPARISON -->
+  <div class="process-compare">
+    <div class="process-card fuze-card">
+      <h3>FUZE Production</h3>
+      <ul class="process-list">
+        <li><span style="color:var(--teal-400);">&#9889;</span> 30-amp laser ablation system</li>
+        <li><span style="color:var(--teal-400);">&#9728;</span> Can operate on solar power</li>
+        <li><span style="color:var(--teal-400);">&#9851;</span> Recycled electronics as feedstock</li>
+        <li><span style="color:var(--teal-400);">&#10003;</span> 1m x 1m production footprint</li>
+        <li><span style="color:var(--teal-400);">&#10003;</span> Zero by-products or waste</li>
+        <li><span style="color:var(--teal-400);">&#10003;</span> Zero effluent discharge</li>
+        <li><span style="color:var(--teal-400);">&#10003;</span> No chemical reagents needed</li>
+      </ul>
+    </div>
+    <div class="process-card others-card">
+      <h3>Traditional Antimicrobials</h3>
+      <ul class="process-list">
+        <li><span style="color:var(--red-400);">&#10007;</span> Industrial chemical reduction facility</li>
+        <li><span style="color:var(--red-400);">&#10007;</span> High energy consumption</li>
+        <li><span style="color:var(--red-400);">&#10007;</span> Mined raw materials + chemical reagents</li>
+        <li><span style="color:var(--red-400);">&#10007;</span> Large factory footprint required</li>
+        <li><span style="color:var(--red-400);">&#10007;</span> Chemical by-products & waste</li>
+        <li><span style="color:var(--red-400);">&#10007;</span> Effluent treatment systems required</li>
+        <li><span style="color:var(--red-400);">&#10007;</span> Added polymers, binders, surfactants</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SUSTAINABILITY -->
+<section id="sustainability" class="section" style="background: var(--slate-900); max-width: 100%; padding-left: 1.5rem; padding-right: 1.5rem;">
+  <div class="section-header">
+    <h2>Environmental Impact</h2>
+    <p>Every fabric treated with FUZE is a step toward cleaner manufacturing. Here's what you eliminate.</p>
+  </div>
+  <div class="sus-grid">
+    <div class="sus-card">
+      <div class="sus-icon">&#128167;</div>
+      <div class="sus-title">Water Saved</div>
+      <div class="sus-value">Up to 90%</div>
+      <div class="sus-desc">No additional rinse cycles needed. FUZE integrates into your existing dyebath &mdash; the carrier is 18 megaohm ultrapure water that adds nothing to your wastewater stream.</div>
+    </div>
+    <div class="sus-card">
+      <div class="sus-icon">&#9729;</div>
+      <div class="sus-title">CO&#8322; Reduced</div>
+      <div class="sus-value">No Heat Curing</div>
+      <div class="sus-desc">Competitors require 130-180&deg;C curing ovens. FUZE needs zero additional thermal energy. Our 30-amp laser production can run on solar power.</div>
+    </div>
+    <div class="sus-card">
+      <div class="sus-icon">&#127811;</div>
+      <div class="sus-title">Zero VOCs</div>
+      <div class="sus-value">0.000%</div>
+      <div class="sus-desc">No binders. No surfactants. No solvents. FUZE is 99.998% ultrapure water and 0.002% silver nanoparticles. Nothing else. No volatile organic compounds released &mdash; ever.</div>
+    </div>
+    <div class="sus-card">
+      <div class="sus-icon">&#128300;</div>
+      <div class="sus-title">Zero Chemical Binders</div>
+      <div class="sus-value">0 Additives</div>
+      <div class="sus-desc">Traditional antimicrobials need polymer binders to stick to fabric. FUZE nanoparticles bond directly to fibers at the molecular level. No coating, no film, no change in hand feel.</div>
+    </div>
+    <div class="sus-card">
+      <div class="sus-icon">&#9851;</div>
+      <div class="sus-title">Recycled Feedstock</div>
+      <div class="sus-value">100%</div>
+      <div class="sus-desc">FUZE silver comes from recycled electronics &mdash; not mined ore. We close the loop on precious metals, reducing mining impact and e-waste simultaneously.</div>
+    </div>
+    <div class="sus-card">
+      <div class="sus-icon">&#127758;</div>
+      <div class="sus-title">Zero Effluent</div>
+      <div class="sus-value">Nothing Down the Drain</div>
+      <div class="sus-desc">No chemical waste from production. No effluent treatment required. No heavy metals, no toxic by-products, no drain discharge. Period.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-box">
+    <h2>Ready for the Full Suite?</h2>
+    <p>FUZE Atlas gives you fabric management, lab testing, recipe development, compliance tracking, and supply chain tools &mdash; all in one platform.</p>
+    <a href="https://fuzeatlas.com" target="_blank" class="btn btn-primary">
+      Register at FUZE Atlas &rarr;
+    </a>
+    <p style="margin-top: 1.25rem; font-size: 0.9rem; color: var(--slate-500);">Free for brands, factories, and laboratories. <br>Manage your entire antimicrobial textile workflow.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>&copy; 2026 FUZE Biotech. All rights reserved. &nbsp;|&nbsp; <a href="https://fuzeatlas.com">FUZE Atlas Platform</a> &nbsp;|&nbsp; <a href="mailto:info@fuzebiotech.com">Contact</a></p>
+</footer>
+
+<script>
+  // ============ CALCULATOR LOGIC ============
+  const STOCK_PPM = 30; // mg/L silver concentration in delivered FUZE
+  const BOTTLE_L = 19; // liters per standard bottle
+
+  let currentMethod = 'exhaust';
+
+  function switchMethod(method) {
+    currentMethod = method;
+    document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('method-exhaust').style.display = method === 'exhaust' ? 'grid' : 'none';
+    document.getElementById('method-pad').style.display = method === 'pad' ? 'grid' : 'none';
+    document.getElementById('method-spray').style.display = method === 'spray' ? 'grid' : 'none';
+    calculate();
+  }
+
+  function getVal(id) { return parseFloat(document.getElementById(id)?.value) || 0; }
+
+  function calculate() {
+    const tier = parseFloat(document.getElementById('tier').value);
+    let results = [];
+
+    if (currentMethod === 'exhaust') {
+      const gsm = getVal('gsm'), width = getVal('width') / 100, len = getVal('length');
+      const ratio = getVal('ratio'), exhaustion = getVal('exhaustion') / 100;
+      const fabricArea = width * len; // m2
+      const fabricWeight = (gsm / 1000) * fabricArea; // kg
+      const bathVolume = fabricWeight * ratio; // liters
+      const silverNeeded = fabricWeight * tier / exhaustion; // mg
+      const fuzeVolume = silverNeeded / STOCK_PPM; // liters
+      const fuzeML = fuzeVolume * 1000;
+      const fuzePct = (fuzeVolume / bathVolume) * 100;
+      const bathConc = silverNeeded / bathVolume; // mg/L
+      const bottles = fuzeVolume / BOTTLE_L;
+
+      results = [
+        { label: 'Fabric Weight', value: fabricWeight.toFixed(1) + ' kg' },
+        { label: 'Bath Volume', value: bathVolume.toFixed(0) + ' L' },
+        { label: 'FUZE Volume Needed', value: fuzeML.toFixed(0) + ' mL' },
+        { label: 'FUZE % of Bath', value: fuzePct.toFixed(3) + '%' },
+        { label: 'Bath Concentration', value: bathConc.toFixed(2) + ' mg/L' },
+        { label: 'Bottles (19L)', value: bottles.toFixed(2) },
+      ];
+    } else if (currentMethod === 'pad') {
+      const gsm = getVal('pad-gsm'), width = getVal('pad-width') / 100, len = getVal('pad-length');
+      const pickup = getVal('pad-pickup') / 100;
+      const fabricArea = width * len;
+      const fabricWeight = (gsm / 1000) * fabricArea;
+      const silverNeeded = fabricWeight * tier; // mg
+      const solutionPickedUp = fabricWeight * pickup; // kg of solution = liters
+      const padConc = silverNeeded / solutionPickedUp; // mg/L
+      const fuzeVolume = silverNeeded / STOCK_PPM; // liters
+      const fuzeML = fuzeVolume * 1000;
+      const bottles = fuzeVolume / BOTTLE_L;
+
+      results = [
+        { label: 'Fabric Weight', value: fabricWeight.toFixed(1) + ' kg' },
+        { label: 'Solution Pickup', value: solutionPickedUp.toFixed(1) + ' L' },
+        { label: 'Pad Solution Conc.', value: padConc.toFixed(2) + ' mg/L' },
+        { label: 'FUZE Volume Needed', value: fuzeML.toFixed(0) + ' mL' },
+        { label: 'Bottles (19L)', value: bottles.toFixed(2) },
+      ];
+    } else if (currentMethod === 'spray') {
+      const gsm = getVal('spray-gsm'), widthIn = getVal('spray-width-in');
+      const speed = getVal('spray-speed'), pumpRate = getVal('spray-pump');
+      const runLength = getVal('spray-length');
+      const widthCm = widthIn * 2.54;
+      const headsPerSide = Math.ceil(widthIn / 6);
+      const totalHeads = headsPerSide * 2;
+      const totalSprayRate = totalHeads * pumpRate; // mL/min
+      const timePerMeter = 1 / speed; // min/m
+      const volumePerMeter = totalSprayRate * timePerMeter; // mL/m
+      const fabricWeightPerMeter = (gsm / 1000) * (widthCm / 100); // kg/m
+      const silverPerMeter = fabricWeightPerMeter * tier; // mg/m
+      const concNeeded = silverPerMeter / (volumePerMeter / 1000); // mg/L
+      const dilutionRatio = STOCK_PPM / concNeeded;
+      const totalVolume = volumePerMeter * runLength / 1000; // liters
+      const bottles = totalVolume / BOTTLE_L;
+      const metersPerBottle = (BOTTLE_L * 1000) / volumePerMeter;
+
+      results = [
+        { label: 'Spray Heads (top+bottom)', value: totalHeads },
+        { label: 'Total Spray Rate', value: totalSprayRate + ' mL/min' },
+        { label: 'Volume per Meter', value: volumePerMeter.toFixed(1) + ' mL' },
+        { label: 'Required Concentration', value: concNeeded.toFixed(2) + ' mg/L' },
+        { label: 'Dilution Ratio', value: '1:' + dilutionRatio.toFixed(1) + ' from stock' },
+        { label: 'Meters per Bottle', value: metersPerBottle.toFixed(0) + ' m' },
+      ];
+    }
+
+    const grid = document.getElementById('result-grid');
+    grid.innerHTML = results.map(r =>
+      `<div class="result-item"><div class="result-value">${r.value}</div><div class="result-label">${r.label}</div></div>`
+    ).join('');
+  }
+
+  // Initial calculation
+  calculate();
+</script>
+</body>
+</html>
