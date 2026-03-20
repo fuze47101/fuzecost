@@ -237,7 +237,7 @@
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
-    <a href="/" class="nav-logo"><img src="/fuze-logo.jpg" alt="FUZE Biotech" style="height: 38px; width: auto;"></a>
+    <a href="/" class="nav-logo"><img src="/fuze-logo.jpg" alt="FUZE Biotech" style="height: 52px; width: auto;"></a>
     <div class="nav-links">
       <a href="#calculator">Calculator</a>
       <a href="#tiers">Treatment Tiers</a>
@@ -252,10 +252,10 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
-    <img src="/fuze-logo-full.png" alt="FUZE" style="height: 120px; width: auto; margin-bottom: 1.5rem;">
+    <img src="/fuze-logo-full.png" alt="FUZE" style="height: 180px; width: auto; margin-bottom: 1.5rem;">
     <div class="hero-badge">NY HOSPITALITY MARKET 2026</div>
     <h1>The World's Cleanest <span>Antimicrobial Treatment</span></h1>
-    <p>99.998% ultrapure water. 20 ppm silver nanoparticles. No binders. No VOCs. No heat curing. Calculate your treatment costs and see why the world's leading textile manufacturers are switching to FUZE.</p>
+    <p>99.998% ultrapure water. 20 ppm FUZE metamaterial. No binders. No VOCs. No heat curing. Calculate your treatment costs and see why the world's leading textile manufacturers are switching to FUZE.</p>
     <div class="hero-btns">
       <a href="#calculator" class="btn btn-primary">Open Calculator</a>
       <a href="/sustainability" class="btn btn-secondary">See Environmental Impact</a>
@@ -272,7 +272,7 @@
     </div>
     <div class="purity-stat">
       <div class="purity-num">20 ppm</div>
-      <div class="purity-label">Silver Nanoparticles</div>
+      <div class="purity-label">FUZE Metamaterial</div>
     </div>
     <div class="purity-stat">
       <div class="purity-num">0</div>
@@ -288,101 +288,134 @@
 <!-- CALCULATOR -->
 <section id="calculator" class="section">
   <div class="section-header">
-    <h2>Treatment Calculator</h2>
-    <p>Calculate exact FUZE dosage, bath concentration, and cost for your specific fabric and application method.</p>
+    <h2>FUZE Quote Calculator</h2>
+    <p>Calculate FUZE application cost, compare against competitors, and generate environmental impact scores.</p>
   </div>
-  <div class="calc-container">
-    <div class="calc-tabs">
-      <button class="calc-tab active" onclick="switchMethod('exhaust')">Exhaust</button>
-      <button class="calc-tab" onclick="switchMethod('pad')">Pad-Dry-Cure</button>
-      <button class="calc-tab" onclick="switchMethod('spray')">Spray</button>
+  <div class="calc-container" style="display: grid; grid-template-columns: 1fr 360px; gap: 2rem; align-items: start;">
+    <!-- LEFT: Inputs -->
+    <div>
+      <!-- Currency & Width Unit -->
+      <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem; align-items: center;">
+        <div class="calc-field" style="min-width: 120px;">
+          <label>Currency</label>
+          <select id="currency" onchange="calculate()" style="width: 100%; padding: 0.6rem 1rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--slate-100); font-size: 0.95rem;">
+            <option value="USD">USD</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <label>Width unit</label>
+          <div style="display: flex; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+            <button id="unit-in" onclick="setUnit('in')" style="padding: 0.6rem 1.25rem; background: var(--teal-600); color: white; border: none; font-weight: 600; font-size: 0.9rem; cursor: pointer;">Inches</button>
+            <button id="unit-m" onclick="setUnit('m')" style="padding: 0.6rem 1.25rem; background: var(--slate-700); color: var(--slate-400); border: none; font-weight: 600; font-size: 0.9rem; cursor: pointer;">Meters</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FUZE Application Tier -->
+      <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-size: 0.85rem; color: var(--slate-400); margin-bottom: 0.75rem; font-weight: 500;">FUZE Application Tier</label>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
+          <div id="tier-f1" class="tier-select active" onclick="selectTier(1.0, this)">
+            <div class="tier-select-badge" style="color: var(--teal-400);">F1</div>
+            <div class="tier-select-name">Full Spectrum</div>
+            <div class="tier-select-desc">Maximum particle density &middot; Passes all test standards &middot; Full ancillary benefits (UV, wicking, cooling)</div>
+          </div>
+          <div id="tier-f2" class="tier-select" onclick="selectTier(0.75, this)">
+            <div class="tier-select-badge" style="color: var(--emerald-400);">F2</div>
+            <div class="tier-select-name">Advanced Performance</div>
+            <div class="tier-select-desc">High particle density &middot; AATCC 100 &amp; ASTM E2149 compatible &middot; Enhanced fabric performance</div>
+          </div>
+          <div id="tier-f3" class="tier-select" onclick="selectTier(0.5, this)">
+            <div class="tier-select-badge" style="color: var(--blue-400);">F3</div>
+            <div class="tier-select-name">Core Performance</div>
+            <div class="tier-select-desc">Balanced particle density &middot; Optimized for ASTM E2149 contact testing &middot; Cost-efficient integration</div>
+          </div>
+          <div id="tier-f4" class="tier-select" onclick="selectTier(0.25, this)">
+            <div class="tier-select-badge" style="color: var(--amber-400);">F4</div>
+            <div class="tier-select-name">Essential Protection</div>
+            <div class="tier-select-desc">Permanent antimicrobial &middot; Ideal for cotton-rich blends &middot; ASTM E2149 contact testing</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Fields -->
+      <div class="calc-grid">
+        <div class="calc-field">
+          <label>Fabric Weight (GSM)</label>
+          <input type="number" id="gsm" value="150" oninput="calculate()">
+        </div>
+        <div class="calc-field">
+          <label id="width-label">Width (inches)</label>
+          <input type="number" id="width" value="60" oninput="calculate()">
+        </div>
+        <div class="calc-field">
+          <label>FUZE Price ($/L)</label>
+          <input type="number" id="price" value="36" oninput="calculate()">
+        </div>
+        <div class="calc-field">
+          <label>Discount (%)</label>
+          <input type="number" id="discount" value="0" oninput="calculate()">
+        </div>
+      </div>
+      <div class="calc-grid" style="margin-top: 1rem;">
+        <div class="calc-field">
+          <label>Job Length (m)</label>
+          <input type="number" id="job-length" placeholder="Optional" oninput="calculate()">
+        </div>
+      </div>
+
+      <!-- Factory Adders -->
+      <div style="margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <label style="font-size: 0.85rem; color: var(--slate-400); font-weight: 500;">Factory Adders (&cent;/linear meter)</label>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <input type="checkbox" id="adder1-on" checked onchange="calculate()" style="accent-color: var(--teal-500);">
+            <input type="text" value="Below MOQ" style="flex: 1; padding: 0.5rem 0.75rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--slate-200); font-size: 0.9rem;" readonly>
+            <input type="number" id="adder1" value="0" oninput="calculate()" style="width: 80px; padding: 0.5rem 0.75rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--slate-200); font-size: 0.9rem; text-align: right;">
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <input type="checkbox" id="adder2-on" checked onchange="calculate()" style="accent-color: var(--teal-500);">
+            <input type="text" value="Waste in application bath" style="flex: 1; padding: 0.5rem 0.75rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--slate-200); font-size: 0.9rem;" readonly>
+            <input type="number" id="adder2" value="0" oninput="calculate()" style="width: 80px; padding: 0.5rem 0.75rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--slate-200); font-size: 0.9rem; text-align: right;">
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <input type="checkbox" id="adder3-on" checked onchange="calculate()" style="accent-color: var(--teal-500);">
+            <input type="text" value="Additional processing" style="flex: 1; padding: 0.5rem 0.75rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--slate-200); font-size: 0.9rem;" readonly>
+            <input type="number" id="adder3" value="0" oninput="calculate()" style="width: 80px; padding: 0.5rem 0.75rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--slate-200); font-size: 0.9rem; text-align: right;">
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Tier Selector -->
-    <div class="calc-grid" style="margin-bottom: 1.25rem;">
-      <div class="calc-field" style="grid-column: 1 / -1;">
-        <label>Treatment Tier</label>
-        <select id="tier" onchange="calculate()">
-          <option value="1.0">F1 &mdash; Full Protection (1.0 mg/kg)</option>
-          <option value="0.75">F2 &mdash; Enhanced (0.75 mg/kg)</option>
-          <option value="0.5">F3 &mdash; Standard (0.5 mg/kg)</option>
-          <option value="0.25">F4 &mdash; Light (0.25 mg/kg)</option>
-        </select>
-      </div>
-    </div>
+    <!-- RIGHT: Quote Panel -->
+    <div style="background: var(--slate-900); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 2rem; position: sticky; top: 80px;">
+      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">FUZE Quote</h3>
+      <div id="quote-tier-label" style="font-size: 0.9rem; color: var(--slate-400); margin-bottom: 1.5rem;">F1 &mdash; Full Spectrum</div>
 
-    <!-- EXHAUST FIELDS -->
-    <div id="method-exhaust" class="calc-grid">
-      <div class="calc-field">
-        <label>Fabric GSM (g/m&sup2;)</label>
-        <input type="number" id="gsm" value="150" oninput="calculate()">
+      <div style="background: rgba(20, 184, 166, 0.08); border: 1px solid rgba(20, 184, 166, 0.2); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center;">
+        <div style="font-size: 0.8rem; color: var(--slate-400); margin-bottom: 0.25rem;">Total Quoted Cost</div>
+        <div id="quote-per-m" style="font-size: 2.5rem; font-weight: 800; color: white; line-height: 1;">$0.27<span style="font-size: 1rem; font-weight: 400; color: var(--slate-400);">/m</span></div>
+        <div id="quote-per-yd" style="font-size: 1.1rem; color: var(--slate-300); margin-top: 0.25rem;">$0.25 /yd</div>
+        <div id="quote-per-kg" style="font-size: 1.1rem; color: var(--slate-300);">$1.20 /kg</div>
+        <div id="quote-per-lb" style="font-size: 1.1rem; color: var(--slate-300);">$0.54 /lb</div>
       </div>
-      <div class="calc-field">
-        <label>Fabric Width (cm)</label>
-        <input type="number" id="width" value="150" oninput="calculate()">
-      </div>
-      <div class="calc-field">
-        <label>Batch Length (meters)</label>
-        <input type="number" id="length" value="1000" oninput="calculate()">
-      </div>
-      <div class="calc-field">
-        <label>Liquor Ratio (1:X)</label>
-        <input type="number" id="ratio" value="10" oninput="calculate()">
-      </div>
-      <div class="calc-field">
-        <label>Exhaustion Rate (%)</label>
-        <input type="number" id="exhaustion" value="85" oninput="calculate()">
-      </div>
-    </div>
 
-    <!-- PAD FIELDS -->
-    <div id="method-pad" class="calc-grid" style="display:none;">
-      <div class="calc-field">
-        <label>Fabric GSM (g/m&sup2;)</label>
-        <input type="number" id="pad-gsm" value="150" oninput="calculate()">
+      <div style="font-size: 0.85rem; color: var(--slate-400); display: flex; flex-direction: column; gap: 0.5rem;">
+        <div style="display: flex; justify-content: space-between;"><span>FUZE <span id="detail-tier">F1</span> cost</span><span id="detail-fuze-cost" style="color: var(--slate-200);">$0.27/m</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>Adders</span><span id="detail-adders" style="color: var(--slate-200);">$0.00/m</span></div>
+        <div style="display: flex; justify-content: space-between; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.08);"><span>Fabric weight</span><span id="detail-fabric-wt" style="color: var(--slate-200);">0.2286 kg/m</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>Stock/meter</span><span id="detail-stock-m" style="color: var(--slate-200);">0.00762 L</span></div>
       </div>
-      <div class="calc-field">
-        <label>Fabric Width (cm)</label>
-        <input type="number" id="pad-width" value="150" oninput="calculate()">
-      </div>
-      <div class="calc-field">
-        <label>Batch Length (meters)</label>
-        <input type="number" id="pad-length" value="1000" oninput="calculate()">
-      </div>
-      <div class="calc-field">
-        <label>Wet Pickup (%)</label>
-        <input type="number" id="pad-pickup" value="70" oninput="calculate()">
-      </div>
-    </div>
 
-    <!-- SPRAY FIELDS -->
-    <div id="method-spray" class="calc-grid" style="display:none;">
-      <div class="calc-field">
-        <label>Fabric GSM (g/m&sup2;)</label>
-        <input type="number" id="spray-gsm" value="150" oninput="calculate()">
+      <div id="quote-tier-info" style="margin-top: 1.25rem; padding: 1rem; background: rgba(20, 184, 166, 0.06); border-radius: 8px; font-size: 0.8rem; color: var(--teal-400); line-height: 1.6;">
+        <strong>F1 &mdash; Full Spectrum:</strong> Maximum particle density &middot; Passes all test standards &middot; Full ancillary benefits (UV, wicking, cooling) &middot; Permanent attachment &mdash; applied once, lasts the life of the textile.
       </div>
-      <div class="calc-field">
-        <label>Fabric Width (inches)</label>
-        <input type="number" id="spray-width-in" value="60" oninput="calculate()">
-      </div>
-      <div class="calc-field">
-        <label>Fabric Speed (m/min)</label>
-        <input type="number" id="spray-speed" value="15" oninput="calculate()">
-      </div>
-      <div class="calc-field">
-        <label>Pump Rate (mL/min per head)</label>
-        <input type="number" id="spray-pump" value="50" oninput="calculate()">
-      </div>
-      <div class="calc-field">
-        <label>Run Length (meters)</label>
-        <input type="number" id="spray-length" value="1000" oninput="calculate()">
-      </div>
-    </div>
 
-    <!-- RESULTS -->
-    <div class="calc-results" id="results">
-      <h3>Calculation Results</h3>
-      <div class="result-grid" id="result-grid"></div>
+      <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--slate-500);">
+        FUZE stock concentration: 30 ppm &middot; Bottle: 19 L
+      </div>
     </div>
   </div>
 </section>
@@ -396,9 +429,9 @@
   <div class="tiers-grid">
     <div class="tier-card">
       <div class="tier-badge" style="color: var(--teal-400);">TIER F1</div>
-      <div class="tier-name">Full Protection</div>
+      <div class="tier-name">Full Spectrum</div>
       <div class="tier-dose">1.0 mg/kg</div>
-      <div class="tier-unit">silver on fabric</div>
+      <div class="tier-unit">FUZE on fabric</div>
       <ul class="tier-features">
         <li>Maximum antimicrobial efficacy</li>
         <li>Hospitality & healthcare textiles</li>
@@ -409,9 +442,9 @@
     </div>
     <div class="tier-card featured">
       <div class="tier-badge" style="color: var(--emerald-400);">TIER F2</div>
-      <div class="tier-name">Enhanced</div>
+      <div class="tier-name">Advanced Performance</div>
       <div class="tier-dose">0.75 mg/kg</div>
-      <div class="tier-unit">silver on fabric</div>
+      <div class="tier-unit">FUZE on fabric</div>
       <ul class="tier-features">
         <li>Strong antimicrobial performance</li>
         <li>Apparel & activewear</li>
@@ -422,9 +455,9 @@
     </div>
     <div class="tier-card">
       <div class="tier-badge" style="color: var(--blue-400);">TIER F3</div>
-      <div class="tier-name">Standard</div>
+      <div class="tier-name">Core Performance</div>
       <div class="tier-dose">0.50 mg/kg</div>
-      <div class="tier-unit">silver on fabric</div>
+      <div class="tier-unit">FUZE on fabric</div>
       <ul class="tier-features">
         <li>Proven antimicrobial protection</li>
         <li>General apparel & home textiles</li>
@@ -435,9 +468,9 @@
     </div>
     <div class="tier-card">
       <div class="tier-badge" style="color: var(--amber-400);">TIER F4</div>
-      <div class="tier-name">Light</div>
+      <div class="tier-name">Essential Protection</div>
       <div class="tier-dose">0.25 mg/kg</div>
-      <div class="tier-unit">silver on fabric</div>
+      <div class="tier-unit">FUZE on fabric</div>
       <ul class="tier-features">
         <li>Baseline antimicrobial benefit</li>
         <li>High-volume production</li>
@@ -453,14 +486,14 @@
 <section id="compare" class="section">
   <div class="section-header">
     <h2>FUZE vs Traditional Antimicrobials</h2>
-    <p>See how FUZE's pure silver nanoparticle technology compares to conventional chemical treatments.</p>
+    <p>See how FUZE metamaterial technology compares to conventional chemical treatments.</p>
   </div>
   <div class="vs-table-wrap">
     <table class="vs-table">
       <thead>
         <tr>
           <th>Property</th>
-          <th class="fuze-col">FUZE Silver Nanoparticles</th>
+          <th class="fuze-col">FUZE FUZE Metamaterial</th>
           <th>Silver Chloride / Zeolite</th>
           <th>Quaternary Ammonium (Quats)</th>
         </tr>
@@ -468,7 +501,7 @@
       <tbody>
         <tr>
           <td>Active Agent</td>
-          <td class="fuze-cell">Pure elemental silver in 18 M&Omega; water</td>
+          <td class="fuze-cell">FUZE metamaterial in 18 M&Omega; ultrapure water</td>
           <td>Silver salt compounds in polymer matrix</td>
           <td>Organic nitrogen compounds</td>
         </tr>
@@ -510,7 +543,7 @@
         </tr>
         <tr>
           <td>Raw Material Source</td>
-          <td class="fuze-cell"><span class="check">Recycled electronics</span> (silver/gold)</td>
+          <td class="fuze-cell"><span class="check">Recycled electronics</span> (precious metals)</td>
           <td>Mined silver ore + chemical reagents</td>
           <td>Petroleum-derived chemicals</td>
         </tr>
@@ -594,19 +627,19 @@
       <div class="sus-icon">&#127811;</div>
       <div class="sus-title">Zero VOCs</div>
       <div class="sus-value">0.000%</div>
-      <div class="sus-desc">No binders. No surfactants. No solvents. FUZE is 99.998% ultrapure water and 0.002% silver nanoparticles. Nothing else. No volatile organic compounds released &mdash; ever.</div>
+      <div class="sus-desc">No binders. No surfactants. No solvents. FUZE is 99.998% ultrapure water and 0.002% FUZE metamaterial. Nothing else. No volatile organic compounds released &mdash; ever.</div>
     </div>
     <div class="sus-card">
       <div class="sus-icon">&#128300;</div>
       <div class="sus-title">Zero Chemical Binders</div>
       <div class="sus-value">0 Additives</div>
-      <div class="sus-desc">Traditional antimicrobials need polymer binders to stick to fabric. FUZE nanoparticles bond directly to fibers at the molecular level. No coating, no film, no change in hand feel.</div>
+      <div class="sus-desc">Traditional antimicrobials need polymer binders to stick to fabric. FUZE metamaterial bonds directly to fibers at the molecular level. No coating, no film, no change in hand feel.</div>
     </div>
     <div class="sus-card">
       <div class="sus-icon">&#9851;</div>
       <div class="sus-title">Recycled Feedstock</div>
       <div class="sus-value">100%</div>
-      <div class="sus-desc">FUZE silver comes from recycled electronics &mdash; not mined ore. We close the loop on precious metals, reducing mining impact and e-waste simultaneously.</div>
+      <div class="sus-desc">FUZE metamaterial comes from recycled electronics &mdash; not mined ore. We close the loop on precious metals, reducing mining impact and e-waste simultaneously.</div>
     </div>
     <div class="sus-card">
       <div class="sus-icon">&#127758;</div>
@@ -634,101 +667,102 @@
   <p>&copy; 2026 FUZE Biotech. All rights reserved. &nbsp;|&nbsp; <a href="https://fuzeatlas.com">FUZE Atlas Platform</a> &nbsp;|&nbsp; <a href="mailto:info@fuzebiotech.com">Contact</a></p>
 </footer>
 
-<script>
-  // ============ CALCULATOR LOGIC ============
-  const STOCK_PPM = 30; // mg/L silver concentration in delivered FUZE
-  const BOTTLE_L = 19; // liters per standard bottle
-
-  let currentMethod = 'exhaust';
-
-  function switchMethod(method) {
-    currentMethod = method;
-    document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
-    document.getElementById('method-exhaust').style.display = method === 'exhaust' ? 'grid' : 'none';
-    document.getElementById('method-pad').style.display = method === 'pad' ? 'grid' : 'none';
-    document.getElementById('method-spray').style.display = method === 'spray' ? 'grid' : 'none';
-    calculate();
+<style>
+  /* TIER SELECTOR CARDS */
+  .tier-select {
+    background: var(--slate-700); border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 1rem; cursor: pointer; transition: all 0.2s;
   }
+  .tier-select:hover { border-color: rgba(45, 212, 191, 0.4); }
+  .tier-select.active { border-color: var(--teal-500); background: rgba(20, 184, 166, 0.08); }
+  .tier-select-badge { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.25rem; }
+  .tier-select-name { font-size: 0.85rem; font-weight: 700; color: var(--slate-200); margin-bottom: 0.4rem; }
+  .tier-select-desc { font-size: 0.7rem; color: var(--slate-400); line-height: 1.5; }
+  @media (max-width: 900px) {
+    .calc-container { grid-template-columns: 1fr !important; }
+    .tier-select-desc { display: none; }
+  }
+</style>
+<script>
+  // ============ FUZE QUOTE CALCULATOR (matches fuzeatlas.com/pricing) ============
+  const STOCK_MG_PER_L = 30;
+  const BOTTLE_L = 19;
+  const METERS_PER_YARD = 0.9144;
+  const KG_PER_LB = 0.45359237;
+
+  let currentTier = 1.0;
+  let currentUnit = 'in';
+
+  const tierInfo = {
+    1.0:  { label: 'F1', name: 'Full Spectrum', desc: 'Maximum particle density \u00b7 Passes all test standards \u00b7 Full ancillary benefits (UV, wicking, cooling) \u00b7 Permanent attachment \u2014 applied once, lasts the life of the textile.' },
+    0.75: { label: 'F2', name: 'Advanced Performance', desc: 'High particle density \u00b7 AATCC 100 & ASTM E2149 compatible \u00b7 Enhanced fabric performance \u00b7 Permanent attachment \u2014 applied once, lasts the life of the textile.' },
+    0.5:  { label: 'F3', name: 'Core Performance', desc: 'Balanced particle density \u00b7 Optimized for ASTM E2149 contact testing \u00b7 Cost-efficient integration \u00b7 Permanent attachment.' },
+    0.25: { label: 'F4', name: 'Essential Protection', desc: 'Permanent antimicrobial \u00b7 Ideal for cotton-rich blends \u00b7 ASTM E2149 contact testing \u00b7 Applied once, lasts the life of the textile.' },
+  };
 
   function getVal(id) { return parseFloat(document.getElementById(id)?.value) || 0; }
 
+  function setUnit(u) {
+    currentUnit = u;
+    document.getElementById('unit-in').style.background = u === 'in' ? 'var(--teal-600)' : 'var(--slate-700)';
+    document.getElementById('unit-in').style.color = u === 'in' ? 'white' : 'var(--slate-400)';
+    document.getElementById('unit-m').style.background = u === 'm' ? 'var(--teal-600)' : 'var(--slate-700)';
+    document.getElementById('unit-m').style.color = u === 'm' ? 'white' : 'var(--slate-400)';
+    document.getElementById('width-label').textContent = u === 'in' ? 'Width (inches)' : 'Width (meters)';
+    if (u === 'in') document.getElementById('width').value = '60';
+    else document.getElementById('width').value = '1.524';
+    calculate();
+  }
+
+  function selectTier(dose, el) {
+    currentTier = dose;
+    document.querySelectorAll('.tier-select').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    calculate();
+  }
+
+  function fmt(n, d) { return '$' + n.toFixed(d || 2); }
+
   function calculate() {
-    const tier = parseFloat(document.getElementById('tier').value);
-    let results = [];
+    const gsm = Math.max(0, getVal('gsm'));
+    const widthRaw = Math.max(0, getVal('width'));
+    const widthMeters = currentUnit === 'in' ? widthRaw * 0.0254 : widthRaw;
+    const pricePerLiter = Math.max(0, getVal('price'));
+    const discountPct = Math.min(100, Math.max(0, getVal('discount')));
+    const jobLength = getVal('job-length') || 0;
 
-    if (currentMethod === 'exhaust') {
-      const gsm = getVal('gsm'), width = getVal('width') / 100, len = getVal('length');
-      const ratio = getVal('ratio'), exhaustion = getVal('exhaustion') / 100;
-      const fabricArea = width * len; // m2
-      const fabricWeight = (gsm / 1000) * fabricArea; // kg
-      const bathVolume = fabricWeight * ratio; // liters
-      const silverNeeded = fabricWeight * tier / exhaustion; // mg
-      const fuzeVolume = silverNeeded / STOCK_PPM; // liters
-      const fuzeML = fuzeVolume * 1000;
-      const fuzePct = (fuzeVolume / bathVolume) * 100;
-      const bathConc = silverNeeded / bathVolume; // mg/L
-      const bottles = fuzeVolume / BOTTLE_L;
+    const effectivePrice = pricePerLiter * (1 - discountPct / 100);
+    const kgPerMeter = (gsm * widthMeters) / 1000;
+    const mgPerMeter = currentTier * kgPerMeter;
+    const litersPerMeter = mgPerMeter / STOCK_MG_PER_L;
+    const fuzeCostPerMeter = litersPerMeter * effectivePrice;
 
-      results = [
-        { label: 'Fabric Weight', value: fabricWeight.toFixed(1) + ' kg' },
-        { label: 'Bath Volume', value: bathVolume.toFixed(0) + ' L' },
-        { label: 'FUZE Volume Needed', value: fuzeML.toFixed(0) + ' mL' },
-        { label: 'FUZE % of Bath', value: fuzePct.toFixed(3) + '%' },
-        { label: 'Bath Concentration', value: bathConc.toFixed(2) + ' mg/L' },
-        { label: 'Bottles (19L)', value: bottles.toFixed(2) },
-      ];
-    } else if (currentMethod === 'pad') {
-      const gsm = getVal('pad-gsm'), width = getVal('pad-width') / 100, len = getVal('pad-length');
-      const pickup = getVal('pad-pickup') / 100;
-      const fabricArea = width * len;
-      const fabricWeight = (gsm / 1000) * fabricArea;
-      const silverNeeded = fabricWeight * tier; // mg
-      const solutionPickedUp = fabricWeight * pickup; // kg of solution = liters
-      const padConc = silverNeeded / solutionPickedUp; // mg/L
-      const fuzeVolume = silverNeeded / STOCK_PPM; // liters
-      const fuzeML = fuzeVolume * 1000;
-      const bottles = fuzeVolume / BOTTLE_L;
+    // Adders (cents/m → $/m)
+    let addersPerMeter = 0;
+    if (document.getElementById('adder1-on').checked) addersPerMeter += (getVal('adder1') || 0) / 100;
+    if (document.getElementById('adder2-on').checked) addersPerMeter += (getVal('adder2') || 0) / 100;
+    if (document.getElementById('adder3-on').checked) addersPerMeter += (getVal('adder3') || 0) / 100;
 
-      results = [
-        { label: 'Fabric Weight', value: fabricWeight.toFixed(1) + ' kg' },
-        { label: 'Solution Pickup', value: solutionPickedUp.toFixed(1) + ' L' },
-        { label: 'Pad Solution Conc.', value: padConc.toFixed(2) + ' mg/L' },
-        { label: 'FUZE Volume Needed', value: fuzeML.toFixed(0) + ' mL' },
-        { label: 'Bottles (19L)', value: bottles.toFixed(2) },
-      ];
-    } else if (currentMethod === 'spray') {
-      const gsm = getVal('spray-gsm'), widthIn = getVal('spray-width-in');
-      const speed = getVal('spray-speed'), pumpRate = getVal('spray-pump');
-      const runLength = getVal('spray-length');
-      const widthCm = widthIn * 2.54;
-      const headsPerSide = Math.ceil(widthIn / 6);
-      const totalHeads = headsPerSide * 2;
-      const totalSprayRate = totalHeads * pumpRate; // mL/min
-      const timePerMeter = 1 / speed; // min/m
-      const volumePerMeter = totalSprayRate * timePerMeter; // mL/m
-      const fabricWeightPerMeter = (gsm / 1000) * (widthCm / 100); // kg/m
-      const silverPerMeter = fabricWeightPerMeter * tier; // mg/m
-      const concNeeded = silverPerMeter / (volumePerMeter / 1000); // mg/L
-      const dilutionRatio = STOCK_PPM / concNeeded;
-      const totalVolume = volumePerMeter * runLength / 1000; // liters
-      const bottles = totalVolume / BOTTLE_L;
-      const metersPerBottle = (BOTTLE_L * 1000) / volumePerMeter;
+    const totalPerMeter = fuzeCostPerMeter + addersPerMeter;
+    const totalPerYard = totalPerMeter * METERS_PER_YARD;
+    const totalPerKg = kgPerMeter > 0 ? totalPerMeter / kgPerMeter : 0;
+    const totalPerLb = totalPerKg * KG_PER_LB;
 
-      results = [
-        { label: 'Spray Heads (top+bottom)', value: totalHeads },
-        { label: 'Total Spray Rate', value: totalSprayRate + ' mL/min' },
-        { label: 'Volume per Meter', value: volumePerMeter.toFixed(1) + ' mL' },
-        { label: 'Required Concentration', value: concNeeded.toFixed(2) + ' mg/L' },
-        { label: 'Dilution Ratio', value: '1:' + dilutionRatio.toFixed(1) + ' from stock' },
-        { label: 'Meters per Bottle', value: metersPerBottle.toFixed(0) + ' m' },
-      ];
-    }
+    const info = tierInfo[currentTier];
 
-    const grid = document.getElementById('result-grid');
-    grid.innerHTML = results.map(r =>
-      `<div class="result-item"><div class="result-value">${r.value}</div><div class="result-label">${r.label}</div></div>`
-    ).join('');
+    // Update quote panel
+    document.getElementById('quote-tier-label').innerHTML = info.label + ' &mdash; ' + info.name;
+    document.getElementById('quote-per-m').innerHTML = fmt(totalPerMeter) + '<span style="font-size:1rem;font-weight:400;color:var(--slate-400);">/m</span>';
+    document.getElementById('quote-per-yd').textContent = fmt(totalPerYard) + ' /yd';
+    document.getElementById('quote-per-kg').textContent = fmt(totalPerKg) + ' /kg';
+    document.getElementById('quote-per-lb').textContent = fmt(totalPerLb) + ' /lb';
+
+    document.getElementById('detail-tier').textContent = info.label;
+    document.getElementById('detail-fuze-cost').textContent = fmt(fuzeCostPerMeter) + '/m';
+    document.getElementById('detail-adders').textContent = fmt(addersPerMeter) + '/m';
+    document.getElementById('detail-fabric-wt').textContent = kgPerMeter.toFixed(4) + ' kg/m';
+    document.getElementById('detail-stock-m').textContent = litersPerMeter.toFixed(5) + ' L';
+    document.getElementById('quote-tier-info').innerHTML = '<strong>' + info.label + ' &mdash; ' + info.name + ':</strong> ' + info.desc;
   }
 
   // Initial calculation
