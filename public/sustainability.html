@@ -25,21 +25,22 @@
     }
     a { color: var(--teal-400); text-decoration: none; }
 
-    /* NAV */
+    /* NAV — White bar */
     .nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(45, 212, 191, 0.15);
+      background: white; backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--slate-200);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .nav-inner {
-      max-width: 1200px; margin: 0 auto; padding: 0.75rem 1.5rem;
+      max-width: 1200px; margin: 0 auto; padding: 0.6rem 1.5rem;
       display: flex; align-items: center; justify-content: space-between;
     }
     .nav-logo { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
     .nav-logo span { color: var(--teal-400); }
     .nav-links { display: flex; gap: 1.5rem; align-items: center; }
-    .nav-links a { color: var(--slate-300); font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--teal-400); }
+    .nav-links a { color: var(--slate-600); font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--teal-600); }
     .nav-cta {
       background: var(--teal-600); color: white !important; padding: 0.5rem 1.25rem;
       border-radius: 8px; font-weight: 600; transition: background 0.2s;
@@ -194,11 +195,12 @@
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
-    <a href="/" class="nav-logo"><img src="/fuze-logo.jpg" alt="FUZE Biotech" style="height: 52px; width: auto;"></a>
+    <a href="/" class="nav-logo"><img src="/fuze-logo.jpg" alt="FUZE Biotech" style="height: 64px; width: auto;"></a>
     <div class="nav-links">
       <a href="/">Calculator</a>
       <a href="/#tiers">Treatment Tiers</a>
       <a href="/#compare">vs Competition</a>
+      <a href="/competitors">Other Products</a>
       <a href="#impact">Impact Data</a>
       <a href="https://fuzeatlas.com" target="_blank" class="nav-cta">Try FUZE Atlas</a>
     </div>
