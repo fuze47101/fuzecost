@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>True Cost Comparison Calculator | FUZE vs Traditional Antimicrobials</title>
+  <meta name="description" content="Calculate the true environmental and financial cost of traditional antimicrobial treatments vs FUZE — including upstream manufacturing, factory wastewater remediation, and hidden costs.">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;--s600:#475569;--s700:#334155;--s800:#1e293b;--s900:#0f172a;--s950:#020617;--t400:#2dd4bf;--t500:#14b8a6;--t600:#0d9488;--t700:#0f766e;--e400:#34d399;--e500:#10b981;--r400:#f87171;--r500:#ef4444;--a400:#fbbf24;--a500:#f59e0b}
+    html{scroll-behavior:smooth}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:var(--s800);background:#f8fafc;line-height:1.6}
+    a{color:var(--t600);text-decoration:none}
+    .nav{position:fixed;top:0;left:0;right:0;z-index:100;background:white;border-bottom:1px solid var(--s200);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+    .nav-inner{max-width:1200px;margin:0 auto;padding:0.6rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+    .nav-links{display:flex;gap:1.5rem;align-items:center}
+    .nav-links a{color:var(--s600);font-size:0.9rem;font-weight:500}
+    .nav-links a:hover{color:var(--t600)}
+    .nav-cta{background:var(--t600);color:white !important;padding:0.5rem 1.25rem;border-radius:8px;font-weight:600}
+    .page{max-width:1100px;margin:0 auto;padding:5rem 1.5rem 3rem}
+    .hero{text-align:center;margin-bottom:2.5rem}
+    .hero h1{font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:800;color:var(--s900);margin-bottom:0.75rem}
+    .hero h1 span{color:var(--t600)}
+    .hero p{color:var(--s500);font-size:1rem;max-width:700px;margin:0 auto}
+    .card{background:white;border:1px solid var(--s200);border-radius:16px;padding:1.5rem;margin-bottom:1.25rem;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+    .card h2{font-size:1.1rem;font-weight:700;margin-bottom:0.75rem}
+    .inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}
+    .field label{display:block;font-size:0.75rem;color:var(--s500);font-weight:600;margin-bottom:0.3rem;text-transform:uppercase;letter-spacing:0.3px}
+    .field select,.field input{width:100%;padding:0.6rem 0.75rem;border:1px solid var(--s300);border-radius:8px;font-size:0.95rem;color:var(--s800);background:white}
+    .field select:focus,.field input:focus{outline:none;border-color:var(--t500)}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+    .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+    .stat{text-align:center;padding:1rem;border-radius:12px}
+    .stat-val{font-size:1.8rem;font-weight:800;line-height:1.1}
+    .stat-label{font-size:0.7rem;font-weight:600;margin-top:0.3rem}
+    .stat-note{font-size:0.65rem;margin-top:0.25rem;opacity:0.7}
+    .red-bg{background:#fef2f2;border:1px solid #fecaca}
+    .red-txt{color:#b91c1c}
+    .amber-bg{background:#fffbeb;border:1px solid #fde68a}
+    .amber-txt{color:#92400e}
+    .green-bg{background:#ecfdf5;border:1px solid #a7f3d0}
+    .green-txt{color:#065f46}
+    .blue-bg{background:#eff6ff;border:1px solid #bfdbfe}
+    .blue-txt{color:#1e40af}
+    .cost-box{padding:1.25rem;border-radius:12px}
+    .cost-box .cost-title{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.5rem}
+    .cost-box .cost-big{font-size:2rem;font-weight:800;line-height:1}
+    .cost-box .cost-unit{font-size:0.85rem;font-weight:400;opacity:0.7}
+    .cost-box .cost-lines{font-size:0.75rem;margin-top:0.75rem;line-height:1.8}
+    .cost-box .cost-lines .bold{font-weight:700;padding-top:0.25rem;border-top:1px solid rgba(0,0,0,0.1)}
+    .fuze-banner{background:linear-gradient(135deg,var(--t600),var(--e500));color:white;border-radius:16px;padding:2rem;text-align:center;margin:2rem 0}
+    .fuze-banner h2{font-size:1.5rem;font-weight:800;margin-bottom:0.5rem}
+    .fuze-banner p{opacity:0.9;font-size:0.95rem}
+    .footer{text-align:center;padding:2rem;color:var(--s400);font-size:0.8rem;border-top:1px solid var(--s200);margin-top:2rem}
+    @media(max-width:768px){.nav-links{display:none}.grid2,.grid3,.grid4{grid-template-columns:1fr 1fr}.inputs{grid-template-columns:1fr 1fr}}
+    @media(max-width:500px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<nav class="nav"><div class="nav-inner">
+  <a href="/"><img src="/fuze-logo.jpg" alt="FUZE" style="height:64px;width:auto"></a>
+  <div class="nav-links">
+    <a href="/#calculator">Calculator</a>
+    <a href="/competitors">Other Products</a>
+    <a href="/sustainability">Sustainability</a>
+    <a href="/compare" style="color:var(--t600);font-weight:700">True Cost Compare</a>
+    <a href="https://fuzeatlas.com" target="_blank" class="nav-cta">Try FUZE Atlas &mdash; Free</a>
+  </div>
+</div></nav>
+
+<div class="page">
+  <div class="hero">
+    <h1>The <span>True Cost</span> of Antimicrobial Treatment</h1>
+    <p>Select a competitor product and your production volume. See the full environmental and financial cost — including upstream chemical plant manufacturing and factory wastewater remediation that competitors hide from their quotes.</p>
+  </div>
+
+  <!-- INPUTS -->
+  <div class="card">
+    <h2>Configure Your Comparison</h2>
+    <div class="inputs">
+      <div class="field">
+        <label>Compare Against</label>
+        <select id="competitor" onchange="calc()"></select>
+      </div>
+      <div class="field">
+        <label>Production Volume (meters)</label>
+        <input type="number" id="meters" value="100000" onchange="calc()" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Fabric GSM</label>
+        <input type="number" id="gsm" value="150" onchange="calc()" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Width (inches)</label>
+        <input type="number" id="width" value="60" onchange="calc()" oninput="calc()">
+      </div>
+    </div>
+  </div>
+
+  <!-- TRUE COST COMPARISON -->
+  <div class="card" id="cost-section">
+    <h2>💰 True Total Cost Comparison</h2>
+    <p style="font-size:0.8rem;color:var(--s500);margin-bottom:1rem">Antimicrobial product + binder + curing energy + wastewater remediation = the real price, not the listed price.</p>
+    <div class="grid2" id="cost-boxes"></div>
+  </div>
+
+  <!-- UPSTREAM CHEMICAL PLANT -->
+  <div class="card">
+    <h2 style="color:#b91c1c">🏭 Upstream: What Happens at the Chemical Plant</h2>
+    <p style="font-size:0.8rem;color:var(--s500);margin-bottom:1rem">Before the antimicrobial reaches your factory, this is the environmental cost of manufacturing it.</p>
+    <div class="grid4" id="upstream-stats"></div>
+    <div class="green-bg" style="border-radius:12px;padding:1rem;margin-top:1rem">
+      <div style="font-size:0.8rem;font-weight:700;color:#065f46">FUZE Manufacturing: 30-amp liquid laser ablation on a 1m&sup2; table. Recycled electronics feedstock. Solar-capable. Zero chemicals. Zero waste. Zero VOCs. 58 patents.</div>
+    </div>
+  </div>
+
+  <!-- WASTEWATER REMEDIATION -->
+  <div class="card">
+    <h2 style="color:#92400e">🧪 Factory Wastewater Remediation</h2>
+    <p style="font-size:0.8rem;color:var(--s500);margin-bottom:1rem">After applying the competitor's product, the factory must treat contaminated wastewater. These chemicals and costs are never shown in their price quote.</p>
+    <div class="grid3" id="remediation-stats"></div>
+    <div id="remediation-chemicals" style="margin-top:1rem"></div>
+  </div>
+
+  <!-- ENVIRONMENTAL IMPACT -->
+  <div class="card">
+    <h2 style="color:#065f46">🌍 Environmental Impact Avoided</h2>
+    <p style="font-size:0.8rem;color:var(--s500);margin-bottom:1rem">By switching to FUZE, your production run eliminates:</p>
+    <div class="grid4" id="env-stats"></div>
+  </div>
+
+  <!-- FUZE BANNER -->
+  <div class="fuze-banner">
+    <h2>FUZE: The Only Clean-Slate Antimicrobial</h2>
+    <p>58 patents. Full PRIA 6 modern safety testing. Zero binders. Zero VOCs. Zero wastewater treatment. Made from recycled electronics by liquid laser ablation on a solar-powered 1m&sup2; table.</p>
+    <a href="https://fuzeatlas.com" target="_blank" style="display:inline-block;margin-top:1rem;background:white;color:var(--t700);padding:0.75rem 2rem;border-radius:10px;font-weight:700">Try FUZE Atlas &mdash; Free</a>
+  </div>
+</div>
+
+<footer class="footer">
+  &copy; 2026 FUZE Biotech. All rights reserved. | <a href="https://fuzeatlas.com">FUZE Atlas</a> | <a href="mailto:info@fuzebiotech.com">Contact</a>
+  <br><span style="font-size:0.7rem;color:var(--s400)">Data sourced from EPA filings, peer-reviewed research, manufacturer SDS documents, and OEKO-TEX standards.</span>
+</footer>
+
+<script>
+// ============ COMPETITOR DATA ============
+const COMPETITORS = [
+  { id:'silvadur', name:'Silvadur 930 (DuPont)', chemistry:'silver_ion', dose:50, costPerMeter:0.035, binderGPerKg:5, curingC:160, curingReq:true, binderReq:true, leach10:'35%', washClaim:50, epa:'464-785 (2013, me-too data)' },
+  { id:'agion', name:'Agion (Sciessent)', chemistry:'silver_chloride', dose:40, costPerMeter:0.028, binderGPerKg:8, curingC:170, curingReq:true, binderReq:true, leach10:'72%', washClaim:50, epa:'88165 ($220K FIFRA fine)' },
+  { id:'microban', name:'Microban Silver Zeolite', chemistry:'silver_chloride', dose:35, costPerMeter:0.025, binderGPerKg:10, curingC:180, curingReq:true, binderReq:true, leach10:'72%', washClaim:30, epa:'42182 (1983 plastic data)' },
+  { id:'heiq', name:'HeiQ AGS-20 (Nanosilver)', chemistry:'silver_nano', dose:30, costPerMeter:0.045, binderGPerKg:3, curingC:150, curingReq:true, binderReq:true, leach10:'Not disclosed', washClaim:30, epa:'Conditional (court-challenged)' },
+  { id:'aegis', name:'Aegis Microbe Shield (Quat)', chemistry:'qac_silane', dose:100, costPerMeter:0.022, binderGPerKg:15, curingC:150, curingReq:true, binderReq:true, leach10:'77%', washClaim:25, epa:'64881 (Cat I Corrosive)' },
+  { id:'ultrafresh', name:'Ultra-Fresh (Zinc Pyrithione)', chemistry:'zinc_pyrithione', dose:80, costPerMeter:0.018, binderGPerKg:12, curingC:200, curingReq:true, binderReq:true, leach10:'Variable', washClaim:50, epa:'42182-24 (H330 FATAL)' },
+  { id:'noble', name:'Noble Biomaterials (X-STATIC)', chemistry:'silver_ion', dose:45, costPerMeter:0.055, binderGPerKg:0, curingC:0, curingReq:false, binderReq:false, leach10:'38-100%', washClaim:50, epa:'Not published' },
+];
+
+// Upstream manufacturing per kg of antimicrobial product
+const UPSTREAM = {
+  silver_chloride: { co2:120, waste:4.2, voc:12, water:500, name:'Ion Exchange / Chemical Reduction' },
+  silver_ion: { co2:95, waste:3.1, voc:45, water:350, name:'Polymeric Silver Ion Delivery' },
+  silver_nano: { co2:145, waste:5.8, voc:85, water:400, name:'Flame Spray Pyrolysis' },
+  qac_silane: { co2:55, waste:3.8, voc:180, water:200, name:'Organosilane QAC Synthesis' },
+  zinc_pyrithione: { co2:42, waste:2.5, voc:65, water:180, name:'Zinc-Pyrithione Complexation' },
+};
+
+// Wastewater remediation costs per m3
+const REMEDIATION = {
+  silver_chloride: { cost:3.85, chemKg:5.3, energy:2.5, method:'Precipitation + coagulation + microfiltration', chems:['Caustic soda (NaOH)','Aluminum polychloride','Ferric chloride','Lime Ca(OH)\u2082','Hydrochloric acid'] },
+  silver_ion: { cost:3.85, chemKg:5.3, energy:2.5, method:'Precipitation + coagulation + microfiltration', chems:['Caustic soda (NaOH)','Aluminum polychloride','Ferric chloride','Lime Ca(OH)\u2082','HCl'] },
+  silver_nano: { cost:3.85, chemKg:5.3, energy:2.5, method:'Silver-specific precipitation + filtration', chems:['Caustic soda (NaOH)','Flocculants','Lime','Activated carbon'] },
+  qac_silane: { cost:5.20, chemKg:3.65, energy:4.0, method:'MBBR biofilm reactor + sorption + degradation', chems:['Caustic soda (NaOH)','Polymer flocculants','Activated carbon','MBBR biosorbents'] },
+  zinc_pyrithione: { cost:7.45, chemKg:4.7, energy:6.0, method:'SRB bioreactor + sulphide precipitation + electrocoagulation', chems:['Caustic soda (NaOH)','Sodium sulfide','Sodium trithiocarbonate','SRB culture media'] },
+};
+
+const FUZE_COST_PER_METER = 0.27; // F1 at $36/L
+
+function fmt(n,d=2){ return n.toLocaleString(undefined,{maximumFractionDigits:d}); }
+function $(id){ return document.getElementById(id); }
+
+// Populate dropdown
+const sel = $('competitor');
+COMPETITORS.forEach(c => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.name; sel.appendChild(o); });
+
+function calc() {
+  const comp = COMPETITORS.find(c => c.id === sel.value) || COMPETITORS[0];
+  const meters = Math.max(0, +$('meters').value || 100000);
+  const gsm = Math.max(0, +$('gsm').value || 150);
+  const widthIn = Math.max(0, +$('width').value || 60);
+  const widthM = widthIn * 0.0254;
+  const kgPerMeter = (gsm * widthM) / 1000;
+
+  const upstream = UPSTREAM[comp.chemistry] || UPSTREAM.silver_chloride;
+  const remed = REMEDIATION[comp.chemistry] || REMEDIATION.silver_chloride;
+
+  // Product kg per meter (dose mg/kg * fabric kg/m / 1e6 to get kg, * 1000 for scaling)
+  const productKgPerMeter = (comp.dose * kgPerMeter) / 1e6 * 1000;
+
+  // Upstream plant impact for production volume
+  const upCO2 = productKgPerMeter * upstream.co2 * meters;
+  const upWaste = productKgPerMeter * upstream.waste * meters;
+  const upVOC = productKgPerMeter * upstream.voc * meters / 1000; // g to kg
+  const upWater = productKgPerMeter * upstream.water * meters;
+
+  // Wastewater at factory
+  const wastewaterM3PerMeter = kgPerMeter * 0.05;
+  const totalWastewaterM3 = wastewaterM3PerMeter * meters;
+  const remCost = totalWastewaterM3 * remed.cost;
+  const remChemKg = totalWastewaterM3 * remed.chemKg;
+  const remEnergy = totalWastewaterM3 * remed.energy;
+
+  // True cost
+  const curingKwhPerMeter = comp.curingReq ? kgPerMeter * 0.8 : 0;
+  const curingCostPerMeter = curingKwhPerMeter * 0.10;
+  const remCostPerMeter = wastewaterM3PerMeter * remed.cost;
+  const compTruePerMeter = comp.costPerMeter + remCostPerMeter + curingCostPerMeter;
+  const hiddenPerMeter = remCostPerMeter + curingCostPerMeter;
+
+  // Environmental
+  const co2Saved = (productKgPerMeter * upstream.co2 + (comp.curingReq ? kgPerMeter * 0.8 * 0.58 : 0)) * meters;
+  const waterSaved = totalWastewaterM3 * 1000; // liters
+  const binderElimKg = comp.binderReq ? (comp.binderGPerKg * kgPerMeter * meters) / 1000 : 0;
+  const energySavedKwh = curingKwhPerMeter * meters;
+
+  // ---- RENDER ----
+
+  // Cost boxes
+  $('cost-boxes').innerHTML = `
+    <div class="cost-box red-bg">
+      <div class="cost-title red-txt">${comp.name} True Cost / ${fmt(meters,0)} m</div>
+      <div class="cost-big red-txt">$${fmt(compTruePerMeter * meters)}</div>
+      <div style="font-size:0.85rem;color:#b91c1c;margin-top:0.25rem">$${fmt(compTruePerMeter,4)}<span class="cost-unit">/meter</span></div>
+      <div class="cost-lines red-txt">
+        <div>Antimicrobial: $${fmt(comp.costPerMeter * meters)} ($${fmt(comp.costPerMeter,4)}/m)</div>
+        <div>+ Remediation: $${fmt(remCostPerMeter * meters)} ($${fmt(remCostPerMeter,4)}/m)</div>
+        <div>+ Curing energy: $${fmt(curingCostPerMeter * meters)} ($${fmt(curingCostPerMeter,4)}/m)</div>
+        <div class="bold">Hidden costs: $${fmt(hiddenPerMeter * meters)} ($${fmt(hiddenPerMeter,4)}/m)</div>
+      </div>
+    </div>
+    <div class="cost-box green-bg">
+      <div class="cost-title green-txt">FUZE F1 True Cost / ${fmt(meters,0)} m</div>
+      <div class="cost-big green-txt">$${fmt(FUZE_COST_PER_METER * meters)}</div>
+      <div style="font-size:0.85rem;color:#065f46;margin-top:0.25rem">$${fmt(FUZE_COST_PER_METER,4)}<span class="cost-unit">/meter</span></div>
+      <div class="cost-lines green-txt">
+        <div>FUZE treatment: $${fmt(FUZE_COST_PER_METER * meters)} ($${fmt(FUZE_COST_PER_METER,4)}/m)</div>
+        <div>+ Remediation: $0.00 ($0.0000/m)</div>
+        <div>+ Curing energy: $0.00 ($0.0000/m)</div>
+        <div class="bold">Hidden costs: $0.00 ($0.0000/m)</div>
+      </div>
+    </div>
+  `;
+
+  // Upstream stats
+  $('upstream-stats').innerHTML = `
+    <div class="stat red-bg"><div class="stat-val red-txt">${fmt(upCO2,1)}</div><div class="stat-label red-txt">kg CO&sub2; at Chemical Plant</div><div class="stat-note red-txt">${upstream.name}</div></div>
+    <div class="stat red-bg"><div class="stat-val red-txt">${fmt(upWaste,1)}</div><div class="stat-label red-txt">kg Chemical Waste</div></div>
+    <div class="stat red-bg"><div class="stat-val red-txt">${fmt(upVOC,1)}</div><div class="stat-label red-txt">kg VOCs Emitted</div></div>
+    <div class="stat red-bg"><div class="stat-val red-txt">${fmt(upWater,0)}</div><div class="stat-label red-txt">L Process Water</div></div>
+  `;
+
+  // Remediation stats
+  $('remediation-stats').innerHTML = `
+    <div class="stat amber-bg"><div class="stat-val amber-txt">$${fmt(remCost)}</div><div class="stat-label amber-txt">Remediation Cost</div></div>
+    <div class="stat amber-bg"><div class="stat-val amber-txt">${fmt(remChemKg,1)}</div><div class="stat-label amber-txt">kg Treatment Chemicals</div></div>
+    <div class="stat amber-bg"><div class="stat-val amber-txt">${fmt(remEnergy,1)}</div><div class="stat-label amber-txt">kWh Treatment Energy</div></div>
+  `;
+
+  // Remediation chemicals list
+  $('remediation-chemicals').innerHTML = `
+    <div style="background:var(--s50);border:1px solid var(--s200);border-radius:12px;padding:1rem">
+      <div style="font-size:0.75rem;font-weight:700;color:var(--s500);margin-bottom:0.5rem">TREATMENT CHEMICALS REQUIRED: ${remed.method}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem">${remed.chems.map(c => `<span style="background:var(--a400);color:var(--s900);padding:0.25rem 0.75rem;border-radius:50px;font-size:0.75rem;font-weight:600">${c}</span>`).join('')}</div>
+      <div style="margin-top:0.75rem;font-size:0.75rem;color:var(--s500)">FUZE requires: <strong style="color:#065f46">NONE</strong> &mdash; carrier is 18 M&Omega; ultrapure water</div>
+    </div>
+  `;
+
+  // Environmental stats
+  $('env-stats').innerHTML = `
+    <div class="stat green-bg"><div class="stat-val green-txt">${fmt(co2Saved,1)}</div><div class="stat-label green-txt">kg CO&sub2; Eliminated</div></div>
+    <div class="stat blue-bg"><div class="stat-val blue-txt">${fmt(waterSaved,0)}</div><div class="stat-label blue-txt">L Water Saved</div></div>
+    <div class="stat green-bg"><div class="stat-val green-txt">${fmt(binderElimKg,1)}</div><div class="stat-label green-txt">kg Binder Eliminated</div></div>
+    <div class="stat blue-bg"><div class="stat-val blue-txt">${fmt(energySavedKwh,1)}</div><div class="stat-label blue-txt">kWh Energy Saved</div></div>
+  `;
+}
+
+// Initial calculation
+calc();
+</script>
+</body>
+</html>
