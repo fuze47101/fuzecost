@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FUZE vs Other Antimicrobial Products — Competitive Analysis</title>
+  <meta name="description" content="Compare FUZE metamaterial technology against traditional antimicrobial treatments. EPA registration genealogy, safety data, environmental impact for every competitor.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --slate-50: #f8fafc; --slate-100: #f1f5f9; --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1; --slate-400: #94a3b8; --slate-500: #64748b;
+      --slate-600: #475569; --slate-700: #334155; --slate-800: #1e293b;
+      --slate-900: #0f172a; --slate-950: #020617;
+      --teal-400: #2dd4bf; --teal-500: #14b8a6; --teal-600: #0d9488;
+      --teal-700: #0f766e;
+      --red-400: #f87171; --red-500: #ef4444; --red-600: #dc2626;
+      --amber-400: #fbbf24; --amber-500: #f59e0b;
+      --emerald-400: #34d399; --emerald-500: #10b981;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: var(--slate-100); background: var(--slate-950); line-height: 1.6; }
+    a { color: var(--teal-400); text-decoration: none; }
+
+    /* NAV */
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(15,23,42,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(45,212,191,0.15); }
+    .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--slate-300); font-size: 0.9rem; font-weight: 500; }
+    .nav-links a:hover { color: var(--teal-400); }
+    .nav-cta { background: var(--teal-600); color: white !important; padding: 0.5rem 1.25rem; border-radius: 8px; font-weight: 600; }
+
+    /* HERO */
+    .page-hero { padding: 7rem 1.5rem 3rem; text-align: center; background: linear-gradient(135deg, var(--slate-950), var(--slate-900), #0c1f2e); }
+    .page-hero h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.5px; }
+    .page-hero h1 span { color: var(--teal-400); }
+    .page-hero p { color: var(--slate-400); font-size: 1.1rem; max-width: 700px; margin: 0 auto; }
+
+    /* FUZE ORIGIN */
+    .fuze-origin { max-width: 900px; margin: 2rem auto 3rem; padding: 2rem; background: rgba(20,184,166,0.06); border: 1px solid rgba(20,184,166,0.2); border-radius: 16px; }
+    .fuze-origin h2 { color: var(--teal-400); font-size: 1.5rem; margin-bottom: 1rem; }
+    .fuze-origin p { color: var(--slate-300); font-size: 0.95rem; line-height: 1.7; }
+    .fuze-origin .highlight { color: var(--teal-400); font-weight: 700; }
+    .fuze-origin .stat-row { display: flex; gap: 1.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
+    .fuze-origin .stat { background: rgba(20,184,166,0.08); border-radius: 10px; padding: 1rem 1.25rem; flex: 1; min-width: 140px; text-align: center; }
+    .fuze-origin .stat-val { font-size: 1.5rem; font-weight: 800; color: var(--teal-400); }
+    .fuze-origin .stat-label { font-size: 0.75rem; color: var(--slate-400); margin-top: 0.25rem; }
+
+    /* COMPETITOR GRID */
+    .competitors { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+    .comp-card { background: var(--slate-800); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; margin-bottom: 1.25rem; overflow: hidden; transition: border 0.2s; }
+    .comp-card:hover { border-color: rgba(248,113,113,0.3); }
+    .comp-header { padding: 1.25rem 1.5rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .comp-header h3 { font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 0.75rem; }
+    .comp-header .epa-tag { font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 50px; font-weight: 600; }
+    .tag-red { background: rgba(239,68,68,0.15); color: var(--red-400); }
+    .tag-amber { background: rgba(245,158,11,0.15); color: var(--amber-400); }
+    .tag-dead { background: rgba(239,68,68,0.25); color: var(--red-500); }
+    .comp-header .arrow { color: var(--slate-500); font-size: 1.2rem; transition: transform 0.2s; }
+    .comp-card.open .arrow { transform: rotate(180deg); }
+    .comp-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+    .comp-card.open .comp-body { max-height: 3000px; transition: max-height 0.5s ease-in; }
+    .comp-content { padding: 0 1.5rem 1.5rem; }
+
+    /* GENEALOGY */
+    .genealogy { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .gen-node { background: var(--slate-700); padding: 0.4rem 0.75rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }
+    .gen-arrow { color: var(--slate-500); font-size: 0.9rem; }
+    .gen-node.origin { background: rgba(239,68,68,0.15); color: var(--red-400); border: 1px solid rgba(239,68,68,0.3); }
+    .gen-node.current { background: rgba(245,158,11,0.15); color: var(--amber-400); border: 1px solid rgba(245,158,11,0.3); }
+
+    /* INDICTMENTS */
+    .indictment { padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 0.6rem; font-size: 0.9rem; color: var(--slate-300); }
+    .indictment:last-child { border-bottom: none; }
+    .indictment .icon { color: var(--red-400); flex-shrink: 0; font-weight: 700; }
+    .indictment strong { color: var(--slate-200); }
+
+    /* INFO GRID */
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+    .info-item { background: var(--slate-900); padding: 0.75rem; border-radius: 8px; }
+    .info-label { font-size: 0.7rem; color: var(--slate-500); text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-value { font-size: 0.9rem; color: var(--slate-200); font-weight: 600; margin-top: 0.15rem; }
+    .info-value.bad { color: var(--red-400); }
+
+    /* CTA */
+    .page-cta { text-align: center; padding: 4rem 1.5rem; background: linear-gradient(180deg, var(--slate-950), var(--slate-900)); }
+    .page-cta h2 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+    .page-cta p { color: var(--slate-400); max-width: 500px; margin: 0 auto 2rem; }
+    .btn-primary { display: inline-block; background: var(--teal-600); color: white; padding: 0.85rem 2rem; border-radius: 10px; font-weight: 600; font-size: 1rem; }
+    .btn-primary:hover { background: var(--teal-700); }
+
+    .footer { padding: 2rem 1.5rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.06); color: var(--slate-500); font-size: 0.85rem; }
+    @media (max-width: 768px) { .nav-links { display: none; } .info-grid { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/"><img src="/fuze-logo.jpg" alt="FUZE Biotech" style="height: 52px; width: auto;"></a>
+    <div class="nav-links">
+      <a href="/#calculator">Calculator</a>
+      <a href="/#tiers">Treatment Tiers</a>
+      <a href="/#compare">vs Competition</a>
+      <a href="/competitors" style="color: var(--teal-400);">Other Products</a>
+      <a href="/sustainability">Sustainability</a>
+      <a href="https://fuzeatlas.com" target="_blank" class="nav-cta">Try FUZE Atlas</a>
+    </div>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <h1>Other Antimicrobial Products: <span>Know the Facts</span></h1>
+  <p>Every competitor below relies on EPA registrations tracing back to 1970s-1980s safety data, amended for decades without modern testing. Click any product to see its full regulatory genealogy, health hazards, and environmental impact.</p>
+</section>
+
+<div style="max-width: 1100px; margin: 0 auto; padding: 0 1.5rem;">
+  <div class="fuze-origin">
+    <h2>FUZE Metamaterial &mdash; The Only Modern Approach</h2>
+    <p>FUZE is the <span class="highlight">only antimicrobial textile treatment</span> that completed full PRIA 6 modern safety evaluation: chronic toxicity, reproductive/developmental toxicity, neurotoxicity screening, complete environmental fate, and full efficacy validation. Our metamaterial is produced by <span class="highlight">liquid laser ablation</span> &mdash; a patented mechanical manufacturing process using a 30-amp laser on a 1m&sup2; table, powered by solar, using recycled electronics as feedstock. <span class="highlight">58 patents</span> protect a technology revolution in accuracy, scale, and purity that has never been achieved before.</p>
+    <p style="margin-top: 0.75rem;">No binders. No curing. No VOCs. No leaching. No wastewater treatment. 99.998% ultrapure 18 M&Omega; DI water + 20 ppm FUZE metamaterial. Nothing else.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val">58</div><div class="stat-label">Patents</div></div>
+      <div class="stat"><div class="stat-val">PRIA 6</div><div class="stat-label">Full Modern Testing</div></div>
+      <div class="stat"><div class="stat-val">0</div><div class="stat-label">Binders / VOCs / Curing</div></div>
+      <div class="stat"><div class="stat-val">1m&sup2;</div><div class="stat-label">Production Footprint</div></div>
+      <div class="stat"><div class="stat-val">0</div><div class="stat-label">Wastewater Treatment</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="competitors">
+
+<!-- ============ HEIQ ============ -->
+<div class="comp-card" onclick="this.classList.toggle('open')">
+  <div class="comp-header">
+    <h3>HeiQ Materials AG <span class="epa-tag tag-red">CONDITIONAL EPA &bull; COURT-CHALLENGED</span></h3>
+    <span class="arrow">&#9660;</span>
+  </div>
+  <div class="comp-body"><div class="comp-content">
+    <div class="genealogy">
+      <span class="gen-node origin">2008: Me-Too Application</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node">2011: EPA Conditional Reg (85249)</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node current">Today: Still Conditional &mdash; Safety Data Deferred</span>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Technology</div><div class="info-value">AGS-20 Nanosilver on Silica (1-10nm particles)</div></div>
+      <div class="info-item"><div class="info-label">EPA Registration</div><div class="info-value bad">Conditional &mdash; Deferred Safety Studies</div></div>
+      <div class="info-item"><div class="info-label">Stock Performance</div><div class="info-value bad">-69% &rarr; Delisted from LSE (Nov 2024)</div></div>
+      <div class="info-item"><div class="info-label">Net Loss (2024)</div><div class="info-value bad">-$13.89 Million</div></div>
+    </div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Conditional Registration:</strong> EPA explicitly lacked sufficient data for final safety determination. Tier I/II safety studies deferred at time of approval &mdash; product sold commercially for years before testing completed.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Court-Challenged:</strong> NRDC v. EPA (2013) &mdash; Ninth Circuit vacated EPA's risk assessment for AGS-20 textile exposure. Found EPA's assumption that toddlers (not infants) were the appropriate exposure group lacked substantial evidence.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Binding Precedent:</strong> Ninth Circuit vacated IN WHOLE the registration of NSPW liquid nanosilver (2017) &mdash; a directly analogous nanosilver product. Conditional nanosilver registrations can be revoked.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Viroblock Claims Banned in USA:</strong> Cannot make antiviral health claims on U.S. consumer products. Only FDA-registered medical devices can. Any U.S. marketing with antiviral claims violates FIFRA.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>EWG Opposition:</strong> Environmental Working Group formally opposed EPA registration citing nanosilver toxicity to cells developing into eggs/sperm, potential to penetrate skin and cross blood-brain barrier, and irreversible waterway contamination.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Financial Collapse:</strong> Delisted from London Stock Exchange November 2024 after 69% stock decline. $13.89M net loss. 70% demand drop in Q4 2022. Forced return to private ownership at 4.50p/share.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>$100M+ Lawsuit:</strong> HeiQ v. ICP Industrial (Oct 2022) for breach of Viroblock supply agreement. Settled for a fraction. Indicative of partnership failure.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Durability Claims Unverified:</strong> "Lifetime durability" and "guaranteed performance for the lifetime of the product" &mdash; no independent third-party lifetime durability verification exists.</div></div>
+  </div></div>
+</div>
+
+<!-- ============ NOBLE ============ -->
+<div class="comp-card" onclick="this.classList.toggle('open')">
+  <div class="comp-header">
+    <h3>Noble Biomaterials <span class="epa-tag tag-amber">EPA REG #s NOT PUBLISHED</span></h3>
+    <span class="arrow">&#9660;</span>
+  </div>
+  <div class="comp-body"><div class="comp-content">
+    <div class="genealogy">
+      <span class="gen-node origin">1997: Founded (NOT 1970s)</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node">2008-2011: X-STATIC lawsuits</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node">2013: Carolina Silver acquisition</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node current">2023: Pivoted to bio-based (citric acid)</span>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Technology</div><div class="info-value">Metallic silver metallized onto polymer substrates</div></div>
+      <div class="info-item"><div class="info-label">EPA Registration</div><div class="info-value bad">Numbers NOT publicly disclosed</div></div>
+      <div class="info-item"><div class="info-label">Revenue</div><div class="info-value">$20.2M annually</div></div>
+      <div class="info-item"><div class="info-label">Claimed Licensees</div><div class="info-value bad">"250+" &mdash; ~15-20 verified</div></div>
+    </div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Leaching Contradicts "Permanent" Claims:</strong> Swiss Empa study (2014) showed X-STATIC non-nano silver on nylon released the SAME or MORE silver nanoparticles in wastewater than nanosilver-coated textiles. 38% of total silver mass released into artificial sweat. Some studies show 100% silver loss after just 4 wash cycles.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>EPA Registration Opacity:</strong> Noble does not publish EPA registration numbers. No public transparency on what safety data underlies their antimicrobial claims. Compare to FUZE's complete PRIA 6 disclosure.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>"250+ Licensees" Inflated:</strong> Verified major direct licensees number approximately 15-20 (Lululemon, Athleta, Salomon, 3M, Giro). The 250+ figure conflates direct licensees with downstream distributors and supply chain nodes.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Health Effects &mdash; Argyria:</strong> Ionic silver released from embedded textiles can cause argyria (irreversible blue-gray skin pigmentation) and argyrosis (irreversible eye pigmentation). These conditions are permanent with no known treatment.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Pivot to Bio-Based = Admission:</strong> Noble received EPA registration for Ionic+ Botanical (citric acid) in March 2023. This shift away from silver is a tacit admission that silver durability and toxicity concerns are becoming untenable.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Aquatic Toxicity:</strong> Free Ag+ ions from silver textiles are extremely toxic &mdash; LC50 of 1.9-5.3 ppb. 15% of total silver entering European waters comes from biocidal textiles.</div></div>
+  </div></div>
+</div>
+
+<!-- ============ MICROBAN ============ -->
+<div class="comp-card" onclick="this.classList.toggle('open')">
+  <div class="comp-header">
+    <h3>Microban International <span class="epa-tag tag-red">1983 PLASTIC DATA &bull; HEALTH CLAIMS DENIED</span></h3>
+    <span class="arrow">&#9660;</span>
+  </div>
+  <div class="comp-body"><div class="comp-content">
+    <div class="genealogy">
+      <span class="gen-node origin">Aug 1983: EPA 42182-1 (Plastic Additive "B")</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node">1987: EPA says data cannot support health claims</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node">Amendments: 42182-14, -28, -11, -24</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node current">Today: Still riding 1983 plastic additive data</span>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Original Registration</div><div class="info-value bad">August 1983 &mdash; PLASTIC additive</div></div>
+      <div class="info-item"><div class="info-label">EPA Registration</div><div class="info-value">42182-1 (and derivatives)</div></div>
+      <div class="info-item"><div class="info-label">Active Ingredient</div><div class="info-value">Silver zeolite powder</div></div>
+      <div class="info-item"><div class="info-label">EPA Health Claim Status</div><div class="info-value bad">DENIED (1987) &mdash; bacteriostatic only</div></div>
+    </div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Origin: Plastic Additive, Not Textile:</strong> EPA 42182-1 was registered in 1983 for preserving plastics and latex &mdash; not textiles. The original safety data was generated for plastic manufacturing, not human skin contact.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>EPA Denied Health Claims (1987):</strong> EPA informed Microban that their data "do not support health-related efficacy claims." Only bacteriostatic (non-health, non-infectious to humans) claims were allowed. 40 years of amendments have not changed this underlying data limitation.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Silver Leaching:</strong> 72% of applied silver lost after 10 machine washes. The majority of applied antimicrobial serves no purpose &mdash; it washes directly into waterways.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Requires Chemical Binders:</strong> 10% w/w acrylic resin binder solution. Application requires pad-dry-cure at 130-180&deg;C &mdash; significant thermal energy and VOC emissions from the acrylic binder.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Aquatic Toxicity:</strong> Free Ag+ is one of the most toxic metals to aquatic organisms. Amphipod LC50: 1.9 ppb. Bioconcentration factor in algae: 2.1 &times; 10&sup6;.</div></div>
+  </div></div>
+</div>
+
+<!-- ============ SCIESSENT/AGION ============ -->
+<div class="comp-card" onclick="this.classList.toggle('open')">
+  <div class="comp-header">
+    <h3>Sciessent / Agion <span class="epa-tag tag-red">$220K FIFRA FINE &bull; SINANEN-DEPENDENT</span></h3>
+    <span class="arrow">&#9660;</span>
+  </div>
+  <div class="comp-body"><div class="comp-content">
+    <div class="genealogy">
+      <span class="gen-node origin">1984: Sinanen Zeomic (Japan) &mdash; original silver zeolite</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node">Sinanen supplies Agion via FIFRA agreements</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node">EPA 88165 (Agion Type AG/AL/ACU)</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node current">2011: $220K fine for FIFRA violations</span>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Data Origin</div><div class="info-value bad">Sinanen (Japan) supplier data &mdash; not independent</div></div>
+      <div class="info-item"><div class="info-label">EPA Fine</div><div class="info-value bad">$220,000 (2011) &mdash; FIFRA violations</div></div>
+      <div class="info-item"><div class="info-label">Violations</div><div class="info-value bad">Illegal efficacy claims + unreported imports</div></div>
+      <div class="info-item"><div class="info-label">Supply Chain</div><div class="info-value bad">100% dependent on Sinanen (Japan)</div></div>
+    </div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Fined $220,000 for FIFRA Violations:</strong> 2006-2009 violations including illegal antimicrobial efficacy claims and failure to report imports of pesticide products. Settlement reached 2011.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Sinanen Supply Chain Dependency:</strong> All safety data originates from Sinanen Zeomic (Japan). If Sinanen faces regulatory action, trade disruption, or business failure, Agion's registration collapses.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Grandfathered Data:</strong> Sinanen's original silver zeolite was commercialized in 1984 &mdash; safety data predates modern testing requirements by decades. No chronic toxicity, reproductive, or neurotoxicity studies.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>72% Silver Loss:</strong> Same silver leaching problem as all silver-based treatments &mdash; 72% lost after 10 washes, toxic ionic silver entering waterways.</div></div>
+  </div></div>
+</div>
+
+<!-- ============ SILVADUR ============ -->
+<div class="comp-card" onclick="this.classList.toggle('open')">
+  <div class="comp-header">
+    <h3>Silvadur (DuPont / Dow) <span class="epa-tag tag-amber">ME-TOO DATA COMPENSATION</span></h3>
+    <span class="arrow">&#9660;</span>
+  </div>
+  <div class="comp-body"><div class="comp-content">
+    <div class="genealogy">
+      <span class="gen-node origin">Pre-1996: Original silver registrants (106 products)</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node">Data compensation: $25-75K instead of $500K+ testing</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node current">May 2013: EPA 464-785 &mdash; Unconditional Registration</span>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Technology</div><div class="info-value">Polymeric Ag+ ion delivery (no particles)</div></div>
+      <div class="info-item"><div class="info-label">EPA Registration</div><div class="info-value">464-785 (Unconditional)</div></div>
+      <div class="info-item"><div class="info-label">Data Origin</div><div class="info-value bad">Likely data compensation from pre-1996 registrants</div></div>
+      <div class="info-item"><div class="info-label">Durability Claim</div><div class="info-value">50+ washings</div></div>
+    </div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Me-Too Data Pathway:</strong> Despite 2013 registration, DuPont likely leveraged data compensation from pre-1996 silver registrations &mdash; paying $25-75K instead of generating $500K+ in independent modern safety data.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Still Releases Ionic Silver:</strong> Silvadur's "intelligent release" means it deliberately releases toxic Ag+ ions. These ions are acutely toxic to aquatic organisms at parts-per-billion concentrations.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Binder Required:</strong> Organic polymer delivery system serves as the binder &mdash; adds chemical complexity to the treatment process.</div></div>
+  </div></div>
+</div>
+
+<!-- ============ AEGIS ============ -->
+<div class="comp-card" onclick="this.classList.toggle('open')">
+  <div class="comp-header">
+    <h3>Aegis Microbe Shield (Quats) <span class="epa-tag tag-red">CATEGORY I CORROSIVE &bull; "NON-LEACHING" DEBUNKED</span></h3>
+    <span class="arrow">&#9660;</span>
+  </div>
+  <div class="comp-body"><div class="comp-content">
+    <div class="genealogy">
+      <span class="gen-node origin">~1990s: EPA 64881 (Silane Quaternary Ammonium)</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node">64881-1, -2, -3, -7 &mdash; multiple amendments</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node current">Today: NOT silver &mdash; organic chemistry with distinct toxicity</span>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Technology</div><div class="info-value">Organosilane QAC (NOT silver)</div></div>
+      <div class="info-item"><div class="info-label">EPA Classification</div><div class="info-value bad">Toxicity Category I: CORROSIVE</div></div>
+      <div class="info-item"><div class="info-label">Leaching (Underwear)</div><div class="info-value bad">77% per wash</div></div>
+      <div class="info-item"><div class="info-label">Worker Risk</div><div class="info-value bad">Occupational Asthma + COPD</div></div>
+    </div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>"Non-Leaching" is False:</strong> Peer-reviewed research: 77% leaching from underwear, 55% from towels, 81% from socks per wash cycle. Aegis's central marketing claim is directly contradicted by published science (ChemRxiv 2025).</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>EPA Category I Corrosive:</strong> DDAC and ADBAC classified as Toxicity Category I for skin and eye irritation. Ulcerative skin lesions, hyperpigmentation at application concentrations.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Occupational Asthma:</strong> Confirmed via bronchoprovocation testing. COPD risk independent of smoking status. Highest risk during dilution of concentrated products.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>VOC Emissions Despite Claims:</strong> Royal Society of Chemistry (2023) found QACs are NOT nonvolatile. Aegis SDS requires N95/P-100 respirators and notes methanol release.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Massive Binder System:</strong> Requires PVA, methyl cellulose, polycarboxylates, acrylate polymers, paraffin wax, microcrystalline wax, polyether waxes. All enter factory wastewater.</div></div>
+  </div></div>
+</div>
+
+<!-- ============ ULTRA-FRESH ============ -->
+<div class="comp-card" onclick="this.classList.toggle('open')">
+  <div class="comp-header">
+    <h3>Ultra-Fresh / Silpure (Thomson Research) <span class="epa-tag tag-red">H330: FATAL IF INHALED</span></h3>
+    <span class="arrow">&#9660;</span>
+  </div>
+  <div class="comp-body"><div class="comp-content">
+    <div class="genealogy">
+      <span class="gen-node origin">1983: Microban EPA 42182 (shared registration family)</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node">Dec 2009: EPA 42182-24 (DW-56: Zinc Pyrithione + Thiabendazole)</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node current">Also EPA 92760 series &mdash; dual registration families</span>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Active Ingredient</div><div class="info-value bad">Zinc Pyrithione + Thiabendazole</div></div>
+      <div class="info-item"><div class="info-label">GHS Hazard</div><div class="info-value bad">H330: FATAL IF INHALED</div></div>
+      <div class="info-item"><div class="info-label">Reproductive Effects</div><div class="info-value bad">Testosterone reduction, sperm deformities</div></div>
+      <div class="info-item"><div class="info-label">Multigenerational</div><div class="info-value bad">Offspring reduction across 3 generations</div></div>
+    </div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>FATAL IF INHALED (H330):</strong> Highest inhalation hazard classification. Factory workers require NIOSH-approved half-face respirators with organic vapor/acid gas cartridges plus dust/mist filters.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Reproductive Toxicity:</strong> Dose-dependent testosterone reduction, sperm deformities, decreased sperm concentration and motility. 89 ng/L exposure for 4 days reduced offspring across three generations.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>DNA Damage:</strong> Rapid DNA damage detected before cell death. Heat shock response activation, PARP-dependent energy crisis in exposed cells.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Curing: 180-235&deg;C:</strong> Highest curing temperature of any antimicrobial treatment &mdash; massive energy consumption and VOC generation.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Long-Term Effects Unknown:</strong> Despite 50+ years of documented toxicity, long-term effects and underlying mechanisms "remain largely unexplored."</div></div>
+  </div></div>
+</div>
+
+<!-- ============ SANITIZED AG ============ -->
+<div class="comp-card" onclick="this.classList.toggle('open')">
+  <div class="comp-header">
+    <h3>Sanitized AG <span class="epa-tag tag-amber">MULTI-CHEMISTRY &bull; JURISDICTION HOPPING</span></h3>
+    <span class="arrow">&#9660;</span>
+  </div>
+  <div class="comp-body"><div class="comp-content">
+    <div class="genealogy">
+      <span class="gen-node origin">1935: Founded (Switzerland)</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node">Uses silver, zinc pyrithione, IPBC, OR SilanQuat depending on jurisdiction</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node current">Today: Modular chemistry &mdash; different active ingredients per market</span>
+    </div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Jurisdiction Hopping:</strong> Sanitized selects different active ingredients based on regulatory jurisdiction &mdash; silver in one market, zinc pyrithione in another, silane quat in a third. This means the "Sanitized" label does not guarantee a consistent chemistry or safety profile.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Contains H330 Chemistry:</strong> Zinc pyrithione variant carries FATAL IF INHALED classification. IPBC variant is a known sensitizer. The brand name obscures which hazardous chemistry is actually on the fabric.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>No Specific EPA Registration Located:</strong> U.S. presence may be minimal or handled through partner registrations. Regulatory transparency is limited.</div></div>
+  </div></div>
+</div>
+
+<!-- ============ NORDSHIELD ============ -->
+<div class="comp-card" onclick="this.classList.toggle('open')">
+  <div class="comp-header">
+    <h3>NordShield <span class="epa-tag tag-amber">LIMITED DATA AVAILABLE</span></h3>
+    <span class="arrow">&#9660;</span>
+  </div>
+  <div class="comp-body"><div class="comp-content">
+    <div class="genealogy">
+      <span class="gen-node origin">Recent: Plant-based antimicrobial</span>
+      <span class="gen-arrow">&rarr;</span>
+      <span class="gen-node current">Positioning as "biodegradable" alternative to heavy metals/quats</span>
+    </div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Limited EPA Registration Data:</strong> No specific EPA registration numbers located. Regulatory strategy appears to focus on sustainability claims rather than head-to-head efficacy competition.</div></div>
+    <div class="indictment"><span class="icon">&times;</span><div><strong>Bio-Based Efficacy Unproven:</strong> Plant-based antimicrobials face significant durability challenges &mdash; wash durability data not publicly available for NordShield products.</div></div>
+  </div></div>
+</div>
+
+</div><!-- end competitors -->
+
+<section class="page-cta">
+  <h2>Ready for the Only Modern Antimicrobial?</h2>
+  <p>FUZE metamaterial: 58 patents, full PRIA 6 testing, zero binders, zero VOCs, zero wastewater treatment. Made from recycled electronics on a solar-powered 1m&sup2; table.</p>
+  <a href="https://fuzeatlas.com" target="_blank" class="btn-primary">Explore FUZE Atlas &rarr;</a>
+</section>
+
+<footer class="footer">
+  <p>&copy; 2026 FUZE Biotech. All rights reserved. &nbsp;|&nbsp; <a href="https://fuzeatlas.com">FUZE Atlas Platform</a> &nbsp;|&nbsp; <a href="mailto:info@fuzebiotech.com">Contact</a></p>
+  <p style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--slate-600);">All data sourced from EPA filings, peer-reviewed research, manufacturer SDS documents, court records, and OEKO-TEX standards. Sources available upon request.</p>
+</footer>
+
+</body>
+</html>
