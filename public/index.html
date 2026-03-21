@@ -98,37 +98,21 @@
     .section-header h2 { font-size: 2.25rem; font-weight: 700; margin-bottom: 0.75rem; letter-spacing: -0.5px; }
     .section-header p { color: var(--slate-400); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
 
-    /* CALCULATOR */
+    /* CALCULATOR — Light card design matching fuzeatlas.com */
     .calc-container {
-      background: var(--slate-800); border: 1px solid rgba(255,255,255,0.08);
+      background: white; border: 1px solid var(--slate-200);
       border-radius: 16px; padding: 2.5rem; max-width: 900px; margin: 0 auto;
+      color: var(--slate-800);
     }
-    .calc-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
-    .calc-tab {
-      padding: 0.6rem 1.25rem; border-radius: 8px; background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1); color: var(--slate-400); cursor: pointer;
-      font-size: 0.9rem; font-weight: 600; transition: all 0.2s;
-    }
-    .calc-tab.active { background: var(--teal-600); color: white; border-color: var(--teal-600); }
-    .calc-tab:hover:not(.active) { background: rgba(255,255,255,0.1); color: var(--slate-200); }
     .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
     @media (max-width: 600px) { .calc-grid { grid-template-columns: 1fr; } }
-    .calc-field label { display: block; font-size: 0.85rem; color: var(--slate-400); margin-bottom: 0.4rem; font-weight: 500; }
+    .calc-field label { display: block; font-size: 0.85rem; color: var(--slate-500); margin-bottom: 0.4rem; font-weight: 500; }
     .calc-field input, .calc-field select {
-      width: 100%; padding: 0.7rem 1rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; color: var(--slate-100); font-size: 1rem; outline: none; transition: border 0.2s;
+      width: 100%; padding: 0.7rem 1rem; background: white; border: 1px solid var(--slate-300);
+      border-radius: 8px; color: var(--slate-800); font-size: 1rem; outline: none; transition: border 0.2s;
     }
     .calc-field input:focus, .calc-field select:focus { border-color: var(--teal-500); }
-    .calc-field select option { background: var(--slate-700); }
-    .calc-results {
-      margin-top: 2rem; padding: 1.5rem; background: rgba(20, 184, 166, 0.08);
-      border: 1px solid rgba(20, 184, 166, 0.2); border-radius: 12px;
-    }
-    .calc-results h3 { color: var(--teal-400); margin-bottom: 1rem; font-size: 1.1rem; }
-    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
-    .result-item { background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; }
-    .result-value { font-size: 1.5rem; font-weight: 700; color: white; }
-    .result-label { font-size: 0.8rem; color: var(--slate-400); margin-top: 0.25rem; }
+    .calc-field select option { background: white; }
 
     /* TIER COMPARISON */
     .tiers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
@@ -291,29 +275,29 @@
     <h2>FUZE Quote Calculator</h2>
     <p>Calculate FUZE application cost, compare against competitors, and generate environmental impact scores.</p>
   </div>
-  <div class="calc-container" style="display: grid; grid-template-columns: 1fr 360px; gap: 2rem; align-items: start;">
+  <div class="calc-container" style="display: grid; grid-template-columns: 1fr 360px; gap: 2rem; align-items: start; box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);">
     <!-- LEFT: Inputs -->
     <div>
       <!-- Currency & Width Unit -->
       <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem; align-items: center;">
         <div class="calc-field" style="min-width: 120px;">
           <label>Currency</label>
-          <select id="currency" onchange="calculate()" style="width: 100%; padding: 0.6rem 1rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--slate-100); font-size: 0.95rem;">
+          <select id="currency" onchange="calculate()" style="width: 100%; padding: 0.6rem 1rem; background: white; border: 1px solid var(--slate-300); border-radius: 8px; color: var(--slate-800); font-size: 0.95rem;">
             <option value="USD">USD</option>
           </select>
         </div>
         <div class="calc-field">
           <label>Width unit</label>
-          <div style="display: flex; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="display: flex; border-radius: 8px; overflow: hidden; border: 1px solid var(--slate-300);">
             <button id="unit-in" onclick="setUnit('in')" style="padding: 0.6rem 1.25rem; background: var(--teal-600); color: white; border: none; font-weight: 600; font-size: 0.9rem; cursor: pointer;">Inches</button>
-            <button id="unit-m" onclick="setUnit('m')" style="padding: 0.6rem 1.25rem; background: var(--slate-700); color: var(--slate-400); border: none; font-weight: 600; font-size: 0.9rem; cursor: pointer;">Meters</button>
+            <button id="unit-m" onclick="setUnit('m')" style="padding: 0.6rem 1.25rem; background: var(--slate-100); color: var(--slate-500); border: none; font-weight: 600; font-size: 0.9rem; cursor: pointer;">Meters</button>
           </div>
         </div>
       </div>
 
       <!-- FUZE Application Tier -->
       <div style="margin-bottom: 1.5rem;">
-        <label style="display: block; font-size: 0.85rem; color: var(--slate-400); margin-bottom: 0.75rem; font-weight: 500;">FUZE Application Tier</label>
+        <label style="display: block; font-size: 0.85rem; color: var(--slate-500); margin-bottom: 0.75rem; font-weight: 500;">FUZE Application Tier</label>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
           <div id="tier-f1" class="tier-select active" onclick="selectTier(1.0, this)">
             <div class="tier-select-badge" style="color: var(--teal-400);">F1</div>
@@ -367,53 +351,53 @@
       <!-- Factory Adders -->
       <div style="margin-top: 1.5rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-          <label style="font-size: 0.85rem; color: var(--slate-400); font-weight: 500;">Factory Adders (&cent;/linear meter)</label>
+          <label style="font-size: 0.85rem; color: var(--slate-500); font-weight: 500;">Factory Adders (&cent;/linear meter)</label>
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
           <div style="display: flex; align-items: center; gap: 0.75rem;">
             <input type="checkbox" id="adder1-on" checked onchange="calculate()" style="accent-color: var(--teal-500);">
-            <input type="text" value="Below MOQ" style="flex: 1; padding: 0.5rem 0.75rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--slate-200); font-size: 0.9rem;" readonly>
-            <input type="number" id="adder1" value="0" oninput="calculate()" style="width: 80px; padding: 0.5rem 0.75rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--slate-200); font-size: 0.9rem; text-align: right;">
+            <input type="text" value="Below MOQ" style="flex: 1; padding: 0.5rem 0.75rem; background: white; border: 1px solid var(--slate-300); border-radius: 6px; color: var(--slate-700); font-size: 0.9rem;" readonly>
+            <input type="number" id="adder1" value="0" oninput="calculate()" style="width: 80px; padding: 0.5rem 0.75rem; background: white; border: 1px solid var(--slate-300); border-radius: 6px; color: var(--slate-700); font-size: 0.9rem; text-align: right;">
           </div>
           <div style="display: flex; align-items: center; gap: 0.75rem;">
             <input type="checkbox" id="adder2-on" checked onchange="calculate()" style="accent-color: var(--teal-500);">
-            <input type="text" value="Waste in application bath" style="flex: 1; padding: 0.5rem 0.75rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--slate-200); font-size: 0.9rem;" readonly>
-            <input type="number" id="adder2" value="0" oninput="calculate()" style="width: 80px; padding: 0.5rem 0.75rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--slate-200); font-size: 0.9rem; text-align: right;">
+            <input type="text" value="Waste in application bath" style="flex: 1; padding: 0.5rem 0.75rem; background: white; border: 1px solid var(--slate-300); border-radius: 6px; color: var(--slate-700); font-size: 0.9rem;" readonly>
+            <input type="number" id="adder2" value="0" oninput="calculate()" style="width: 80px; padding: 0.5rem 0.75rem; background: white; border: 1px solid var(--slate-300); border-radius: 6px; color: var(--slate-700); font-size: 0.9rem; text-align: right;">
           </div>
           <div style="display: flex; align-items: center; gap: 0.75rem;">
             <input type="checkbox" id="adder3-on" checked onchange="calculate()" style="accent-color: var(--teal-500);">
-            <input type="text" value="Additional processing" style="flex: 1; padding: 0.5rem 0.75rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--slate-200); font-size: 0.9rem;" readonly>
-            <input type="number" id="adder3" value="0" oninput="calculate()" style="width: 80px; padding: 0.5rem 0.75rem; background: var(--slate-700); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--slate-200); font-size: 0.9rem; text-align: right;">
+            <input type="text" value="Additional processing" style="flex: 1; padding: 0.5rem 0.75rem; background: white; border: 1px solid var(--slate-300); border-radius: 6px; color: var(--slate-700); font-size: 0.9rem;" readonly>
+            <input type="number" id="adder3" value="0" oninput="calculate()" style="width: 80px; padding: 0.5rem 0.75rem; background: white; border: 1px solid var(--slate-300); border-radius: 6px; color: var(--slate-700); font-size: 0.9rem; text-align: right;">
           </div>
         </div>
       </div>
     </div>
 
     <!-- RIGHT: Quote Panel -->
-    <div style="background: var(--slate-900); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 2rem; position: sticky; top: 80px;">
-      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">FUZE Quote</h3>
-      <div id="quote-tier-label" style="font-size: 0.9rem; color: var(--slate-400); margin-bottom: 1.5rem;">F1 &mdash; Full Spectrum</div>
+    <div style="background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 16px; padding: 2rem; position: sticky; top: 80px;">
+      <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--slate-800);">FUZE Quote</h3>
+      <div id="quote-tier-label" style="font-size: 0.9rem; color: var(--slate-500); margin-bottom: 1.5rem;">F1 &mdash; Full Spectrum</div>
 
-      <div style="background: rgba(20, 184, 166, 0.08); border: 1px solid rgba(20, 184, 166, 0.2); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center;">
-        <div style="font-size: 0.8rem; color: var(--slate-400); margin-bottom: 0.25rem;">Total Quoted Cost</div>
-        <div id="quote-per-m" style="font-size: 2.5rem; font-weight: 800; color: white; line-height: 1;">$0.27<span style="font-size: 1rem; font-weight: 400; color: var(--slate-400);">/m</span></div>
-        <div id="quote-per-yd" style="font-size: 1.1rem; color: var(--slate-300); margin-top: 0.25rem;">$0.25 /yd</div>
-        <div id="quote-per-kg" style="font-size: 1.1rem; color: var(--slate-300);">$1.20 /kg</div>
-        <div id="quote-per-lb" style="font-size: 1.1rem; color: var(--slate-300);">$0.54 /lb</div>
+      <div style="background: rgba(20, 184, 166, 0.06); border: 1px solid rgba(20, 184, 166, 0.25); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: center;">
+        <div style="font-size: 0.8rem; color: var(--slate-500); margin-bottom: 0.25rem;">Total Quoted Cost</div>
+        <div id="quote-per-m" style="font-size: 2.5rem; font-weight: 800; color: var(--slate-900); line-height: 1;">$0.27<span style="font-size: 1rem; font-weight: 400; color: var(--slate-500);">/m</span></div>
+        <div id="quote-per-yd" style="font-size: 1.1rem; color: var(--slate-600); margin-top: 0.25rem;">$0.25 /yd</div>
+        <div id="quote-per-kg" style="font-size: 1.1rem; color: var(--slate-600);">$1.20 /kg</div>
+        <div id="quote-per-lb" style="font-size: 1.1rem; color: var(--slate-600);">$0.54 /lb</div>
       </div>
 
-      <div style="font-size: 0.85rem; color: var(--slate-400); display: flex; flex-direction: column; gap: 0.5rem;">
-        <div style="display: flex; justify-content: space-between;"><span>FUZE <span id="detail-tier">F1</span> cost</span><span id="detail-fuze-cost" style="color: var(--slate-200);">$0.27/m</span></div>
-        <div style="display: flex; justify-content: space-between;"><span>Adders</span><span id="detail-adders" style="color: var(--slate-200);">$0.00/m</span></div>
-        <div style="display: flex; justify-content: space-between; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.08);"><span>Fabric weight</span><span id="detail-fabric-wt" style="color: var(--slate-200);">0.2286 kg/m</span></div>
-        <div style="display: flex; justify-content: space-between;"><span>Stock/meter</span><span id="detail-stock-m" style="color: var(--slate-200);">0.00762 L</span></div>
+      <div style="font-size: 0.85rem; color: var(--slate-500); display: flex; flex-direction: column; gap: 0.5rem;">
+        <div style="display: flex; justify-content: space-between;"><span>FUZE <span id="detail-tier">F1</span> cost</span><span id="detail-fuze-cost" style="color: var(--slate-700);">$0.27/m</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>Adders</span><span id="detail-adders" style="color: var(--slate-700);">$0.00/m</span></div>
+        <div style="display: flex; justify-content: space-between; padding-top: 0.5rem; border-top: 1px solid var(--slate-200);"><span>Fabric weight</span><span id="detail-fabric-wt" style="color: var(--slate-700);">0.2286 kg/m</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>Stock/meter</span><span id="detail-stock-m" style="color: var(--slate-700);">0.00762 L</span></div>
       </div>
 
-      <div id="quote-tier-info" style="margin-top: 1.25rem; padding: 1rem; background: rgba(20, 184, 166, 0.06); border-radius: 8px; font-size: 0.8rem; color: var(--teal-400); line-height: 1.6;">
+      <div id="quote-tier-info" style="margin-top: 1.25rem; padding: 1rem; background: rgba(20, 184, 166, 0.06); border-radius: 8px; font-size: 0.8rem; color: var(--teal-700); line-height: 1.6;">
         <strong>F1 &mdash; Full Spectrum:</strong> Maximum particle density &middot; Passes all test standards &middot; Full ancillary benefits (UV, wicking, cooling) &middot; Permanent attachment &mdash; applied once, lasts the life of the textile.
       </div>
 
-      <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--slate-500);">
+      <div style="margin-top: 1rem; font-size: 0.75rem; color: var(--slate-400);">
         FUZE stock concentration: 30 ppm &middot; Bottle: 19 L
       </div>
     </div>
@@ -493,7 +477,7 @@
       <thead>
         <tr>
           <th>Property</th>
-          <th class="fuze-col">FUZE FUZE Metamaterial</th>
+          <th class="fuze-col">FUZE Metamaterial</th>
           <th>Silver Chloride / Zeolite</th>
           <th>Quaternary Ammonium (Quats)</th>
         </tr>
@@ -668,16 +652,16 @@
 </footer>
 
 <style>
-  /* TIER SELECTOR CARDS */
+  /* TIER SELECTOR CARDS — Light theme */
   .tier-select {
-    background: var(--slate-700); border: 2px solid rgba(255,255,255,0.1);
+    background: var(--slate-50); border: 2px solid var(--slate-200);
     border-radius: 12px; padding: 1rem; cursor: pointer; transition: all 0.2s;
   }
-  .tier-select:hover { border-color: rgba(45, 212, 191, 0.4); }
-  .tier-select.active { border-color: var(--teal-500); background: rgba(20, 184, 166, 0.08); }
+  .tier-select:hover { border-color: var(--teal-400); }
+  .tier-select.active { border-color: var(--teal-500); background: rgba(20, 184, 166, 0.06); }
   .tier-select-badge { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.25rem; }
-  .tier-select-name { font-size: 0.85rem; font-weight: 700; color: var(--slate-200); margin-bottom: 0.4rem; }
-  .tier-select-desc { font-size: 0.7rem; color: var(--slate-400); line-height: 1.5; }
+  .tier-select-name { font-size: 0.85rem; font-weight: 700; color: var(--slate-800); margin-bottom: 0.4rem; }
+  .tier-select-desc { font-size: 0.7rem; color: var(--slate-500); line-height: 1.5; }
   @media (max-width: 900px) {
     .calc-container { grid-template-columns: 1fr !important; }
     .tier-select-desc { display: none; }
@@ -704,10 +688,10 @@
 
   function setUnit(u) {
     currentUnit = u;
-    document.getElementById('unit-in').style.background = u === 'in' ? 'var(--teal-600)' : 'var(--slate-700)';
-    document.getElementById('unit-in').style.color = u === 'in' ? 'white' : 'var(--slate-400)';
-    document.getElementById('unit-m').style.background = u === 'm' ? 'var(--teal-600)' : 'var(--slate-700)';
-    document.getElementById('unit-m').style.color = u === 'm' ? 'white' : 'var(--slate-400)';
+    document.getElementById('unit-in').style.background = u === 'in' ? 'var(--teal-600)' : 'var(--slate-100)';
+    document.getElementById('unit-in').style.color = u === 'in' ? 'white' : 'var(--slate-500)';
+    document.getElementById('unit-m').style.background = u === 'm' ? 'var(--teal-600)' : 'var(--slate-100)';
+    document.getElementById('unit-m').style.color = u === 'm' ? 'white' : 'var(--slate-500)';
     document.getElementById('width-label').textContent = u === 'in' ? 'Width (inches)' : 'Width (meters)';
     if (u === 'in') document.getElementById('width').value = '60';
     else document.getElementById('width').value = '1.524';
@@ -752,7 +736,7 @@
 
     // Update quote panel
     document.getElementById('quote-tier-label').innerHTML = info.label + ' &mdash; ' + info.name;
-    document.getElementById('quote-per-m').innerHTML = fmt(totalPerMeter) + '<span style="font-size:1rem;font-weight:400;color:var(--slate-400);">/m</span>';
+    document.getElementById('quote-per-m').innerHTML = fmt(totalPerMeter) + '<span style="font-size:1rem;font-weight:400;color:var(--slate-500);">/m</span>';
     document.getElementById('quote-per-yd').textContent = fmt(totalPerYard) + ' /yd';
     document.getElementById('quote-per-kg').textContent = fmt(totalPerKg) + ' /kg';
     document.getElementById('quote-per-lb').textContent = fmt(totalPerLb) + ' /lb';
