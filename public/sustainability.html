@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Environmental Sustainability | FUZE Biotech</title>
-  <meta name="description" content="See how FUZE's laser-produced metamaterial eliminate VOCs, reduce water use by up to 90%, and require zero chemical binders — produced from recycled electronics on a 1m table.">
+  <meta name="description" content="See how FUZE's laser-produced metamaterial eliminates VOCs, reduces water use by up to 90%, and requires zero chemical binders — produced from recycled electronics on a 1m² table.">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -46,6 +46,32 @@
       border-radius: 8px; font-weight: 600; transition: background 0.2s;
     }
     .nav-cta:hover { background: var(--teal-700); }
+
+    /* MOBILE HAMBURGER */
+    .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; z-index: 200; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--slate-700); margin: 5px 0; transition: all 0.3s; border-radius: 2px; }
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+    @media (max-width: 768px) {
+      .hamburger { display: block; }
+      .nav-links { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; z-index: 150; }
+      .nav-links.open { display: flex; }
+      .nav-links a { font-size: 1.2rem; color: var(--slate-700); }
+      .nav-cta { font-size: 1.1rem; }
+    }
+
+    /* WASTEWATER TABLE */
+    .vs-table-wrap { overflow-x: auto; }
+    .vs-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--slate-800); border-radius: 12px; overflow: hidden; }
+    .vs-table th { padding: 1rem 1.25rem; text-align: left; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; color: var(--slate-400); background: var(--slate-900); border-bottom: 2px solid rgba(45, 212, 191, 0.2); }
+    .vs-table th.fuze-col { color: var(--teal-400); }
+    .vs-table td { padding: 0.85rem 1.25rem; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .vs-table tr:last-child td { border-bottom: none; }
+    .vs-table .check { color: var(--emerald-400); font-weight: 700; }
+    .vs-table .cross { color: var(--red-400); font-weight: 700; }
+    .vs-table .warn { color: var(--amber-400); font-weight: 700; }
+    .vs-table .fuze-cell { background: rgba(20, 184, 166, 0.06); }
 
     /* HERO */
     .hero {
@@ -183,7 +209,6 @@
     }
     .footer a { color: var(--slate-400); }
     @media (max-width: 768px) {
-      .nav-links { display: none; }
       .impact-metric { font-size: 2.5rem; }
       [style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr !important; }
       [style*="grid-template-columns: 1fr 1fr;"] { grid-template-columns: 1fr !important; }
@@ -198,12 +223,14 @@
     <a href="/" class="nav-logo"><img src="/fuze-logo.jpg" alt="FUZE Biotech" style="height: 64px; width: auto;"></a>
     <div class="nav-links">
       <a href="/">Calculator</a>
-      <a href="/#tiers">Treatment Tiers</a>
-      <a href="/#compare">vs Competition</a>
       <a href="/competitors">Other Products</a>
-      <a href="#impact">Impact Data</a>
+      <a href="/sustainability" style="color: var(--teal-600); font-weight: 700;">Sustainability</a>
+      <a href="/compare">True Cost Compare</a>
       <a href="https://fuzeatlas.com" target="_blank" class="nav-cta">Try FUZE Atlas &mdash; Free</a>
     </div>
+    <button class="hamburger" onclick="this.classList.toggle('active');document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 

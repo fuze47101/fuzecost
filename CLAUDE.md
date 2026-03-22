@@ -59,3 +59,19 @@ Andrew Peterson, CEO/Founder of FUZE Biotech. Building antimicrobial textile tre
 - Direct communication, no fluff
 - Brand language is sacred — FUZE and metamaterial, never silver/nano
 → Full glossary: memory/glossary.md
+
+## Platform Wish List (Priority Order)
+1. **Environmental Impact Reports for Brands (ESG)** — Auto-generate quarterly reports: chemical binders eliminated, wastewater saved, curing energy avoided. Brands need this for sustainability reporting. HIGHEST PRIORITY.
+2. **Consumption & Reorder Dashboard** — Track factory FUZE usage, projected run-out dates, automated reorder triggers. Turn one-time sales into recurring revenue.
+3. **Competitive Intelligence Dashboard (EPA Scraping)** — Live dashboard tracking competitor registrations, formulation changes, regulatory actions. PhD-level teardown of every competing chemistry.
+4. **Real-Time Test Tracking (FedEx-style)** — Live tracking page: sample received → in queue → testing day X of Y → results pending → complete. Push notifications at each stage.
+5. **AI Test Interpretation at Scale** — Auto-generate plain-English summaries with branded PDF certificates for every test result.
+6. **Brand Self-Service QR Verification** — QR codes on fabric hang tags → verification page showing test results, certification status, environmental impact.
+7. **Factory Performance Scoring** — Score factories on first-pass rates, retreatment needs. "FUZE Certified Factory" rating.
+8. **API for Brand PLM Integration** — REST API with webhooks for large brands to pull test data into their own compliance systems.
+
+## Competitive Intelligence Project
+- **Stage 1**: Full-force attack on traditional antimicrobials (silver chloride, zinc pyrithione, copper, quats, Noble Biometal embedded silver)
+- **Stage 2**: Bio-based antimicrobial comparison (chitosan, etc.)
+- **Depth**: PhD-level. Manufacturing process, VOCs on application, curing requirements, leaching, toxicity (skin/lung/eye/long-term), home laundering washoff, binders required, caustic soda/magnesium/ash for wastewater cleanup, full EPA filing data
+- **Target competitors**: NordShield, Noble Biometal, Microban, Sciessent, Sanitized AG, Ultra-Fresh, BioPrism, Aegis, Silvadur

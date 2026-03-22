@@ -30,6 +30,20 @@
     .nav-links a:hover { color: var(--teal-600); }
     .nav-cta { background: var(--teal-600); color: white !important; padding: 0.5rem 1.25rem; border-radius: 8px; font-weight: 600; }
 
+    /* MOBILE HAMBURGER */
+    .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; z-index: 200; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--slate-700); margin: 5px 0; transition: all 0.3s; border-radius: 2px; }
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+    @media (max-width: 768px) {
+      .hamburger { display: block; }
+      .nav-links { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: white; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; z-index: 150; }
+      .nav-links.open { display: flex; }
+      .nav-links a { font-size: 1.2rem; color: var(--slate-700); }
+      .nav-cta { font-size: 1.1rem; }
+    }
+
     /* HERO */
     .page-hero { padding: 7rem 1.5rem 3rem; text-align: center; background: linear-gradient(135deg, var(--slate-950), var(--slate-900), #0c1f2e); }
     .page-hero h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; margin-bottom: 1rem; letter-spacing: -0.5px; }
@@ -90,7 +104,7 @@
     .btn-primary:hover { background: var(--teal-700); }
 
     .footer { padding: 2rem 1.5rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.06); color: var(--slate-500); font-size: 0.85rem; }
-    @media (max-width: 768px) { .nav-links { display: none; } .info-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 768px) { .info-grid { grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
 <body>
@@ -99,13 +113,15 @@
   <div class="nav-inner">
     <a href="/"><img src="/fuze-logo.jpg" alt="FUZE Biotech" style="height: 64px; width: auto;"></a>
     <div class="nav-links">
-      <a href="/#calculator">Calculator</a>
-      <a href="/#tiers">Treatment Tiers</a>
-      <a href="/#compare">vs Competition</a>
+      <a href="/">Calculator</a>
       <a href="/competitors" style="color: var(--teal-600); font-weight: 700;">Other Products</a>
-      <a href="/compare">Sustainability &amp; True Cost</a>
+      <a href="/sustainability">Sustainability</a>
+      <a href="/compare">True Cost Compare</a>
       <a href="https://fuzeatlas.com" target="_blank" class="nav-cta">Try FUZE Atlas &mdash; Free</a>
     </div>
+    <button class="hamburger" onclick="this.classList.toggle('active');document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 
