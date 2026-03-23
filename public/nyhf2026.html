@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>NY Home Fashion Market Week — FUZE Biotech Internal</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --slate-50: #f8fafc; --slate-100: #f1f5f9; --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1; --slate-400: #94a3b8; --slate-500: #64748b;
+      --slate-600: #475569; --slate-700: #334155; --slate-800: #1e293b;
+      --slate-900: #0f172a; --slate-950: #020617;
+      --teal-400: #2dd4bf; --teal-500: #14b8a6; --teal-600: #0d9488;
+      --emerald-400: #34d399; --amber-400: #fbbf24; --red-400: #f87171;
+      --blue-400: #60a5fa;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color: var(--slate-100); background: var(--slate-950); line-height: 1.6; }
+    a { color: var(--teal-400); text-decoration: none; }
+
+    .top-bar { background: rgba(15,23,42,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(45,212,191,0.15); padding: 0.75rem 1.5rem; position: sticky; top: 0; z-index: 100; }
+    .top-bar-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .top-bar h1 { font-size: 1rem; font-weight: 800; color: var(--teal-400); white-space: nowrap; }
+    .top-bar h1 span { color: var(--slate-400); font-weight: 500; }
+    .search-box { flex: 1; max-width: 400px; min-width: 200px; }
+    .search-box input { width: 100%; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.06); color: var(--slate-100); font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+    .search-box input:focus { border-color: var(--teal-400); }
+    .search-box input::placeholder { color: var(--slate-500); }
+    .internal-badge { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--amber-400); background: rgba(251,191,36,0.1); padding: 0.25rem 0.75rem; border-radius: 6px; border: 1px solid rgba(251,191,36,0.2); white-space: nowrap; }
+
+    .page { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.5rem 4rem; }
+
+    .day-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem; flex-wrap: wrap; }
+    .day-tab { padding: 0.5rem 1.25rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: var(--slate-400); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .day-tab:hover { background: rgba(45,212,191,0.08); color: var(--slate-200); }
+    .day-tab.active { background: rgba(45,212,191,0.15); color: var(--teal-400); border-color: var(--teal-400); }
+    .day-tab .day-count { display: inline-block; margin-left: 0.4rem; font-size: 0.7rem; background: rgba(255,255,255,0.08); padding: 0.1rem 0.4rem; border-radius: 4px; }
+    .day-tab.active .day-count { background: rgba(45,212,191,0.2); }
+
+    .day-section { display: none; }
+    .day-section.visible { display: block; }
+    .day-header { font-size: 1.4rem; font-weight: 800; color: var(--slate-100); margin-bottom: 0.25rem; }
+    .day-date { font-size: 0.85rem; color: var(--slate-500); margin-bottom: 1.5rem; }
+
+    .appt-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 1.25rem; margin-bottom: 0.75rem; transition: all 0.2s; }
+    .appt-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(45,212,191,0.2); }
+    .appt-card.highlight { border-color: var(--teal-400); background: rgba(45,212,191,0.06); }
+    .appt-card.unconfirmed { border-left: 3px solid var(--amber-400); }
+    .appt-card.not-attending { opacity: 0.45; }
+
+    .appt-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+    .appt-company { font-size: 1.1rem; font-weight: 800; color: var(--slate-50); }
+    .appt-time { font-size: 0.85rem; font-weight: 700; color: var(--teal-400); background: rgba(45,212,191,0.1); padding: 0.25rem 0.75rem; border-radius: 6px; white-space: nowrap; }
+
+    .appt-details { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1.5rem; }
+    @media (max-width: 600px) { .appt-details { grid-template-columns: 1fr; } }
+    .appt-field { display: flex; flex-direction: column; }
+    .appt-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--slate-500); margin-bottom: 0.1rem; }
+    .appt-value { font-size: 0.9rem; color: var(--slate-200); }
+    .appt-value a { color: var(--teal-400); }
+    .appt-value.address { color: var(--blue-400); }
+
+    .appt-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.75rem; }
+    .tag { font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 4px; background: rgba(255,255,255,0.06); color: var(--slate-400); }
+    .tag.country { background: rgba(96,165,250,0.1); color: var(--blue-400); }
+    .tag.status-confirmed { background: rgba(52,211,153,0.1); color: var(--emerald-400); }
+    .tag.status-requested { background: rgba(251,191,36,0.1); color: var(--amber-400); }
+    .tag.status-declined { background: rgba(248,113,113,0.1); color: var(--red-400); }
+
+    .appt-notes { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; color: var(--slate-400); font-style: italic; }
+
+    .section-divider { margin: 2rem 0 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); }
+    .section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--slate-500); margin-bottom: 1rem; }
+
+    .no-results { text-align: center; padding: 3rem 1rem; color: var(--slate-500); font-size: 1rem; }
+    .hotel-info { background: rgba(45,212,191,0.06); border: 1px solid rgba(45,212,191,0.15); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--slate-300); }
+    .hotel-info strong { color: var(--teal-400); }
+
+    .stats-row { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .stat-pill { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.8rem; color: var(--slate-400); }
+    .stat-pill strong { color: var(--teal-100); font-size: 1.1rem; margin-right: 0.25rem; }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-bar-inner">
+    <h1>FUZE <span>NY Home Fashion Market Week</span></h1>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search company, contact, category..." oninput="filterCards()">
+    </div>
+    <div class="internal-badge">Internal Only</div>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="hotel-info">
+    <strong>Our Hotel:</strong> Doubletree — 525 Eighth Avenue, New York
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-pill"><strong>4</strong> days</div>
+    <div class="stat-pill"><strong id="totalAppts">0</strong> meetings</div>
+    <div class="stat-pill"><strong id="confirmedCount">0</strong> confirmed</div>
+  </div>
+
+  <div class="day-tabs" id="dayTabs">
+    <button class="day-tab active" data-day="all">All Days</button>
+    <button class="day-tab" data-day="sunday">Sun 3/22</button>
+    <button class="day-tab" data-day="monday">Mon 3/23</button>
+    <button class="day-tab" data-day="tuesday">Tue 3/24</button>
+    <button class="day-tab" data-day="wednesday">Wed 3/25</button>
+    <button class="day-tab" data-day="thursday">Thu 3/26</button>
+    <button class="day-tab" data-day="pipeline">Pipeline</button>
+    <button class="day-tab" data-day="kathir">Dr. Kathir</button>
+  </div>
+
+  <div id="noResults" class="no-results" style="display:none;">No matching appointments found.</div>
+
+  <!-- ═══════════ SUNDAY ═══════════ -->
+  <div class="day-section visible" data-day="sunday">
+    <div class="day-header">Sunday</div>
+    <div class="day-date">March 22, 2026</div>
+
+    <div class="appt-card" data-search="industry executives lenzing walter ciclo hector cheryl preston networking">
+      <div class="appt-top">
+        <div class="appt-company">Industry Executives — Networking Event</div>
+        <div class="appt-time">5:30 – 7:30 PM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Lenzing (Walter) · Ciclo (Hector, Cheryl, Preston) — Sponsoring</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=1150+Broadway+New+York+NY" target="_blank">1150 Broadway (Lotte Hotel at 482 Eighth Ave)</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-confirmed">Confirmed</span><span class="tag">Networking</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MONDAY ═══════════ -->
+  <div class="day-section visible" data-day="monday">
+    <div class="day-header">Monday</div>
+    <div class="day-date">March 23, 2026</div>
+
+    <div class="appt-card" data-search="loftex gretchen dale charles gaenslen meg wang towels china">
+      <div class="appt-top">
+        <div class="appt-company">Loftex</div>
+        <div class="appt-time">10:00 AM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Gretchen Dale, Charles Gaenslen, Meg Wang</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=58+W+40th+St+New+York+NY" target="_blank">58 W 40th St</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-confirmed">Confirmed</span><span class="tag">Towels</span><span class="tag country">China</span></div>
+    </div>
+
+    <div class="appt-card" data-search="classic fashion manjunath deveenthiran richard tinsley wendy lu apparel india">
+      <div class="appt-top">
+        <div class="appt-company">Classic Fashion</div>
+        <div class="appt-time">11:30 AM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Manjunath Deveenthiran, Richard Tinsley, Wendy Lu</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=1410+Broadway+24th+Floor+New+York+NY" target="_blank">1410 Broadway, 24th Floor</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-confirmed">Confirmed</span><span class="tag">Apparel</span><span class="tag country">India</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="mohan spintex srinivasan bedding fabric india">
+      <div class="appt-top">
+        <div class="appt-company">Mohan Spintex</div>
+        <div class="appt-time">2:00 PM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Mr. Srinivasan R — AVP</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=230+Fifth+Ave+Suite+402+New+York+NY" target="_blank">230 Fifth Ave, Suite 402</a></div></div>
+        <div class="appt-field"><div class="appt-label">Email</div><div class="appt-value"><a href="mailto:avphomtex@mohanspintex.com">avphomtex@mohanspintex.com</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Requested</span><span class="tag">Bedding</span><span class="tag">Fabric</span><span class="tag country">India</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ TUESDAY ═══════════ -->
+  <div class="day-section visible" data-day="tuesday">
+    <div class="day-header">Tuesday</div>
+    <div class="day-date">March 24, 2026</div>
+
+    <div class="appt-card" data-search="indo count deepak arora bedding india">
+      <div class="appt-top">
+        <div class="appt-company">Indo Count</div>
+        <div class="appt-time">10:00 AM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Deepak Arora</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=390+5th+Ave+Suite+405+New+York+NY" target="_blank">390 5th Ave, Suite 405</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-confirmed">Confirmed</span><span class="tag">Bedding</span><span class="tag country">India</span></div>
+    </div>
+
+    <div class="appt-card" data-search="gul ahmed sky home marci cohen apparel india">
+      <div class="appt-top">
+        <div class="appt-company">Gul Ahmed / Sky Home</div>
+        <div class="appt-time">11:00 AM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Marci Cohen</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=267+5th+Ave+2nd+floor+New+York+NY" target="_blank">267 5th Ave, 2nd Floor</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-confirmed">Confirmed</span><span class="tag">Apparel</span><span class="tag country">India</span></div>
+    </div>
+
+    <div class="appt-card" data-search="himatsingka brian delp jennifer tom andrea sorvino towels bedding india">
+      <div class="appt-top">
+        <div class="appt-company">Himatsingka</div>
+        <div class="appt-time">12:00 PM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Brian Delp, Jennifer Tom, Andrea Sorvino</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=261+5th+Ave+Suite+1400+New+York+NY" target="_blank">261 5th Ave, Suite 1400</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-confirmed">Confirmed</span><span class="tag">Towels</span><span class="tag">Bedding</span><span class="tag country">India</span></div>
+    </div>
+
+    <div class="appt-card" data-search="al rahim arslan rasheed rashid lodhi towels pakistan">
+      <div class="appt-top">
+        <div class="appt-company">Al Rahim</div>
+        <div class="appt-time">1:30 PM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Arslan Rasheed (Rashid Lodhi not attending)</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=10+W+33rd+St+Ste+1002+New+York+NY" target="_blank">10 W 33rd St, Ste 1002</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-confirmed">Confirmed</span><span class="tag">Towels</span><span class="tag country">Pakistan</span></div>
+    </div>
+
+    <div class="appt-card" data-search="trident nasreen ahmad rajneesh bhatia towels bedding india">
+      <div class="appt-top">
+        <div class="appt-company">Trident</div>
+        <div class="appt-time">3:00 PM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Nasreen Ahmad, Rajneesh Bhatia</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=320+5th+Ave+Ste+810+New+York+NY" target="_blank">320 5th Ave, Ste 810</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-confirmed">Confirmed</span><span class="tag">Towels</span><span class="tag">Bedding</span><span class="tag country">India</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="jla home brett rife bedding curtains rugs china dinner">
+      <div class="appt-top">
+        <div class="appt-company">JLA Home</div>
+        <div class="appt-time">6:00 PM — Dinner</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Brett Rife</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=11+E+26th+St+New+York+NY" target="_blank">11 E 26th St #2</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Requested</span><span class="tag">Bedding</span><span class="tag">Curtains</span><span class="tag">Rugs</span><span class="tag country">China</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ WEDNESDAY ═══════════ -->
+  <div class="day-section visible" data-day="wednesday">
+    <div class="day-header">Wednesday</div>
+    <div class="day-date">March 25, 2026</div>
+
+    <div class="appt-card unconfirmed" data-search="ciclo cheryl smyre biodegradable yarn pakistan">
+      <div class="appt-top">
+        <div class="appt-company">Ciclo</div>
+        <div class="appt-time">8:00 AM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Cheryl Smyre</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">No NYC Office — phone/virtual</div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Requested</span><span class="tag">Biodegradable Yarn</span><span class="tag country">Pakistan</span></div>
+    </div>
+
+    <div class="appt-card" data-search="1888 feroze lexi marissa aamir towels india">
+      <div class="appt-top">
+        <div class="appt-company">1888 Feroze</div>
+        <div class="appt-time">10:00 AM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Lexi, Marissa, Aamir</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=230+Fifth+Ave+Ste+610+New+York+NY" target="_blank">230 Fifth Ave, Ste 610</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-confirmed">Confirmed</span><span class="tag">Towels</span><span class="tag country">India</span></div>
+    </div>
+
+    <div class="appt-card" data-search="liberty mills ovais fazal all categories pakistan loftex 1888 affiliated">
+      <div class="appt-top">
+        <div class="appt-company">Liberty Mills</div>
+        <div class="appt-time">10:00 AM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Ovais Fazal</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=330+5th+Ave+6th+floor+New+York+NY" target="_blank">330 5th Ave, 6th Floor</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-confirmed">Confirmed</span><span class="tag">All Categories</span><span class="tag country">Pakistan</span></div>
+      <div class="appt-notes">Affiliated with 1888 · Look for while in Loftex</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="arshad group faisal rahim apparel workwear patient gowns bedding scrubs denim sheets kitchen towels pakistan">
+      <div class="appt-top">
+        <div class="appt-company">Arshad Group</div>
+        <div class="appt-time">11:00 AM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Faisal Rahim</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">Lenzing showroom (TBC)</div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Requested</span><span class="tag">Apparel</span><span class="tag">Workwear</span><span class="tag">Bedding</span><span class="tag">Scrubs</span><span class="tag">Denim</span><span class="tag country">Pakistan</span></div>
+    </div>
+
+    <div class="appt-card" data-search="alkaram muzzammil kasumbi bedding apparel pakistan">
+      <div class="appt-top">
+        <div class="appt-company">AlKaram</div>
+        <div class="appt-time">4:00 PM</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Muzzammil Kasumbi</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=295+5th+Ave+Ste+1111+New+York+NY" target="_blank">295 5th Ave, Ste 1111</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-confirmed">Confirmed</span><span class="tag">Bedding</span><span class="tag">Apparel</span><span class="tag country">Pakistan</span></div>
+    </div>
+
+    <div class="appt-card" data-search="lenzing walter bridgham tencel austria dinner">
+      <div class="appt-top">
+        <div class="appt-company">Lenzing</div>
+        <div class="appt-time">6:30 PM — Dinner</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Walter Bridgham</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=530+Seventh+Avenue+Suite+808+New+York+NY" target="_blank">530 Seventh Ave, Suite 808</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-confirmed">Confirmed</span><span class="tag">Tencel</span><span class="tag country">Austria</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ THURSDAY ═══════════ -->
+  <div class="day-section visible" data-day="thursday">
+    <div class="day-header">Thursday</div>
+    <div class="day-date">March 26, 2026 — Leave at Noon</div>
+
+    <div class="appt-card unconfirmed" data-search="value source peacer zheng medical ppe rehab automotive marine sporting goods china">
+      <div class="appt-top">
+        <div class="appt-company">Value Source</div>
+        <div class="appt-time">TBD</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Peacer Zheng</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">No NYC Office</div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Requested</span><span class="tag">Medical PPE</span><span class="tag">Automotive</span><span class="tag">Marine</span><span class="tag">Sporting Goods</span><span class="tag country">China</span></div>
+      <div class="appt-notes">Send info from Kaylee and get appointment confirmed</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ PIPELINE (no day set) ═══════════ -->
+  <div class="day-section visible" data-day="pipeline">
+    <div class="day-header">Pipeline — Outreach in Progress</div>
+    <div class="day-date">Contacts reached out to — awaiting confirmation or need follow-up</div>
+
+    <div class="appt-card unconfirmed" data-search="americo group barry mcgeough apparel global">
+      <div class="appt-top"><div class="appt-company">Americo Group</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Barry McGeough</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=1411+Broadway+New+York+NY" target="_blank">1411 Broadway #2 or 31 W 34th St</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Apparel</span><span class="tag country">Global</span></div>
+      <div class="appt-notes">Tested MFA w ProTecht — likely interested in FUZE · LVM at 212.563.2700</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="bokser robin jeffers bedding hospitality bio-based sustainability brooklyn">
+      <div class="appt-top"><div class="appt-company">Bokser</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Robin Jeffers</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=26+Court+Street+Suite+1003+Brooklyn+NY+11242" target="_blank">26 Court St, Ste 1003, Brooklyn</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding — Hospitality</span><span class="tag country">Global</span></div>
+      <div class="appt-notes">Really interested in sustainability, liked Ceravida · LVM 612.806.3245</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="brooklinen cassandra past walter bedding towels bath china">
+      <div class="appt-top"><div class="appt-company">Brooklinen</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Cassandra Past (via Walter)</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=383+Bleecker+St+New+York+NY" target="_blank">383 Bleecker St</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding</span><span class="tag">Towels</span><span class="tag">Bath</span><span class="tag country">China</span></div>
+      <div class="appt-notes">Walter can connect · W: 212.951.7800 C: 212.951.8125</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="chf industries jerry verma aminah haynesworth may chan towels bedding curtains pillows china">
+      <div class="appt-top"><div class="appt-company">CHF Industries</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Jerry Verma, Aminah Haynesworth, May Chan</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=1+Park+Ave+New+York+NY" target="_blank">1 Park Ave #9</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Towels</span><span class="tag">Bedding</span><span class="tag">Curtains</span><span class="tag country">China</span></div>
+      <div class="appt-notes">LM at 212.951.8125 · NC, Canada, Haiti, Turkey</div>
+    </div>
+
+    <div class="appt-card not-attending" data-search="danican ida aronsson bedding global">
+      <div class="appt-top"><div class="appt-company">Danican</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Ida Aronsson</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">No NYC Office</div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-declined">Not Attending</span><span class="tag">Bedding</span><span class="tag country">Global</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="hsn judy block bedding curtains towels china">
+      <div class="appt-top"><div class="appt-company">HSN</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Judy Block</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">No NYC Office</div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding</span><span class="tag">Curtains</span><span class="tag">Towels</span><span class="tag country">China</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="ifg marlene miqui apparel pakistan">
+      <div class="appt-top"><div class="appt-company">IFG</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Marlene Miqui</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=463+Fashion+Ave+FL+5+New+York+NY" target="_blank">463 Fashion Ave, FL 5</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Apparel</span><span class="tag country">Pakistan</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="js royal home stephanie bedel hospitality bedding curtains china">
+      <div class="appt-top"><div class="appt-company">JS Royal Home</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Stephanie Bedel</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=230+5th+Ave+Suite+1212+New+York+NY" target="_blank">230 5th Ave, Suite 1212</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding</span><span class="tag">Curtains</span><span class="tag">Hospitality</span><span class="tag country">China</span></div>
+      <div class="appt-notes">Hospitality angle · LVM 704.542.2304</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="kohls alison wikoff all categories antimicrobial china">
+      <div class="appt-top"><div class="appt-company">Kohl's</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Alison Wikoff</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">No NYC Office</div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">All Categories</span><span class="tag country">China</span></div>
+      <div class="appt-notes">Wanted antimicrobial in fabric — other big-box using cross-category</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="lands end erika degomes workwear all categories global">
+      <div class="appt-top"><div class="appt-company">Lands End</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Erika Degomes</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">No NYC Office</div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">All Categories</span><span class="tag">Workwear</span><span class="tag country">Global</span></div>
+      <div class="appt-notes">High laundering use case</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="live comfortably keeco grayson owens nancy zimmerman bedding global andrew">
+      <div class="appt-top"><div class="appt-company">Live Comfortably (Keeco)</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Grayson Owens, Nancy Zimmerman</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=390+Fifth+Ave+Ste+500+New+York+NY" target="_blank">390 Fifth Ave, Ste 500</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding</span><span class="tag country">Global</span></div>
+      <div class="appt-notes">Andrew to follow up</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="lucky textile mills yunus saad zuberi bedding curtains workwear pakistan">
+      <div class="appt-top"><div class="appt-company">Lucky Textile Mills (Yunus Showroom)</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Saad Zuberi</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=330+Fifth+Ave+4th+floor+New+York+NY" target="_blank">330 Fifth Ave, 4th Floor</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding</span><span class="tag">Curtains</span><span class="tag">Workwear</span><span class="tag country">Pakistan</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="macys kristin werdine all categories global india">
+      <div class="appt-top"><div class="appt-company">Macy's</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Kristin Werdine</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=151+West+34th+Street+New+York+NY" target="_blank">151 West 34th Street</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">All Categories</span><span class="tag country">Global</span></div>
+      <div class="appt-notes">Sources in India — we have mills in India using us. Strong consumer environmental message.</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="mainstream international lori shpecher kitchen table bedding bath beach global silvadur">
+      <div class="appt-top"><div class="appt-company">Mainstream International</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Lori Shpecher</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">No NYC Office — Edison, NJ</div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Kitchen</span><span class="tag">Bedding</span><span class="tag">Bath</span><span class="tag">Beach</span><span class="tag country">Global</span></div>
+      <div class="appt-notes">They switched to Silvadur — we have a better story</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="nishat jennyka wasserman bedding apparel pakistan environmental">
+      <div class="appt-top"><div class="appt-company">Nishat</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Jennyka Wasserman</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=230+Fifth+Avenue+Suite+600+New+York+NY" target="_blank">230 Fifth Ave, Suite 600</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding</span><span class="tag">Apparel</span><span class="tag country">Pakistan</span></div>
+      <div class="appt-notes">PK mill is very environmentally conscious</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="pattern brands aditi sabharwal towels bedding kitchen global">
+      <div class="appt-top"><div class="appt-company">Pattern Brands</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Aditi Sabharwal</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=228+Park+Ave+S+New+York+NY" target="_blank">228 Park Ave S, PMB 73891</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Towels</span><span class="tag">Bedding</span><span class="tag">Kitchen</span><span class="tag country">Global</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="pico scott altman clothes fabric global india">
+      <div class="appt-top"><div class="appt-company">Pico</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Scott Altman</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=463+Fashion+Ave+New+York+NY" target="_blank">463 Fashion Ave</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Clothes</span><span class="tag">Fabric</span><span class="tag country">Global</span></div>
+      <div class="appt-notes">India — better silver convo, durable laundering</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="purecure kelly crenshaw bedding usa sustainability">
+      <div class="appt-top"><div class="appt-company">Purecure</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Kelly Crenshaw</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">No NYC Office — Highpoint, NC</div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding</span><span class="tag country">USA</span></div>
+      <div class="appt-notes">Likes sustainability and environmental messaging</div>
+    </div>
+
+    <div class="appt-card not-attending" data-search="pvh yvonne rado clothes china">
+      <div class="appt-top"><div class="appt-company">PVH</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Yvonne Rado</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=205+W+39th+St+New+York+NY" target="_blank">205 W 39th St, 2nd Floor</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-declined">Not Attending — Mom sick</span><span class="tag">Clothes</span><span class="tag country">China</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="ralph lauren michelle nguyen clothes global ben moore">
+      <div class="appt-top"><div class="appt-company">Ralph Lauren</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Michelle Nguyen</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=650+Madison+Avenue+New+York+NY" target="_blank">650 Madison Avenue</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Clothes</span><span class="tag country">Global</span></div>
+      <div class="appt-notes">Try Ben Moore — he's in Hubspot</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="royal heritage krista hartman bedding curtains towels nicaragua">
+      <div class="appt-top"><div class="appt-company">Royal Heritage</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Krista Hartman</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=45+W+36th+St+5th+Floor+New+York+NY" target="_blank">45 W 36th St, 5th Floor</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding</span><span class="tag">Curtains</span><span class="tag">Towels</span><span class="tag country">Nicaragua</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="sapphire mills syed shiraz abid bedding pakistan">
+      <div class="appt-top"><div class="appt-company">Sapphire Mills</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Syed Shiraz Abid</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=250+W+39th+St+New+York+NY" target="_blank">250 W 39th St</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding</span><span class="tag country">Pakistan</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="sheets giggles mike pearl bedding india">
+      <div class="appt-top"><div class="appt-company">Sheets &amp; Giggles</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Mike Pearl</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">No NYC Office</div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding</span><span class="tag country">India</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="standard fiber morgan biddix bedding blankets towels china jessica kleit pet">
+      <div class="appt-top"><div class="appt-company">Standard Fiber</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Morgan Biddix</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">No NYC Office</div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding</span><span class="tag">Blankets</span><span class="tag">Towels</span><span class="tag country">China</span></div>
+      <div class="appt-notes">Already working with FUZE — contact was Jessica Kleit · Pet use?</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="skims wendy lam clothing turkey kimberly clark">
+      <div class="appt-top"><div class="appt-company">Skims</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Wendy Lam</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=647+5th+Ave+New+York+NY" target="_blank">647 5th Ave</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Clothing</span><span class="tag country">Turkey</span></div>
+      <div class="appt-notes">Our contact from Kimberly Clark — had lunch. Has Andrew reached out?</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="town and country melissa nunziato home textiles global walter">
+      <div class="appt-top"><div class="appt-company">Town and Country</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Melissa Nunziato</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">No NYC Office</div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">All Home Textiles</span><span class="tag country">Global</span></div>
+      <div class="appt-notes">Walter can connect</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="welspun casey jothen towels bedding flooring india kathir">
+      <div class="appt-top"><div class="appt-company">Welspun</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Casey Jothen</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=10+W+33rd+St+New+York+NY" target="_blank">10 W 33rd St</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Towels</span><span class="tag">Bedding</span><span class="tag">Flooring</span><span class="tag country">India</span></div>
+      <div class="appt-notes">Asked Dr. Kathir for assist</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="westpoint home martha buriss towels bedding pillows bahrain brian delp">
+      <div class="appt-top"><div class="appt-company">WestPoint Home</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Martha Buriss</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=777+Third+Avenue+7th+Floor+New+York+NY" target="_blank">777 Third Avenue, 7th Floor</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Towels</span><span class="tag">Bedding</span><span class="tag country">Bahrain</span></div>
+      <div class="appt-notes">Brian Delp adores her — great friends. Asked Brian for assist.</div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="yunus haider bokhary bedding curtains pakistan hospitality laundering silver">
+      <div class="appt-top"><div class="appt-company">Yunus</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contacts</div><div class="appt-value">Haider Bokhary</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=330+Fifth+Ave+4th+floor+New+York+NY" target="_blank">330 Fifth Ave, 4th Floor</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Outreach</span><span class="tag">Bedding</span><span class="tag">Curtains</span><span class="tag">Hospitality</span><span class="tag country">Pakistan</span></div>
+      <div class="appt-notes">Hospitality / high laundering — he likes antimicrobial tech</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ DR. KATHIR ═══════════ -->
+  <div class="day-section visible" data-day="kathir">
+    <div class="day-header">Dr. Kathir's India Attendees</div>
+    <div class="day-date">Contacts sourced by Dr. Kathir — schedule TBD during market week</div>
+
+    <div class="appt-card unconfirmed" data-search="kpp group balasubramnian shenbagamurugan bedding india cmo">
+      <div class="appt-top"><div class="appt-company">KPP Group of Companies</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contact</div><div class="appt-value">Mr. Balasubramnian "Shenbagamurugan" — CMO</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=230+Fifth+Avenue+Suite+1015+New+York+NY" target="_blank">230 Fifth Ave, Ste 1015</a></div></div>
+        <div class="appt-field"><div class="appt-label">Email</div><div class="appt-value"><a href="mailto:flsm@kkpindia.com">flsm@kkpindia.com</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Via Dr. Kathir</span><span class="tag">Bedding</span><span class="tag country">India</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="sara textiles mudit khandelwal towels robes india vp marketing">
+      <div class="appt-top"><div class="appt-company">Sara Textiles</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contact</div><div class="appt-value">Mr. Mudit Khandelwal — VP Marketing</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">Meeting room TBD</div></div>
+        <div class="appt-field"><div class="appt-label">Email</div><div class="appt-value"><a href="mailto:vpmarketing@saratextiles.com">vpmarketing@saratextiles.com</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Via Dr. Kathir</span><span class="tag">Towels</span><span class="tag">Robes</span><span class="tag country">India</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="tc terry parveen goyal towels india 25th only">
+      <div class="appt-top">
+        <div class="appt-company">TC Terry</div>
+        <div class="appt-time">Wed 3/25 Only</div>
+      </div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contact</div><div class="appt-value">Mr. Parveen Goyal — Pres. Marketing</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=41+Madison+Ave+New+York+NY" target="_blank">41 Madison Ave</a></div></div>
+        <div class="appt-field"><div class="appt-label">Email</div><div class="appt-value"><a href="mailto:parveen@tctl.in">parveen@tctl.in</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Via Dr. Kathir</span><span class="tag">Towels</span><span class="tag country">India</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="trident limited subhasree datta towels bedding india design head">
+      <div class="appt-top"><div class="appt-company">Trident Limited</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contact</div><div class="appt-value">Subhasree Datta — Design Head, Bedding</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value address"><a href="https://maps.google.com/?q=320+5th+Avenue+8th+Floor+New+York+NY" target="_blank">320 5th Ave, 8th Floor</a></div></div>
+        <div class="appt-field"><div class="appt-label">Email</div><div class="appt-value"><a href="mailto:subhasreedatta@tridentindia.com">subhasreedatta@tridentindia.com</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Via Dr. Kathir</span><span class="tag">Towels</span><span class="tag">Bedding</span><span class="tag country">India</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="himatsingka rashpal singh towels bedding india">
+      <div class="appt-top"><div class="appt-company">Himatsingka</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contact</div><div class="appt-value">Mr. Rashpal Singh</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">Himatsingka Showroom (TBC)</div></div>
+        <div class="appt-field"><div class="appt-label">Email</div><div class="appt-value"><a href="mailto:rashpal.tak@himatsingka.com">rashpal.tak@himatsingka.com</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Via Dr. Kathir</span><span class="tag">Towels</span><span class="tag">Bedding</span><span class="tag country">India</span></div>
+    </div>
+
+    <div class="appt-card unconfirmed" data-search="premier fine linen yuvaraj rajendran bedding india">
+      <div class="appt-top"><div class="appt-company">Premier Fine Linen</div></div>
+      <div class="appt-details">
+        <div class="appt-field"><div class="appt-label">Contact</div><div class="appt-value">Mr. Yuvaraj / Mr. Rajendran</div></div>
+        <div class="appt-field"><div class="appt-label">Address</div><div class="appt-value">Meeting location TBD</div></div>
+        <div class="appt-field"><div class="appt-label">Email</div><div class="appt-value"><a href="mailto:yuvarajj@premiermills.com">yuvarajj@premiermills.com</a></div></div>
+      </div>
+      <div class="appt-tags"><span class="tag status-requested">Via Dr. Kathir</span><span class="tag">Bedding</span><span class="tag country">India</span></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Tab switching
+document.querySelectorAll('.day-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const day = tab.dataset.day;
+    document.querySelectorAll('.day-section').forEach(s => {
+      s.classList.toggle('visible', day === 'all' || s.dataset.day === day);
+    });
+    filterCards();
+  });
+});
+
+// Search
+function filterCards() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  let found = 0;
+  document.querySelectorAll('.day-section.visible').forEach(section => {
+    let sectionHasMatch = false;
+    section.querySelectorAll('.appt-card').forEach(card => {
+      const text = (card.dataset.search + ' ' + card.textContent).toLowerCase();
+      const match = !q || text.includes(q);
+      card.style.display = match ? '' : 'none';
+      if (match) { found++; sectionHasMatch = true; }
+    });
+    // Show/hide section headers
+    const header = section.querySelector('.day-header');
+    const date = section.querySelector('.day-date');
+    if (header) header.style.display = sectionHasMatch ? '' : 'none';
+    if (date) date.style.display = sectionHasMatch ? '' : 'none';
+  });
+  document.getElementById('noResults').style.display = (q && found === 0) ? '' : 'none';
+}
+
+// Stats
+const allCards = document.querySelectorAll('.appt-card');
+document.getElementById('totalAppts').textContent = allCards.length;
+document.getElementById('confirmedCount').textContent = document.querySelectorAll('.tag.status-confirmed').length;
+</script>
+</body>
+</html>
