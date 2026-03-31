@@ -37,7 +37,7 @@ Andrew Peterson, CEO/Founder of FUZE Biotech. Building antimicrobial textile tre
 | Field | Value |
 |-------|-------|
 | **Company** | FUZE Biotech |
-| **Address** | 4790 Irvine Blvd, Suite 105-504, Irvine CA 92620 USA |
+| **Address** | 1895 West 2100 South, Salt Lake City, Utah 84119 USA |
 | **Email** | andrew@fuzebiotech.com / andrew@801inc.com |
 | **CAS Number** | 7440-22-4 (for compliance docs only) |
 

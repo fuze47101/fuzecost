@@ -178,12 +178,15 @@ const UPSTREAM = {
 };
 
 // Wastewater remediation costs per m3
+// cost = Global avg (SE Asia/South Asia textile hubs)
+// costUS = US/EU (stricter EPA/REACH discharge limits; silver: 5 µg/L, copper: 13 µg/L)
+// Sources: Aurubis EFD 2024, EPA effluent guidelines, WHO/UNIDO textile treatment benchmarks
 const REMEDIATION = {
-  silver_chloride: { cost:3.85, chemKg:5.3, energy:2.5, method:'Precipitation + coagulation + microfiltration', chems:['Caustic soda (NaOH)','Aluminum polychloride','Ferric chloride','Lime Ca(OH)\u2082','Hydrochloric acid'] },
-  silver_ion: { cost:3.85, chemKg:5.3, energy:2.5, method:'Precipitation + coagulation + microfiltration', chems:['Caustic soda (NaOH)','Aluminum polychloride','Ferric chloride','Lime Ca(OH)\u2082','HCl'] },
-  silver_nano: { cost:3.85, chemKg:5.3, energy:2.5, method:'Silver-specific precipitation + filtration', chems:['Caustic soda (NaOH)','Flocculants','Lime','Activated carbon'] },
-  qac_silane: { cost:5.20, chemKg:3.65, energy:4.0, method:'MBBR biofilm reactor + sorption + degradation', chems:['Caustic soda (NaOH)','Polymer flocculants','Activated carbon','MBBR biosorbents'] },
-  zinc_pyrithione: { cost:7.45, chemKg:4.7, energy:6.0, method:'SRB bioreactor + sulphide precipitation + electrocoagulation', chems:['Caustic soda (NaOH)','Sodium sulfide','Sodium trithiocarbonate','SRB culture media'] },
+  silver_chloride: { cost:3.85, costUS:7.20, chemKg:5.3, energy:2.5, method:'Silver-specific precipitation + coagulation + microfiltration (Ag⁺ removal)', chems:['Caustic soda (NaOH)','Aluminum polychloride','Ferric chloride','Lime Ca(OH)\u2082','Hydrochloric acid'] },
+  silver_ion: { cost:3.85, costUS:7.20, chemKg:5.3, energy:2.5, method:'Silver-specific precipitation + coagulation + microfiltration (Ag⁺ removal)', chems:['Caustic soda (NaOH)','Aluminum polychloride','Ferric chloride','Lime Ca(OH)\u2082','HCl'] },
+  silver_nano: { cost:3.85, costUS:7.20, chemKg:5.3, energy:2.5, method:'Silver-specific precipitation + filtration', chems:['Caustic soda (NaOH)','Flocculants','Lime','Activated carbon'] },
+  qac_silane: { cost:5.20, costUS:9.40, chemKg:3.65, energy:4.0, method:'MBBR biofilm reactor + sorption + degradation', chems:['Caustic soda (NaOH)','Polymer flocculants','Activated carbon','MBBR biosorbents'] },
+  zinc_pyrithione: { cost:7.45, costUS:13.80, chemKg:4.7, energy:6.0, method:'SRB bioreactor + sulphide precipitation + electrocoagulation', chems:['Caustic soda (NaOH)','Sodium sulfide','Sodium trithiocarbonate','SRB culture media'] },
 };
 
 const FUZE_COST_PER_METER = 0.27; // F1 at $36/L
