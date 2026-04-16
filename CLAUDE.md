@@ -46,7 +46,7 @@ Andrew Peterson, CEO/Founder of FUZE Biotech. Building antimicrobial textile tre
 |---------|--------|
 | **NY Hospitality Market** | Next week — QR codes on calculators → fuzefaq.com |
 | **fuzefaq.com launch** | LIVE — needs terminology fixes, logo sizing |
-| **FUZE Atlas production fixes** | Prisma errors on multiple API endpoints |
+| **FUZE Atlas production fixes** | Multiple features built, deployment pending push |
 | **Customer compliance forms** | LS&Co CIL, Arvind CIL, Arvind ARSL — generated, under review |
 
 ## Tech Stack
